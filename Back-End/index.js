@@ -70,7 +70,7 @@ app.post('/api/data/send', (req, res) => {
 // ===== ROUTE: GET ambil semua data =====
 // GET /api/data/all
 app.get('/api/data/all', (req, res) => {
-  const sql = `SELECT id, air_temperature AS temperature, humidity, moisture, light, created_at FROM DATA_SENSOR ORDER BY created_at DESC`;
+  const sql = `SELECT id, temperature AS temperature, humidity, moisture, light, created_at FROM DATA_SENSOR ORDER BY created_at DESC`;
   db.query(sql, (err, results) => {
     if (err) {
       console.error(err);

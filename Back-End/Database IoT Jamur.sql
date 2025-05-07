@@ -33,10 +33,10 @@ CREATE TABLE `DATA_SENSOR` (
   `id` bigserial PRIMARY KEY,
   `device_id` integer NOT NULL,
   `created_at` timestamp NOT NULL,
-  `temperature_celsius` float COMMENT 'Suhu udara dalam °C',
-  `humidity_percent` float COMMENT 'Kelembapan udara dalam %',
-  `light_lux` float COMMENT 'Intensitas cahaya dalam lux',
-  `soil_moisture_percent` float COMMENT 'Kelembapan baglog dalam %'
+  `temperature` float COMMENT 'Suhu udara dalam °C',
+  `humidity` float COMMENT 'Kelembapan udara dalam %',
+  `light` float COMMENT 'Intensitas cahaya dalam lux',
+  `moisture` float COMMENT 'Kelembapan baglog dalam %'
 );
 
 CREATE TABLE `HUMIDIFIER` (
