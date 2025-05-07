@@ -53,13 +53,17 @@ app.post('/api/data/send', (req, res) => {
     return res.status(400).send('Semua parameter (temperature, humidity, moisture, light) wajib diisi.');
   }
 
-  const sql = `INSERT INTO DATA_SENSOR (air_temperature, humidity, moisture, light) VALUES (?, ?, ?, ?)`;
+  const sql = `INSERT INTO DATA_SENSOR (temperature, humidity, moisture, light) VALUES (?, ?, ?, ?)`;
   db.query(sql, [temperature, humidity, moisture, light], (err) => {
     if (err) {
       console.error(err);
       return res.status(500).send('Gagal menyimpan data.');
     }
-    res.send(`Data diterima via POST: temperature=${temperature}, humidity=${humidity}, moisture=${moisture}, light=${light}`);
+    res.send(`Data diterima via POST: 
+      temperature=${temperature}, 
+      humidity=${humidity}, 
+      moisture=${moisture}, 
+      light=${light}`);
   });
 });
 
@@ -94,7 +98,7 @@ app.get('/api/data/:id', (req, res) => {
 });
 
 // ===== Start Server =====
-app.listen(port, () => {
+app.listen(port, function () {
   console.log(`Server berjalan di http://localhost:${port}`);
   console.log(`- Kirim data via GET  : /api/data/send?temperature=..&humidity=..&moisture=..&light=..`);
   console.log(`- Kirim data via POST : /api/data/send (body JSON)`);
