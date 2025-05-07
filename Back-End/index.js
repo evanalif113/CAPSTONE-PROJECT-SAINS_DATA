@@ -15,39 +15,23 @@ const db = mysql.createPool({
   host: 'localhost',
   user: 'root',
   password: '',
-  database: 'weather_db'
+  database: 'db_jamur'
 });
 
 // ===== ROUTE: GET kirim via URL-encoded =====
-// contoh: GET /api/data/send?temperature=24.5&humidity=60&pressure=1013&dew=18.2&rainfall=0
+// contoh: GET /api/data/send?temperature=24.5&humidity=60&moisture=30&light=500
 app.get('/api/data/send', (req, res) => {
-  const { 
-    temperature, 
-    humidity, 
-    pressure, 
-    dew, 
-    rainfall 
+  const { temperature, humidity, moisture, light 
   } = req.query;
 
-  if (!temperature || 
-      !humidity || 
-      !pressure || 
-      !dew || 
-      !rainfall
-    ) {
-    return res.status(400).send('Semua parameter (temperature, humidity, pressure, dew, rainfall) wajib diisi.');
+  if (!temperature || !humidity || !moisture || !light) {
+    return res.status(400).send('Semua parameter (temperature, humidity, moisture, light) wajib diisi. goblok sia');
   }
 
   const sql = 
-  `INSERT INTO 
-    weather_data (
-    temperature, 
-    humidity, 
-    pressure, 
-    dew, 
-    rainfall
-  ) VALUES (?, ?, ?, ?, ?)`;
-  db.query(sql, [temperature, humidity, pressure, dew, rainfall], (err) => {
+  `INSERT INTO data_sensor (temperature, humidity, moisture, light) VALUES (?, ?, ?, ?)`;
+
+  db.query(sql, [temperature, humidity, moisture, light], (err) => {
     if (err) {
       console.error(err);
       return res.status(500).send('Gagal menyimpan data.');
@@ -55,35 +39,34 @@ app.get('/api/data/send', (req, res) => {
     res.send(`Data diterima via GET: 
       temperature=${temperature}, 
       humidity=${humidity}, 
-      pressure=${pressure}, 
-      dew=${dew}, 
-      rainfall=${rainfall}`);
+      moisture=${moisture}, 
+      light=${light}`);
   });
 });
 
-// ===== ROUTE: POST kirim via URL-encoded =====
-// contoh: POST /api/data/send dengan body: { "temperature": 24.5, "humidity": 60, "pressure": 1013, "dew": 18.2, "rainfall": 0 }
+// ===== ROUTE: POST kirim via JSON =====
+// contoh: POST /api/data/send dengan body: { "temperature": 24.5, "humidity": 60, "moisture": 30, "light": 500 }
 app.post('/api/data/send', (req, res) => {
-  const { temperature, humidity, pressure, dew, rainfall } = req.body;
+  const { temperature, humidity, moisture, light } = req.body;
 
-  if (!temperature || !humidity || !pressure || !dew || !rainfall) {
-    return res.status(400).send('Semua parameter (temperature, humidity, pressure, dew, rainfall) wajib diisi.');
+  if (!temperature || !humidity || !moisture || !light) {
+    return res.status(400).send('Semua parameter (temperature, humidity, moisture, light) wajib diisi.');
   }
 
-  const sql = `INSERT INTO weather_data (temperature, humidity, pressure, dew, rainfall) VALUES (?, ?, ?, ?, ?)`;
-  db.query(sql, [temperature, humidity, pressure, dew, rainfall], (err) => {
+  const sql = `INSERT INTO DATA_SENSOR (air_temperature, humidity, moisture, light) VALUES (?, ?, ?, ?)`;
+  db.query(sql, [temperature, humidity, moisture, light], (err) => {
     if (err) {
       console.error(err);
       return res.status(500).send('Gagal menyimpan data.');
     }
-    res.send(`Data diterima via POST: temperature=${temperature}, humidity=${humidity}, pressure=${pressure}, dew=${dew}, rainfall=${rainfall}`);
+    res.send(`Data diterima via POST: temperature=${temperature}, humidity=${humidity}, moisture=${moisture}, light=${light}`);
   });
 });
 
 // ===== ROUTE: GET ambil semua data =====
 // GET /api/data/all
 app.get('/api/data/all', (req, res) => {
-  const sql = `SELECT id, temperature, humidity, pressure, dew, rainfall, created_at FROM weather_data ORDER BY created_at DESC`;
+  const sql = `SELECT id, air_temperature AS temperature, humidity, moisture, light, created_at FROM DATA_SENSOR ORDER BY created_at DESC`;
   db.query(sql, (err, results) => {
     if (err) {
       console.error(err);
@@ -97,7 +80,7 @@ app.get('/api/data/all', (req, res) => {
 // GET /api/data/:id
 app.get('/api/data/:id', (req, res) => {
   const id = req.params.id;
-  const sql = `SELECT id, temperature, humidity, pressure, dew, rainfall, created_at FROM weather_data WHERE id = ?`;
+  const sql = `SELECT id, air_temperature AS temperature, humidity, moisture, light, created_at FROM DATA_SENSOR WHERE id = ?`;
   db.query(sql, [id], (err, results) => {
     if (err) {
       console.error(err);
@@ -113,7 +96,7 @@ app.get('/api/data/:id', (req, res) => {
 // ===== Start Server =====
 app.listen(port, () => {
   console.log(`Server berjalan di http://localhost:${port}`);
-  console.log(`- Kirim data via GET  : /api/data/send?temperature=..&humidity=..&pressure=..&dew=..&rainfall=..`);
+  console.log(`- Kirim data via GET  : /api/data/send?temperature=..&humidity=..&moisture=..&light=..`);
   console.log(`- Kirim data via POST : /api/data/send (body JSON)`);
   console.log(`- Ambil semua data     : /api/data/all`);
   console.log(`- Ambil data by ID     : /api/data/:id`);
