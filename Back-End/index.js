@@ -15,21 +15,22 @@ const db = mysql.createPool({
   host: 'localhost',
   user: 'root',
   password: '',
-  database: 'db_jamur'
+  database: 'DB_JAMUR'
 });
 
 // ===== ROUTE: GET kirim via URL-encoded =====
 // contoh: GET /api/data/send?temperature=24.5&humidity=60&moisture=30&light=500
 app.get('/api/data/send', (req, res) => {
-  const { temperature, humidity, moisture, light 
-  } = req.query;
+  const { temperature, humidity, moisture, light } = req.query;
 
   if (!temperature || !humidity || !moisture || !light) {
-    return res.status(400).send('Semua parameter (temperature, humidity, moisture, light) wajib diisi. goblok sia');
+    return res.status(400).send('Semua parameter (temperature, humidity, moisture, light) wajib diisi.');
   }
 
-  const sql = 
-  `INSERT INTO data_sensor (temperature, humidity, moisture, light) VALUES (?, ?, ?, ?)`;
+  const sql = `
+    INSERT INTO DATA_SENSOR (temperature, humidity, moisture, light) 
+    VALUES (?, ?, ?, ?)
+  `;
 
   db.query(sql, [temperature, humidity, moisture, light], (err) => {
     if (err) {
@@ -53,7 +54,11 @@ app.post('/api/data/send', (req, res) => {
     return res.status(400).send('Semua parameter (temperature, humidity, moisture, light) wajib diisi.');
   }
 
-  const sql = `INSERT INTO DATA_SENSOR (temperature, humidity, moisture, light) VALUES (?, ?, ?, ?)`;
+  const sql = `
+    INSERT INTO DATA_SENSOR (temperature, humidity, moisture, light) 
+    VALUES (?, ?, ?, ?)
+  `;
+
   db.query(sql, [temperature, humidity, moisture, light], (err) => {
     if (err) {
       console.error(err);
@@ -70,7 +75,12 @@ app.post('/api/data/send', (req, res) => {
 // ===== ROUTE: GET ambil semua data =====
 // GET /api/data/all
 app.get('/api/data/all', (req, res) => {
-  const sql = `SELECT id, temperature AS temperature, humidity, moisture, light, created_at FROM DATA_SENSOR ORDER BY created_at DESC`;
+  const sql = `
+    SELECT id, temperature, humidity, moisture, light, created_at 
+    FROM DATA_SENSOR 
+    ORDER BY created_at DESC
+  `;
+
   db.query(sql, (err, results) => {
     if (err) {
       console.error(err);
@@ -84,7 +94,12 @@ app.get('/api/data/all', (req, res) => {
 // GET /api/data/:id
 app.get('/api/data/:id', (req, res) => {
   const id = req.params.id;
-  const sql = `SELECT id, air_temperature AS temperature, humidity, moisture, light, created_at FROM DATA_SENSOR WHERE id = ?`;
+  const sql = `
+    SELECT id, temperature, humidity, moisture, light, created_at 
+    FROM DATA_SENSOR 
+    WHERE id = ?
+  `;
+
   db.query(sql, [id], (err, results) => {
     if (err) {
       console.error(err);
