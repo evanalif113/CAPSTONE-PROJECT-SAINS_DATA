@@ -1,78 +1,81 @@
-CREATE TABLE `PENGGUNA` (
-  `id` integer PRIMARY KEY,
-  `email` varchar(255) UNIQUE,
-  `password` varchar(255),
-  `role` varchar(255) COMMENT 'admin, petani, teknisi',
-  `created_at` timestamp,
-  `updated_at` timestamp
+CREATE TABLE "pengguna" (
+  "id" integer PRIMARY KEY,
+  "username" varchar UNIQUE,
+  "password" varchar,
+  "role" varchar,
+  "created_at" timestamp,
+  "updated_at" timestamp
 );
 
-CREATE TABLE `BAGLOG` (
-  `id` integer PRIMARY KEY,
-  `pengguna_id` integer NOT NULL,
-  `name` varchar(255),
-  `location` varchar(255),
-  `description` text,
-  `created_at` timestamp,
-  `updated_at` timestamp
+CREATE TABLE "baglog" (
+  "id" integer PRIMARY KEY,
+  "pengguna_id" integer NOT NULL,
+  "name" varchar,
+  "location" varchar,
+  "description" text,
+  "created_at" timestamp,
+  "updated_at" timestamp
 );
 
-CREATE TABLE `DEVICE` (
-  `id` integer PRIMARY KEY,
-  `baglog_id` integer NOT NULL,
-  `name` varchar(255),
-  `serial_number` varchar(255) UNIQUE,
-  `status` device_status,
-  `installed_at` timestamp,
-  `last_active` timestamp,
-  `created_at` timestamp,
-  `updated_at` timestamp
+CREATE TABLE "sensor" (
+  "id" integer PRIMARY KEY,
+  "baglog_id" integer NOT NULL,
+  "name" varchar,
+  "serial_number" varchar UNIQUE,
+  "status" device_status,
+  "last_active" timestamp,
+  "created_at" timestamp,
+  "updated_at" timestamp
 );
 
-CREATE TABLE `DATA_SENSOR` (
-  `id` bigserial PRIMARY KEY,
-  `device_id` integer NOT NULL,
-  `created_at` timestamp NOT NULL,
-  `temperature` float COMMENT 'Suhu udara dalam °C',
-  `humidity` float COMMENT 'Kelembapan udara dalam %',
-  `light` float COMMENT 'Intensitas cahaya dalam lux',
-  `moisture` float COMMENT 'Kelembapan baglog dalam %'
+CREATE TABLE "data_sensor" (
+  "id" bigserial PRIMARY KEY,
+  "sensor_id" integer NOT NULL,
+  "created_at" timestamp NOT NULL,
+  "temperature" float,
+  "humidity" float,
+  "light" float,
+  "moisture" float
 );
 
-CREATE TABLE `HUMIDIFIER` (
-  `id` integer PRIMARY KEY,
-  `device_id` integer NOT NULL,
-  `pengguna_id` integer NOT NULL,
-  `started_at` timestamp,
-  `ended_at` timestamp,
-  `volume_liters` float
+CREATE TABLE "aktuator" (
+  "id" integer PRIMARY KEY,
+  "device_id" integer NOT NULL,
+  "pengguna_id" integer NOT NULL,
+  "baglog_id" integer NOT NULL,
+  "started_at" timestamp,
+  "ended_at" timestamp,
+  "volume_liters" float
 );
 
-CREATE TABLE `AKTUATOR` (
-  `id` integer PRIMARY KEY,
-  `actuator_id` intger NOT NULL
-);
+COMMENT ON TABLE "pengguna" IS 'Tabel Pengguna';
 
-ALTER TABLE `PENGGUNA` COMMENT = 'Tabel Pengguna';
+COMMENT ON COLUMN "pengguna"."role" IS 'admin, petani, teknisi';
 
-ALTER TABLE `BAGLOG` COMMENT = 'Tabel Baglog';
+COMMENT ON TABLE "baglog" IS 'Tabel Baglog';
 
-ALTER TABLE `DEVICE` COMMENT = 'Tabel perangkat';
+COMMENT ON TABLE "sensor" IS 'Tabel perangkat';
 
-ALTER TABLE `DATA_SENSOR` COMMENT = 'Data pembacaan sensor secara berkala';
+COMMENT ON TABLE "data_sensor" IS 'Data pembacaan sensor secara berkala';
 
-ALTER TABLE `HUMIDIFIER` COMMENT = 'Catatan aktivitas humidifier otomatis';
+COMMENT ON COLUMN "data_sensor"."temperature" IS 'Suhu udara dalam °C';
 
-ALTER TABLE `BAGLOG` ADD FOREIGN KEY (`pengguna_id`) REFERENCES `PENGGUNA` (`id`);
+COMMENT ON COLUMN "data_sensor"."humidity" IS 'Kelembapan udara dalam %';
 
-ALTER TABLE `DEVICE` ADD FOREIGN KEY (`baglog_id`) REFERENCES `BAGLOG` (`id`);
+COMMENT ON COLUMN "data_sensor"."light" IS 'Intensitas cahaya dalam lux';
 
-ALTER TABLE `DATA_SENSOR` ADD FOREIGN KEY (`device_id`) REFERENCES `DEVICE` (`id`);
+COMMENT ON COLUMN "data_sensor"."moisture" IS 'Kelembapan baglog dalam %';
 
-ALTER TABLE `HUMIDIFIER` ADD FOREIGN KEY (`device_id`) REFERENCES `DEVICE` (`id`);
+COMMENT ON TABLE "aktuator" IS 'Catatan aktivitas humidifier otomatis';
 
-ALTER TABLE `HUMIDIFIER` ADD FOREIGN KEY (`pengguna_id`) REFERENCES `PENGGUNA` (`id`);
+ALTER TABLE "baglog" ADD FOREIGN KEY ("pengguna_id") REFERENCES "pengguna" ("id");
 
-ALTER TABLE `AKTUATOR` ADD FOREIGN KEY (`actuator_id`) REFERENCES `DEVICE` (`id`);
+ALTER TABLE "sensor" ADD FOREIGN KEY ("baglog_id") REFERENCES "baglog" ("id");
 
-ALTER TABLE `DEVICE` ADD FOREIGN KEY (`serial_number`) REFERENCES `DEVICE` (`baglog_id`);
+ALTER TABLE "data_sensor" ADD FOREIGN KEY ("sensor_id") REFERENCES "sensor" ("id");
+
+ALTER TABLE "aktuator" ADD FOREIGN KEY ("device_id") REFERENCES "sensor" ("id");
+
+ALTER TABLE "aktuator" ADD FOREIGN KEY ("pengguna_id") REFERENCES "pengguna" ("id");
+
+ALTER TABLE "aktuator" ADD FOREIGN KEY ("baglog_id") REFERENCES "baglog" ("id");
