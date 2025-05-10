@@ -22,8 +22,8 @@
 #endif
 
 // Replace with your network credentials
-const char* ssid     = "Melon Kebakalan";
-const char* password = "Melon1234#";
+const char* ssid     = "SSID";
+const char* password = "password";
 
 #ifdef USE_NTP
 WiFiUDP ntpUDP;
@@ -31,7 +31,7 @@ NTPClient timeClient(ntpUDP, "pool.ntp.org", 7 * 3600, 60000); // UTC+7 Jakarta
 #endif
 
 // Server details
-const char* serverName = "http://192.168.100.92/sensor/store";
+const char* serverName = "http://192.168.100.92/sensor/send";
 WebServer server(80);
 
 // API Key and Sensor details
