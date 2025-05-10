@@ -35,7 +35,6 @@ const char* serverName = "http://192.168.100.92/sensor/store";
 WebServer server(80);
 
 // API Key and Sensor details
-String apiKeyValue = "coba123";
 String sensorName = "Sensor_2";
 String sensorLocation = "Greenhouse";
 String sensorID  = "2";
@@ -125,7 +124,7 @@ void setup() {
 #endif
 
   server.on("/", []() {
-    server.send(200, "text/plain", "SENSOR_OTA_UPDATER VERSION 18-09-2-24");
+    server.send(200, "text/plain", "SENSOR_OTA_UPDATER VERSION 1.0.0");
   });
 
   ElegantOTA.begin(&server);    // Start ElegantOTA
@@ -173,12 +172,10 @@ void loop() {
       
       // Prepare your HTTP POST request data
       String httpRequestData = 
-      "apiKey=" + apiKeyValue + 
       "&nama_perangkat=" + sensorName + 
       "&identitas_perangkat=" + sensorLocation + 
       "&suhu=" + String(temperature) + 
-      "&kelembaban=" + String(humidity) + 
-      "&hst=" + "1";
+      "&kelembaban=" + String(humidity);
       Serial.print("httpRequestData: ");
       Serial.println(httpRequestData);
       
