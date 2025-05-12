@@ -35,8 +35,7 @@ const char* serverName = "http://192.168.100.92/sensor/send";
 WebServer server(80);
 
 // API Key and Sensor details
-String sensorName = "Sensor_2";
-String sensorLocation = "Greenhouse";
+String sensorName = "Baglog_Sensing_1";
 String sensorID  = "2";
 
 #ifdef USE_RTC
