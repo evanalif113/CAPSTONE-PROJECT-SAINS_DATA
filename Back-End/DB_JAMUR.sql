@@ -1,90 +1,104 @@
--- SQL script to create the DB_JAMUR database
-
--- Create the database
+-- 1. Buat database
 CREATE DATABASE IF NOT EXISTS DB_JAMUR;
-
--- Use the created database
 USE DB_JAMUR;
 
--- Create the PENGGUNA table
+-- 2. Tabel Pengguna
 CREATE TABLE IF NOT EXISTS PENGGUNA (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(50) UNIQUE,
-    password VARCHAR(255),
-    role VARCHAR(50),
+    username VARCHAR(50) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    role ENUM('admin', 'petani', 'teknisi') DEFAULT 'petani',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
--- Create the BAGLOG table
-CREATE TABLE IF NOT EXISTS BAGLOG (
+-- 3. Tabel Kumbung (ruang budidaya jamur)
+CREATE TABLE IF NOT EXISTS KUMBUNG (
     id INT AUTO_INCREMENT PRIMARY KEY,
     pengguna_id INT NOT NULL,
-    name VARCHAR(100),
-    location VARCHAR(255),
-    description TEXT,
+    nama VARCHAR(100) NOT NULL,
+    lokasi VARCHAR(255),
+    deskripsi TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (pengguna_id) REFERENCES PENGGUNA(id) ON DELETE CASCADE
 );
 
--- Create the SENSOR table
+-- 4. Tabel Sensor
 CREATE TABLE IF NOT EXISTS SENSOR (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    baglog_id INT NOT NULL,
-    name VARCHAR(100),
-    serial_number VARCHAR(100) UNIQUE,
-    status ENUM('active', 'inactive', 'error'),
-    last_active TIMESTAMP,
+    kumbung_id INT NOT NULL,
+    nama VARCHAR(100) NOT NULL,
+    jenis ENUM('suhu', 'kelembapan', 'cahaya', 'moisture', 'lainnya'),
+    nomor_seri VARCHAR(100) UNIQUE NOT NULL,
+    status ENUM('active', 'inactive', 'error') DEFAULT 'active',
+    tanggal_registrasi DATE DEFAULT CURRENT_DATE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (kumbung_id) REFERENCES KUMBUNG(id) ON DELETE CASCADE
 );
 
--- Create the DATA_SENSOR table
+-- 5. Tabel Data Sensor
 CREATE TABLE IF NOT EXISTS DATA_SENSOR (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     sensor_id INT NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    temperature FLOAT COMMENT 'Suhu udara dalam °C',
-    humidity FLOAT COMMENT 'Kelembapan udara dalam %',
-    light FLOAT COMMENT 'Intensitas cahaya dalam lux',
-    moisture FLOAT COMMENT 'Kelembapan baglog dalam %'
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    temperature FLOAT,
+    humidity FLOAT,
+    light FLOAT,
+    moisture FLOAT,
+    FOREIGN KEY (sensor_id) REFERENCES SENSOR(id) ON DELETE CASCADE
 );
 
--- Create the AKTUATOR table
+-- 6. Tabel Aktuator (kendali perangkat via relay)
 CREATE TABLE IF NOT EXISTS AKTUATOR (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    device_id INT NOT NULL,
-    pengguna_id INT NOT NULL,
-    baglog_id INT NOT NULL,
-    started_at TIMESTAMP,
-    ended_at TIMESTAMP,
-    volume_liters FLOAT
+    kumbung_id INT NOT NULL,
+    nama VARCHAR(100) NOT NULL,
+    jenis ENUM('kipas', 'humidifier', 'lampu', 'lainnya') NOT NULL,
+    nomor_relay INT NOT NULL,
+    status ENUM('aktif', 'non-aktif') DEFAULT 'aktif',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (kumbung_id) REFERENCES KUMBUNG(id) ON DELETE CASCADE
 );
 
--- Add comments to tables and columns
-COMMENT ON TABLE PENGGUNA IS 'Tabel Pengguna';
-COMMENT ON COLUMN PENGGUNA.role IS 'admin, petani, teknisi';
+-- 7. Tabel Log Aktuator (aktivitas perangkat)
+CREATE TABLE IF NOT EXISTS LOG_AKTUATOR (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    aktuator_id INT NOT NULL,
+    aksi ENUM('ON', 'OFF') NOT NULL,
+    keterangan TEXT,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (aktuator_id) REFERENCES AKTUATOR(id) ON DELETE CASCADE
+);
 
-COMMENT ON TABLE BAGLOG IS 'Tabel Baglog';
+-- 8. Tabel Kalibrasi Sensor
+CREATE TABLE IF NOT EXISTS KALIBRASI_SENSOR (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    sensor_id INT NOT NULL,
+    calibration_date DATE NOT NULL,
+    calibration_value FLOAT,
+    notes TEXT,
+    FOREIGN KEY (sensor_id) REFERENCES SENSOR(id) ON DELETE CASCADE
+);
 
-COMMENT ON TABLE SENSOR IS 'Tabel perangkat';
+-- 9. Tabel Pengaturan Threshold
+CREATE TABLE IF NOT EXISTS PENGATURAN (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    kumbung_id INT NOT NULL,
+    parameter VARCHAR(100) NOT NULL,  -- contoh: suhu_min, suhu_max
+    value FLOAT NOT NULL,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (kumbung_id) REFERENCES KUMBUNG(id) ON DELETE CASCADE
+);
 
-COMMENT ON TABLE DATA_SENSOR IS 'Data pembacaan sensor secara berkala';
-COMMENT ON COLUMN DATA_SENSOR.temperature IS 'Suhu udara dalam °C';
-COMMENT ON COLUMN DATA_SENSOR.humidity IS 'Kelembapan udara dalam %';
-COMMENT ON COLUMN DATA_SENSOR.light IS 'Intensitas cahaya dalam lux';
-COMMENT ON COLUMN DATA_SENSOR.moisture IS 'Kelembapan baglog dalam %';
-
-COMMENT ON TABLE AKTUATOR IS 'Catatan aktivitas humidifier otomatis';
-
--- Add foreign keys
-ALTER TABLE BAGLOG ADD FOREIGN KEY (pengguna_id) REFERENCES PENGGUNA (id);
-
-ALTER TABLE SENSOR ADD FOREIGN KEY (baglog_id) REFERENCES BAGLOG (id);
-
-ALTER TABLE DATA_SENSOR ADD FOREIGN KEY (sensor_id) REFERENCES SENSOR (id);
-
-ALTER TABLE AKTUATOR ADD FOREIGN KEY (device_id) REFERENCES SENSOR (id);
-ALTER TABLE AKTUATOR ADD FOREIGN KEY (pengguna_id) REFERENCES PENGGUNA (id);
-ALTER TABLE AKTUATOR ADD FOREIGN KEY (baglog_id) REFERENCES BAGLOG (id);
-
+-- 10. Tabel Notifikasi
+CREATE TABLE IF NOT EXISTS NOTIFIKASI (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    pengguna_id INT NOT NULL,
+    message TEXT NOT NULL,
+    status ENUM('terbaca', 'belum_terbaca') DEFAULT 'belum_terbaca',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (pengguna_id) REFERENCES PENGGUNA(id) ON DELETE CASCADE
+);
