@@ -84,12 +84,25 @@ CREATE TABLE IF NOT EXISTS KALIBRASI_SENSOR (
 );
 
 -- 9. Tabel Pengaturan Threshold
-CREATE TABLE IF NOT EXISTS PENGATURAN (
+CREATE TABLE IF NOT EXISTS THRESHOLD (
     id INT AUTO_INCREMENT PRIMARY KEY,
     kumbung_id INT NOT NULL,
-    parameter VARCHAR(100) NOT NULL,  -- contoh: suhu_min, suhu_max
-    value FLOAT NOT NULL,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    suhu_min FLOAT NOT NULL,
+    suhu_max FLOAT NOT NULL,
+    
+    kelembapan_min FLOAT NOT NULL,
+    kelembapan_max FLOAT NOT NULL,
+    
+    moisture_min FLOAT,
+    moisture_max FLOAT,
+    
+    light_min FLOAT,
+    light_max FLOAT,
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
     FOREIGN KEY (kumbung_id) REFERENCES KUMBUNG(id) ON DELETE CASCADE
 );
 
