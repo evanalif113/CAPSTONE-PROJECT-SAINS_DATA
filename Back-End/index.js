@@ -19,7 +19,7 @@ const db = mysql.createPool({
 });
 
 // ===== ROUTE: GET kirim via URL-encoded =====
-// contoh: GET /api/data/send?temperature=24.5&humidity=60&moisture=30&light=500
+// contoh: GET /api/data/send?id_sensor=1&temperature=24.5&humidity=60&moisture=30&light=500
 app.get('/api/data/send', (req, res) => {
   const { id_sensor, temperature, humidity, moisture, light } = req.query;
 
@@ -80,7 +80,7 @@ app.post('/api/data/send', (req, res) => {
 // GET /api/data/all
 app.get('/api/data/all', (req, res) => {
   const sql = `
-    SELECT id, temperature, humidity, moisture, light, created_at 
+    SELECT id_sensor, temperature, humidity, moisture, light, created_at 
     FROM DATA_SENSOR 
     ORDER BY created_at DESC
   `;
@@ -99,9 +99,9 @@ app.get('/api/data/all', (req, res) => {
 app.get('/api/data/:id', (req, res) => {
   const id = req.params.id;
   const sql = `
-    SELECT id, temperature, humidity, moisture, light, created_at 
+    SELECT id_sensor, temperature, humidity, moisture, light, created_at 
     FROM DATA_SENSOR 
-    WHERE id = ?
+    WHERE id_sensor = ?
   `;
 
   db.query(sql, [id], (err, results) => {
@@ -119,8 +119,8 @@ app.get('/api/data/:id', (req, res) => {
 // ===== Start Server =====
 app.listen(port, function () {
   console.log(`Server berjalan di http://localhost:${port}`);
-  console.log(`- Kirim data via GET  : /api/data/send?temperature=..&humidity=..&moisture=..&light=..`);
-  console.log(`- Kirim data via POST : /api/data/send (body JSON)`);
-  console.log(`- Ambil semua data     : /api/data/all`);
-  console.log(`- Ambil data by ID     : /api/data/:id`);
+  console.log(`Kirim data via GET  : /api/data/send?temperature=..&humidity=..&moisture=..&light=..`);
+  console.log(`Kirim data via POST : /api/data/send (body JSON)`);
+  console.log(`Ambil semua data     : /api/data/all`);
+  console.log(`Ambil data by ID     : /api/data/:id`);
 });
