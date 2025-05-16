@@ -21,23 +21,24 @@ const db = mysql.createPool({
 // ===== ROUTE: GET kirim via URL-encoded =====
 // contoh: GET /api/data/send?temperature=24.5&humidity=60&moisture=30&light=500
 app.get('/api/data/send', (req, res) => {
-  const { temperature, humidity, moisture, light } = req.query;
+  const { id_sensor, temperature, humidity, moisture, light } = req.query;
 
-  if (!temperature || !humidity || !moisture || !light) {
-    return res.status(400).send('Semua parameter (temperature, humidity, moisture, light) wajib diisi.');
+  if ( !id_sensor || !temperature || !humidity || !moisture || !light) {
+    return res.status(400).send('Semua parameter (id_sensor, temperature, humidity, moisture, light) wajib diisi.');
   }
 
   const sql = `
-    INSERT INTO DATA_SENSOR (temperature, humidity, moisture, light) 
-    VALUES (?, ?, ?, ?)
+    INSERT INTO DATA_SENSOR (id_sensor, temperature, humidity, moisture, light) 
+    VALUES (?, ?, ?, ?, ?)
   `;
 
-  db.query(sql, [temperature, humidity, moisture, light], (err) => {
+  db.query(sql, [id_sensor, temperature, humidity, moisture, light], (err) => {
     if (err) {
       console.error(err);
       return res.status(500).send('Gagal menyimpan data.');
     }
     res.send(`Data diterima via GET: 
+      id_sensor=${id_sensor},
       temperature=${temperature}, 
       humidity=${humidity}, 
       moisture=${moisture}, 
@@ -45,18 +46,20 @@ app.get('/api/data/send', (req, res) => {
   });
 });
 
+
+
 // ===== ROUTE: POST kirim via JSON =====
 // contoh: POST /api/data/send dengan body: { "temperature": 24.5, "humidity": 60, "moisture": 30, "light": 500 }
 app.post('/api/data/send', (req, res) => {
-  const { temperature, humidity, moisture, light } = req.body;
+  const { id_sensor, temperature, humidity, moisture, light } = req.body;
 
-  if (!temperature || !humidity || !moisture || !light) {
-    return res.status(400).send('Semua parameter (temperature, humidity, moisture, light) wajib diisi.');
+  if (!id_sensor|| !temperature || !humidity || !moisture || !light) {
+    return res.status(400).send('Semua parameter (id_sensor, temperature, humidity, moisture, light) wajib diisi.');
   }
 
   const sql = `
-    INSERT INTO DATA_SENSOR (temperature, humidity, moisture, light) 
-    VALUES (?, ?, ?, ?)
+    INSERT INTO DATA_SENSOR (id_sensor, temperature, humidity, moisture, light) 
+    VALUES (?, ?, ?, ?, ?)
   `;
 
   db.query(sql, [temperature, humidity, moisture, light], (err) => {
@@ -65,6 +68,7 @@ app.post('/api/data/send', (req, res) => {
       return res.status(500).send('Gagal menyimpan data.');
     }
     res.send(`Data diterima via POST: 
+      id_sensor=${id_sensor},
       temperature=${temperature}, 
       humidity=${humidity}, 
       moisture=${moisture}, 

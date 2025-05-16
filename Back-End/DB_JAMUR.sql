@@ -41,13 +41,13 @@ CREATE TABLE IF NOT EXISTS SENSOR (
 -- 5. Tabel Data Sensor
 CREATE TABLE IF NOT EXISTS DATA_SENSOR (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    sensor_id INT NOT NULL,
+    id_sensor INT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     temperature FLOAT,
     humidity FLOAT,
     light FLOAT,
     moisture FLOAT,
-    FOREIGN KEY (sensor_id) REFERENCES SENSOR(id) ON DELETE CASCADE
+    FOREIGN KEY (id_sensor) REFERENCES SENSOR(id) ON DELETE CASCADE
 );
 
 -- 6. Tabel Aktuator (kendali perangkat via relay)
@@ -71,16 +71,6 @@ CREATE TABLE IF NOT EXISTS LOG_AKTUATOR (
     keterangan TEXT,
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (aktuator_id) REFERENCES AKTUATOR(id) ON DELETE CASCADE
-);
-
--- 8. Tabel Kalibrasi Sensor
-CREATE TABLE IF NOT EXISTS KALIBRASI_SENSOR (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    sensor_id INT NOT NULL,
-    calibration_date DATE NOT NULL,
-    calibration_value FLOAT,
-    notes TEXT,
-    FOREIGN KEY (sensor_id) REFERENCES SENSOR(id) ON DELETE CASCADE
 );
 
 -- 9. Tabel Pengaturan Threshold
