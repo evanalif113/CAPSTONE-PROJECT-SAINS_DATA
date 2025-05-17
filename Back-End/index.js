@@ -96,7 +96,7 @@ app.get('/api/data/all', (req, res) => {
 
 // ===== ROUTE: GET ambil satu record by ID =====
 // GET /api/data/:id
-app.get('/api/data/:id', (req, res) => {
+app.get('/api/data/id', (req, res) => {
   const id = req.params.id;
   const sql = `
     SELECT id_sensor, temperature, humidity, moisture, light, created_at 
