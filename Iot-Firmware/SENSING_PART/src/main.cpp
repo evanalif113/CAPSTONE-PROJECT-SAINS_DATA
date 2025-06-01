@@ -3,6 +3,9 @@
 #include <Adafruit_SSD1306.h>
 #include <BH1750.h>
 #include <Adafruit_NeoPixel.h>
+#include <WebServer.h>
+#include <ElegantOTA.h>
+#include <WiFi.h>
 
 // OLED display width and height
 #define SCREEN_WIDTH 128
@@ -19,6 +22,8 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 BH1750 light;
 // Initialize Neopixel
 Adafruit_NeoPixel strip(1, STRIP_PIN, NEO_GRB + NEO_KHZ800);
+
+WebServer server(80);
 
 void initializeSensors() {
     strip.begin(); // Initialize Neopixel strip
@@ -87,17 +92,47 @@ void updateSensor() {
     }
 }
 
+void connectWiFi() {
+    const char* ssid = "server";
+    const char* password = "jeris6467";
+    Serial.print("Connecting to WiFi: ");
+    Serial.println(ssid);
+    WiFi.begin(ssid, password);
+    int retry = 0;
+    while (WiFi.status() != WL_CONNECTED) {
+        delay(500);
+        Serial.print(".");
+        retry++;
+        if (retry > 40) { // timeout ~20 detik
+            Serial.println("\nFailed to connect to WiFi!");
+            return;
+        }
+    }
+    Serial.println("\nWiFi connected!");
+    Serial.print("IP address: ");
+    Serial.println(WiFi.localIP());
+}
+
 void setup() {
     Wire.begin();
     // Initialize serial communication
     Serial.begin(115200);
+    connectWiFi(); // Hubungkan ke WiFi sebelum inisialisasi sensor
     initializeSensors(); // Initialize sensors and display
+    server.on("/", []() {
+    server.send(200, "text/plain", "Halo ini Sensor ESP32!");
+    });
+    ElegantOTA.begin(&server);    // Start ElegantOTA
+    server.begin();
+    Serial.println("HTTP server started");
 }
 
 static unsigned long previousMillis;
 const unsigned long interval = 2000;
 
 void loop() {
+    server.handleClient();
+    ElegantOTA.loop();
     unsigned long currentMillis = millis();
     if (currentMillis - previousMillis >= interval) {
     previousMillis = currentMillis;
