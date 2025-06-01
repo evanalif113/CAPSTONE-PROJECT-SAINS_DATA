@@ -16,7 +16,7 @@ Adafruit_SHT31 sht31 = Adafruit_SHT31();
 // Initialize OLED display
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 // Initialize BH1750 light sensor
-BH1750 lightMeter;
+BH1750 light;
 // Initialize Neopixel
 Adafruit_NeoPixel strip(1, STRIP_PIN, NEO_GRB + NEO_KHZ800);
 
@@ -43,7 +43,7 @@ void setup() {
     }
 
     // Initialize BH1750 sensor
-    if (!lightMeter.begin(BH1750::CONTINUOUS_HIGH_RES_MODE)) {
+    if (!light.begin(BH1750::CONTINUOUS_HIGH_RES_MODE)) {
         Serial.println("Could not find BH1750 sensor!");
         while (1);
     }
@@ -52,8 +52,13 @@ void setup() {
     display.clearDisplay();
     display.display();
 }
+static unsigned long previousMillis;
+const unsigned long interval = 5000;
 
 void loop() {
+    unsigned long currentMillis = millis();
+    if (currentMillis - previousMillis >= interval) {
+    previousMillis = currentMillis;
     // Read temperature and humidity from SHT31
     float temperature = sht31.readTemperature();
     float humidity = sht31.readHumidity();
@@ -87,7 +92,7 @@ void loop() {
     }
 
     // Read light intensity from BH1750
-    float lux = lightMeter.readLightLevel();
+    float lux = light.readLightLevel();
 
     // Check if reading is valid
     if (lux >= 0) {
@@ -104,7 +109,5 @@ void loop() {
     } else {
         Serial.println("Failed to read from BH1750 sensor!");
     }
-
-    // Wait for 5 seconds before next reading
-    delay(5000);
+    }
 }
