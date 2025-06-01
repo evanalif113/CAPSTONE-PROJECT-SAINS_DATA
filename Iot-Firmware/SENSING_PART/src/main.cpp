@@ -20,52 +20,15 @@ BH1750 light;
 // Initialize Neopixel
 Adafruit_NeoPixel strip(1, STRIP_PIN, NEO_GRB + NEO_KHZ800);
 
-void setup() {
-    Wire.begin();
-    strip.begin(); // Initialize Neopixel strip
-    strip.setPixelColor(0, strip.Color(0, 255, 0)); // Set first pixel to red
-    strip.setBrightness(100); // Set brightness of the strip
-    strip.show(); // Update the strip to show the color
-
-    // Initialize serial communication
-    Serial.begin(115200);
-
-    // Initialize SHT31 sensor
-    if (!sht31.begin(0x44)) { // Default I2C address for SHT31
-        Serial.println("Could not find SHT31 sensor!");
-        while (1);
-    }
-
-    // Initialize OLED display
-    if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) { // Default I2C address for OLED
-        Serial.println("SSD1306 allocation failed!");
-        while (1);
-    }
-
-    // Initialize BH1750 sensor
-    if (!light.begin(BH1750::CONTINUOUS_HIGH_RES_MODE)) {
-        Serial.println("Could not find BH1750 sensor!");
-        while (1);
-    }
-
-    // Clear the display
-    display.clearDisplay();
-    display.display();
-}
-static unsigned long previousMillis;
-const unsigned long interval = 5000;
-
-void loop() {
-    unsigned long currentMillis = millis();
-    if (currentMillis - previousMillis >= interval) {
-    previousMillis = currentMillis;
+void updateSensor() {
     // Read temperature and humidity from SHT31
     float temperature = sht31.readTemperature();
     float humidity = sht31.readHumidity();
     sht31.heater(false); // Disable heater after reading
+    float lux = light.readLightLevel();
 
     // Check if readings are valid
-    if (!isnan(temperature) && !isnan(humidity)) {
+    if (!isnan(temperature) && !isnan(humidity) && !isnan(lux)) {
         // Print data to Serial Monitor
         Serial.print("Temperature: ");
         Serial.print(temperature);
@@ -87,27 +50,60 @@ void loop() {
         display.print("Humi: ");
         display.print(humidity);
         display.println(" %");
-    } else {
-        Serial.println("Failed to read from SHT31 sensor!");
-    }
-
-    // Read light intensity from BH1750
-    float lux = light.readLightLevel();
-
-    // Check if reading is valid
-    if (lux >= 0) {
-        // Print light intensity to Serial Monitor
-        Serial.print("Light: ");
-        Serial.print(lux);
-        Serial.println(" lx");
-
-        // Display light intensity on OLED
         display.print("Light: ");
         display.print(lux);
         display.println(" lx");
         display.display();
     } else {
-        Serial.println("Failed to read from BH1750 sensor!");
+        Serial.println("Failed to read sensor!");
     }
+}
+
+void initializeSensors() {
+    strip.begin(); // Initialize Neopixel strip
+    strip.setPixelColor(0, strip.Color(0, 255, 0)); // Set first pixel to red
+    strip.setBrightness(100); // Set brightness of the strip
+    strip.show(); // Update the strip to show the color
+
+    if (!sht31.begin(0x44)) { // Default I2C address for SHT31
+        Serial.println("Could not find SHT31 sensor!");
+        while (1);
+    }
+
+    // Initialize OLED display
+    if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) { // Default I2C address for OLED
+        Serial.println("SSD1306 allocation failed!");
+        while (1);
+    }
+
+    // Initialize BH1750 sensor
+    if (!light.begin(BH1750::CONTINUOUS_HIGH_RES_MODE)) {
+        Serial.println("Could not find BH1750 sensor!");
+        while (1);
+    }
+
+    // Clear the display
+    display.clearDisplay();
+    display.display();
+}
+
+void setup() {
+    Wire.begin();
+
+
+    // Initialize serial communication
+    Serial.begin(115200);
+}
+
+
+
+static unsigned long previousMillis;
+const unsigned long interval = 5000;
+
+void loop() {
+    unsigned long currentMillis = millis();
+    if (currentMillis - previousMillis >= interval) {
+    previousMillis = currentMillis;
+    updateSensor();
     }
 }
