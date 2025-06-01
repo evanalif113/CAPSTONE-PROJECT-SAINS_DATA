@@ -7,7 +7,7 @@ const port = 2518;
 
 // ===== Middleware =====
 // parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({extended: false }));
 app.use(bodyParser.json()); // Untuk parsing JSON
 
 // ===== Koneksi MySQL =====

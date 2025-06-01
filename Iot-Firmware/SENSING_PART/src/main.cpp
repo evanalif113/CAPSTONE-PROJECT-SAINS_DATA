@@ -1,23 +1,31 @@
 #include <Wire.h>
 #include <Adafruit_SHT31.h>
 #include <Adafruit_SSD1306.h>
-#include <BH1750.h> // Include BH1750 library
+#include <BH1750.h>
+#include <Adafruit_NeoPixel.h>
 
 // OLED display width and height
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
 
+// Strip Pin Indicator
+#define STRIP_PIN 5
+
 // Initialize SHT31 sensor
 Adafruit_SHT31 sht31 = Adafruit_SHT31();
-
 // Initialize OLED display
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
-
 // Initialize BH1750 light sensor
 BH1750 lightMeter;
+// Initialize Neopixel
+Adafruit_NeoPixel strip(1, STRIP_PIN, NEO_GRB + NEO_KHZ800);
 
 void setup() {
     Wire.begin();
+    strip.begin(); // Initialize Neopixel strip
+    strip.setPixelColor(0, strip.Color(0, 255, 0)); // Set first pixel to red
+    strip.setBrightness(100); // Set brightness of the strip
+    strip.show(); // Update the strip to show the color
 
     // Initialize serial communication
     Serial.begin(115200);
@@ -49,6 +57,7 @@ void loop() {
     // Read temperature and humidity from SHT31
     float temperature = sht31.readTemperature();
     float humidity = sht31.readHumidity();
+    sht31.heater(false); // Disable heater after reading
 
     // Check if readings are valid
     if (!isnan(temperature) && !isnan(humidity)) {
@@ -96,6 +105,6 @@ void loop() {
         Serial.println("Failed to read from BH1750 sensor!");
     }
 
-    // Wait for 2 seconds before next reading
-    delay(2000);
+    // Wait for 5 seconds before next reading
+    delay(5000);
 }
