@@ -1,3 +1,5 @@
+#include <WiFi.h>
+#include <HTTPClient.h>
 #include <Wire.h>
 #include <Adafruit_SHT31.h>
 #include <Adafruit_SSD1306.h>
@@ -5,7 +7,7 @@
 #include <Adafruit_NeoPixel.h>
 #include <WebServer.h>
 #include <ElegantOTA.h>
-#include <WiFi.h>
+
 
 // OLED display width and height
 #define SCREEN_WIDTH 128
