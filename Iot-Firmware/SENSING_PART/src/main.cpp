@@ -89,8 +89,6 @@ void initializeSensors() {
 
 void setup() {
     Wire.begin();
-
-
     // Initialize serial communication
     Serial.begin(115200);
 }
