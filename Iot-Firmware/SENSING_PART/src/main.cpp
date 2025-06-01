@@ -20,45 +20,6 @@ BH1750 light;
 // Initialize Neopixel
 Adafruit_NeoPixel strip(1, STRIP_PIN, NEO_GRB + NEO_KHZ800);
 
-void updateSensor() {
-    // Read temperature and humidity from SHT31
-    float temperature = sht31.readTemperature();
-    float humidity = sht31.readHumidity();
-    sht31.heater(false); // Disable heater after reading
-    float lux = light.readLightLevel();
-
-    // Check if readings are valid
-    if (!isnan(temperature) && !isnan(humidity) && !isnan(lux)) {
-        // Print data to Serial Monitor
-        Serial.print("Temperature: ");
-        Serial.print(temperature);
-        Serial.println(" °C");
-        Serial.print("Humidity: ");
-        Serial.print(humidity);
-        Serial.println(" %");
-
-        // Display data on OLED
-        display.clearDisplay();
-        display.setTextSize(1);
-        display.setTextColor(SSD1306_WHITE);
-        display.setCursor(0, 0);
-        display.println("Sensor Data");
-        display.print("Temp: ");
-        display.print(temperature);
-        display.write(167); // Degree symbol
-        display.println(" C");
-        display.print("Humi: ");
-        display.print(humidity);
-        display.println(" %");
-        display.print("Light: ");
-        display.print(lux);
-        display.println(" lx");
-        display.display();
-    } else {
-        Serial.println("Failed to read sensor!");
-    }
-}
-
 void initializeSensors() {
     strip.begin(); // Initialize Neopixel strip
     strip.setPixelColor(0, strip.Color(0, 255, 0)); // Set first pixel to red
@@ -87,16 +48,54 @@ void initializeSensors() {
     display.display();
 }
 
+void updateSensor() {
+    // Read temperature and humidity from SHT31
+    float temperature = sht31.readTemperature();
+    float humidity = sht31.readHumidity();
+    sht31.heater(false); // Disable heater after reading
+    float lux = light.readLightLevel();
+
+    // Check if readings are valid
+    if (!isnan(temperature) && !isnan(humidity) && !isnan(lux)) {
+        // Print data to Serial Monitor
+        Serial.print("Temperature: ");
+        Serial.print(temperature);
+        Serial.println(" °C");
+        Serial.print("Humidity: ");
+        Serial.print(humidity);
+        Serial.println(" %");
+
+        // Display data on OLED
+        display.clearDisplay();
+        display.setTextSize(1);
+        display.setTextColor(SSD1306_WHITE);
+        display.setCursor(0, 0);
+        display.println("Sensor Data");
+        display.print("Temp : ");
+        display.print(temperature);
+        display.write(167); // Degree symbol
+        display.println(" C");
+        display.print("Humi : ");
+        display.print(humidity);
+        display.println(" %");
+        display.print("Light: ");
+        display.print(lux);
+        display.println(" lx");
+        display.display();
+    } else {
+        Serial.println("Failed to read sensor!");
+    }
+}
+
 void setup() {
     Wire.begin();
     // Initialize serial communication
     Serial.begin(115200);
+    initializeSensors(); // Initialize sensors and display
 }
 
-
-
 static unsigned long previousMillis;
-const unsigned long interval = 5000;
+const unsigned long interval = 2000;
 
 void loop() {
     unsigned long currentMillis = millis();
