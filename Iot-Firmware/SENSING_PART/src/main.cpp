@@ -69,7 +69,7 @@ void updateSensor() {
         Serial.print(temperature);
         Serial.println(" °C");
         Serial.print("Humidity: ");
-        Serial.print(humidity);
+        Serial.print(humidity); 
         Serial.println(" %");
         Serial.print("Light Level: ");
         Serial.print(lux);
