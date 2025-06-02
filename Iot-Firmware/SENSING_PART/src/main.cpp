@@ -16,10 +16,10 @@
 // Strip Pin Indicator
 #define STRIP_PIN 5
 
-// Initialize SHT31 sensor
-Adafruit_SHT31 sht31 = Adafruit_SHT31();
 // Initialize OLED display
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
+// Initialize SHT31 sensor
+Adafruit_SHT31 sht31 = Adafruit_SHT31();
 // Initialize BH1750 light sensor
 BH1750 light;
 // Initialize Neopixel
@@ -71,6 +71,9 @@ void updateSensor() {
         Serial.print("Humidity: ");
         Serial.print(humidity);
         Serial.println(" %");
+        Serial.print("Light Level: ");
+        Serial.print(lux);
+        Serial.println(" lx");
 
         // Display data on OLED
         display.clearDisplay();
@@ -95,8 +98,8 @@ void updateSensor() {
 }
 
 void connectWiFi() {
-    const char* ssid = "server";
-    const char* password = "jeris6467";
+    const char* ssid = "risetiklim";
+    const char* password = "iklim6467";
     Serial.print("Connecting to WiFi: ");
     Serial.println(ssid);
     WiFi.begin(ssid, password);
