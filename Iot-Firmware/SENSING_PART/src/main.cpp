@@ -15,6 +15,7 @@
 
 // Strip Pin Indicator
 #define STRIP_PIN 5
+#define MOISTURE_PIN 34  // Tambahkan definisi pin sensor kelembaban tanah
 
 // Initialize OLED display
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
@@ -50,6 +51,8 @@ void initializeSensors() {
         while (1);
     }
 
+    pinMode(MOISTURE_PIN, INPUT); // Inisialisasi pin sensor kelembaban tanah
+
     // Clear the display
     display.clearDisplay();
     display.display();
@@ -61,6 +64,9 @@ void updateSensor() {
     float humidity = sht31.readHumidity();
     sht31.heater(false); // Disable heater after reading
     float lux = light.readLightLevel();
+
+    // Baca nilai kelembaban tanah dari sensor analog
+    int moistureValue = analogRead(MOISTURE_PIN);
 
     // Check if readings are valid
     if (!isnan(temperature) && !isnan(humidity) && !isnan(lux)) {
@@ -74,6 +80,8 @@ void updateSensor() {
         Serial.print("Light Level: ");
         Serial.print(lux);
         Serial.println(" lx");
+        Serial.print("Soil Moisture: ");
+        Serial.println(moistureValue);
 
         // Display data on OLED
         display.clearDisplay();
@@ -87,10 +95,12 @@ void updateSensor() {
         display.println(" C");
         display.print("Humi : ");
         display.print(humidity);
-        display.println(" %");
+        display.println(" Rh%");
         display.print("Light: ");
         display.print(lux);
-        display.println(" lx");
+        display.println(" lux");
+        display.print("Moist: ");
+        display.println(moistureValue);
         display.display();
     } else {
         Serial.println("Failed to read sensor!");
