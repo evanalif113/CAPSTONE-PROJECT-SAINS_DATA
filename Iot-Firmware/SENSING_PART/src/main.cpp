@@ -17,6 +17,9 @@
 #define STRIP_PIN 5
 #define MOISTURE_PIN 34  // Tambahkan definisi pin sensor kelembaban tanah
 
+String deviceName = "ESP32_Sensor";
+String ServerPath = "http://example.com/api/sensor"; // Ganti dengan URL server Anda
+
 // Initialize OLED display
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 // Initialize SHT31 sensor
@@ -105,6 +108,13 @@ void updateSensor() {
     } else {
         Serial.println("Failed to read sensor!");
     }
+}
+
+void sendDataToServer() {
+    HTTPClient http;
+    String serverPath = "http://example.com/api/sensor"; // Ganti dengan URL server Anda
+    http.begin(serverPath);
+    http.addHeader("Content-Type", "application/json");
 }
 
 void connectWiFi() {
