@@ -46,16 +46,19 @@ void myTimerEvent()
   display.clearDisplay();
   display.setTextSize(1);
   display.setTextColor(SSD1306_WHITE);
+
   display.setCursor(0, 0);
   display.print("Suhu:");
-  display.setCursor(0, 20);
+  display.setCursor(50, 0);
   display.print(suhu, 1);
   display.print(" C");
-  display.setCursor(0, 40);
+
+  display.setCursor(0, 20);
   display.print("Hum:");
-  display.setCursor(0, 55);
+  display.setCursor(50, 20);
   display.print(kelembaban, 1);
   display.print(" %");
+
   display.display();
 }
 
