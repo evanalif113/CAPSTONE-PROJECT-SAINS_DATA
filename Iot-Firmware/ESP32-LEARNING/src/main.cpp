@@ -1,30 +1,41 @@
 /*********
-  The include file, index_OCV_ColorTrack.h, the Client, is an intoduction of OpenCV.js to the ESP32 Camera environment. The Client was
-  developed and written by Andrew R. Sass. Permission to reproduce the index_OCV_ColorTrack.h file is granted free of charge if this
-  entire copyright notice is included in all copies of the index_OCV_ColorTrack.h file.
+  Rui Santos
+  Complete project details at https://RandomNerdTutorials.com/esp32-cam-take-photo-display-web-server/
   
-  Complete instructions at https://RandomNerdTutorials.com/esp32-cam-opencv-js-color-detection-tracking/
+  IMPORTANT!!! 
+   - Select Board "AI Thinker ESP32-CAM"
+   - GPIO 0 must be connected to GND to upload a sketch
+   - After connecting GPIO 0 to GND, press the ESP32-CAM on-board RESET button to put your board in flashing mode
   
-  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files.
-  The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+  The above copyright notice and this permission notice shall be included in all
+  copies or substantial portions of the Software.
 *********/
 
-#include <WiFi.h>
-#include <WiFiClientSecure.h>
+#include "WiFi.h"
 #include "esp_camera.h"
-#include "soc/soc.h"
-#include "soc/rtc_cntl_reg.h"
-#include "index_OCV_ColorTrack.h"
+#include "esp_timer.h"
+#include "img_converters.h"
+#include "Arduino.h"
+#include "soc/soc.h"           // Disable brownour problems
+#include "soc/rtc_cntl_reg.h"  // Disable brownour problems
+#include "driver/rtc_io.h"
+#include <ESPAsyncWebServer.h>
+#include <SPIFFS.h>
+#include <FS.h>
 
 // Replace with your network credentials
 const char* ssid = "server";
 const char* password = "jeris6467";
- 
-String Feedback="";
-String Command="",cmd="",P1="",P2="",P3="",P4="",P5="",P6="",P7="",P8="",P9="";
-byte ReceiveState=0,cmdState=1,strState=1,questionstate=0,equalstate=0,semicolonstate=0;
-//ANN:0
-//       AI-Thinker                    
+
+// Create AsyncWebServer object on port 80
+AsyncWebServer server(80);
+
+boolean takeNewPhoto = false;
+
+// Photo File Name to save in SPIFFS
+#define FILE_PHOTO "/photo.jpg"
+
+// OV2640 camera module pins (CAMERA_MODEL_AI_THINKER)
 #define PWDN_GPIO_NUM     32
 #define RESET_GPIO_NUM    -1
 #define XCLK_GPIO_NUM      0
@@ -42,92 +53,73 @@ byte ReceiveState=0,cmdState=1,strState=1,questionstate=0,equalstate=0,semicolon
 #define HREF_GPIO_NUM     23
 #define PCLK_GPIO_NUM     22
 
-WiFiServer server(80);
-//ANN:2
-void ExecuteCommand() {
-  if (cmd!="colorDetect") {  //Omit printout
-    //Serial.println("cmd= "+cmd+" ,P1= "+P1+" ,P2= "+P2+" ,P3= "+P3+" ,P4= "+P4+" ,P5= "+P5+" ,P6= "+P6+" ,P7= "+P7+" ,P8= "+P8+" ,P9= "+P9);
-    //Serial.println("");
+const char index_html[] PROGMEM = R"rawliteral(
+<!DOCTYPE HTML><html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { text-align:center; }
+    .vert { margin-bottom: 10%; }
+    .hori{ margin-bottom: 0%; }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <h2>ESP32-CAM Last Photo</h2>
+    <p>It might take more than 5 seconds to capture a photo.</p>
+    <p>
+      <button onclick="rotatePhoto();">ROTATE</button>
+      <button onclick="capturePhoto()">CAPTURE PHOTO</button>
+      <button onclick="location.reload();">REFRESH PAGE</button>
+    </p>
+  </div>
+  <div><img src="saved-photo" id="photo" width="70%"></div>
+</body>
+<script>
+  var deg = 0;
+  function capturePhoto() {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', "/capture", true);
+    xhr.send();
   }
-  
-  if (cmd=="resetwifi") {
-    WiFi.begin(P1.c_str(), P2.c_str());
-    Serial.print("Connecting to ");
-    Serial.println(P1);
-    long int StartTime=millis();
-    while (WiFi.status() != WL_CONNECTED) 
-    {
-        delay(500);
-        if ((StartTime+5000) < millis()) break;
-    } 
-    Serial.println("");
-    Serial.println("STAIP: "+WiFi.localIP().toString());
-    Feedback="STAIP: "+WiFi.localIP().toString();
-  }    
-  else if (cmd=="restart") {
-    ESP.restart();
+  function rotatePhoto() {
+    var img = document.getElementById("photo");
+    deg += 90;
+    if(isOdd(deg/90)){ document.getElementById("container").className = "vert"; }
+    else{ document.getElementById("container").className = "hori"; }
+    img.style.transform = "rotate(" + deg + "deg)";
   }
-  else if (cmd=="cm"){
-    int XcmVal = P1.toInt();
-    int YcmVal = P2.toInt();
-    Serial.println("cmd= "+cmd+" ,VALXCM= "+XcmVal);
-    Serial.println("cmd= "+cmd+" ,VALYCM= "+YcmVal);   
-  }
-  else if (cmd=="quality") { 
-    sensor_t * s = esp_camera_sensor_get();
-    int val = P1.toInt(); 
-    s->set_quality(s, val);
-  }
-  else if (cmd=="contrast") {
-    sensor_t * s = esp_camera_sensor_get();
-    int val = P1.toInt(); 
-    s->set_contrast(s, val);
-  }
-  else if (cmd=="brightness") {
-    sensor_t * s = esp_camera_sensor_get();
-    int val = P1.toInt();  
-    s->set_brightness(s, val);  
-  }   
-  else {
-    Feedback="Command is not defined.";
-  }
-  if (Feedback=="") {
-    Feedback=Command;
-  }
-}
-
-
-void getCommand(char c){
-  if (c=='?') ReceiveState=1;
-  if ((c==' ')||(c=='\r')||(c=='\n')) ReceiveState=0;
-  
-  if (ReceiveState==1) {
-    Command=Command+String(c);    
-    if (c=='=') cmdState=0;
-    if (c==';') strState++;
-    if ((cmdState==1)&&((c!='?')||(questionstate==1))) cmd=cmd+String(c);
-    if ((cmdState==0)&&(strState==1)&&((c!='=')||(equalstate==1))) P1=P1+String(c);
-    if ((cmdState==0)&&(strState==2)&&(c!=';')) P2=P2+String(c);
-    if ((cmdState==0)&&(strState==3)&&(c!=';')) P3=P3+String(c);
-    if ((cmdState==0)&&(strState==4)&&(c!=';')) P4=P4+String(c);
-    if ((cmdState==0)&&(strState==5)&&(c!=';')) P5=P5+String(c);
-    if ((cmdState==0)&&(strState==6)&&(c!=';')) P6=P6+String(c);
-    if ((cmdState==0)&&(strState==7)&&(c!=';')) P7=P7+String(c);
-    if ((cmdState==0)&&(strState==8)&&(c!=';')) P8=P8+String(c);
-    if ((cmdState==0)&&(strState>=9)&&((c!=';')||(semicolonstate==1))) P9=P9+String(c);   
-    if (c=='?') questionstate=1;
-    if (c=='=') equalstate=1;
-    if ((strState>=9)&&(c==';')) semicolonstate=1;
-  }
-}
+  function isOdd(n) { return Math.abs(n % 2) == 1; }
+</script>
+</html>)rawliteral";
 
 void setup() {
-  WRITE_PERI_REG(RTC_CNTL_BROWN_OUT_REG, 0);
-  
+  // Serial port for debugging purposes
   Serial.begin(115200);
-  Serial.setDebugOutput(true);
-  Serial.println();
 
+  // Connect to Wi-Fi
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(1000);
+    Serial.println("Connecting to WiFi...");
+  }
+  if (!SPIFFS.begin(true)) {
+    Serial.println("An Error has occurred while mounting SPIFFS");
+    ESP.restart();
+  }
+  else {
+    delay(500);
+    Serial.println("SPIFFS mounted successfully");
+  }
+
+  // Print ESP32 Local IP Address
+  Serial.print("IP Address: http://");
+  Serial.println(WiFi.localIP());
+
+  // Turn-off the 'brownout detector'
+  WRITE_PERI_REG(RTC_CNTL_BROWN_OUT_REG, 0);
+
+  // OV2640 camera module
   camera_config_t config;
   config.ledc_channel = LEDC_CHANNEL_0;
   config.ledc_timer = LEDC_TIMER_0;
@@ -149,144 +141,93 @@ void setup() {
   config.pin_reset = RESET_GPIO_NUM;
   config.xclk_freq_hz = 20000000;
   config.pixel_format = PIXFORMAT_JPEG;
-  //init with high specs to pre-allocate larger buffers
-  if(psramFound()){
+
+  if (psramFound()) {
     config.frame_size = FRAMESIZE_UXGA;
-    config.jpeg_quality = 10;  //0-63 lower number means higher quality
+    config.jpeg_quality = 10;
     config.fb_count = 2;
   } else {
     config.frame_size = FRAMESIZE_SVGA;
-    config.jpeg_quality = 12;  //0-63 lower number means higher quality
+    config.jpeg_quality = 12;
     config.fb_count = 1;
   }
-  
-  // camera init
+  // Camera init
   esp_err_t err = esp_camera_init(&config);
   if (err != ESP_OK) {
     Serial.printf("Camera init failed with error 0x%x", err);
-    delay(1000);
     ESP.restart();
   }
 
-  //drop down frame size for higher initial frame rate
-  sensor_t * s = esp_camera_sensor_get();
-  s->set_framesize(s, FRAMESIZE_CIF);  //UXGA|SXGA|XGA|SVGA|VGA|CIF|QVGA|HQVGA|QQVGA  設定初始化影像解析度
-     
-  WiFi.mode(WIFI_AP_STA);
-  WiFi.begin(ssid, password);   
+  // Route for root / web page
+  server.on("/", HTTP_GET, [](AsyncWebServerRequest * request) {
+    request->send(200, "text/html", index_html);
+  });
 
-  delay(1000);
+  server.on("/capture", HTTP_GET, [](AsyncWebServerRequest * request) {
+    takeNewPhoto = true;
+    request->send(200, "text/plain", "Taking Photo");
+  });
 
-  long int StartTime=millis();
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    if ((StartTime+10000) < millis()) 
-      break;   
-  } 
+  server.on("/saved-photo", HTTP_GET, [](AsyncWebServerRequest * request) {
+    request->send(SPIFFS, FILE_PHOTO, "image/jpg", false);
+  });
 
-  if (WiFi.status() == WL_CONNECTED) {   
-    Serial.print("ESP IP Address: http://");
-    Serial.println(WiFi.localIP());  
-  }
-  server.begin();          
+  // Start server
+  server.begin();
+
+}
+// Check if photo capture was successful
+bool checkPhoto( fs::FS &fs ) {
+  File f_pic = fs.open( FILE_PHOTO );
+  unsigned int pic_sz = f_pic.size();
+  return ( pic_sz > 100 );
 }
 
+// Capture Photo and Save it to SPIFFS
+void capturePhotoSaveSpiffs( void ) {
+  camera_fb_t * fb = NULL; // pointer
+  bool ok = 0; // Boolean indicating if the picture has been taken correctly
+
+  do {
+    // Take a photo with the camera
+    Serial.println("Taking a photo...");
+
+    fb = esp_camera_fb_get();
+    if (!fb) {
+      Serial.println("Camera capture failed");
+      return;
+    }
+
+    // Photo file name
+    Serial.printf("Picture file name: %s\n", FILE_PHOTO);
+    File file = SPIFFS.open(FILE_PHOTO, FILE_WRITE);
+
+    // Insert the data in the photo file
+    if (!file) {
+      Serial.println("Failed to open file in writing mode");
+    }
+    else {
+      file.write(fb->buf, fb->len); // payload (image), payload length
+      Serial.print("The picture has been saved in ");
+      Serial.print(FILE_PHOTO);
+      Serial.print(" - Size: ");
+      Serial.print(file.size());
+      Serial.println(" bytes");
+    }
+    // Close the file
+    file.close();
+    esp_camera_fb_return(fb);
+
+    // check if file has been correctly saved in SPIFFS
+    ok = checkPhoto(SPIFFS);
+  } while ( !ok );
+}
 
 void loop() {
-  Feedback="";Command="";cmd="";P1="";P2="";P3="";P4="";P5="";P6="";P7="";P8="";P9="";
-  ReceiveState=0,cmdState=1,strState=1,questionstate=0,equalstate=0,semicolonstate=0;
-  
-  WiFiClient client = server.available();
-
-  if (client) { 
-    String currentLine = "";
-
-    while (client.connected()) {
-      if (client.available()) {
-        char c = client.read();             
-        
-        getCommand(c);
-                
-        if (c == '\n') {
-          if (currentLine.length() == 0) {    
-            
-            if (cmd=="colorDetect") {
-              camera_fb_t * fb = NULL;
-              fb = esp_camera_fb_get();  
-              if(!fb) {
-                Serial.println("Camera capture failed");
-                delay(1000);
-                ESP.restart();
-              }
-              //ANN:1
-              client.println("HTTP/1.1 200 OK");
-              client.println("Access-Control-Allow-Origin: *");              
-              client.println("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept");
-              client.println("Access-Control-Allow-Methods: GET,POST,PUT,DELETE,OPTIONS");
-              client.println("Content-Type: image/jpeg");
-              client.println("Content-Disposition: form-data; name=\"imageFile\"; filename=\"picture.jpg\""); 
-              client.println("Content-Length: " + String(fb->len));             
-              client.println("Connection: close");
-              client.println();
-              
-              uint8_t *fbBuf = fb->buf;
-              size_t fbLen = fb->len;
-              for (size_t n=0;n<fbLen;n=n+1024) {
-                if (n+1024<fbLen) {
-                  client.write(fbBuf, 1024);
-                  fbBuf += 1024;
-                }
-                else if (fbLen%1024>0) {
-                  size_t remainder = fbLen%1024;
-                  client.write(fbBuf, remainder);
-                }
-              }    
-              esp_camera_fb_return(fb);                        
-            }
-            else {
-              //ANN:1
-              client.println("HTTP/1.1 200 OK");
-              client.println("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept");
-              client.println("Access-Control-Allow-Methods: GET,POST,PUT,DELETE,OPTIONS");
-              client.println("Content-Type: text/html; charset=utf-8");
-              client.println("Access-Control-Allow-Origin: *");
-              client.println("Connection: close");
-              client.println();           
-              String Data="";
-              if (cmd!="")
-                Data = Feedback;
-              else {
-                Data = String((const char *)INDEX_HTML);
-              }
-              int Index;
-              for (Index = 0; Index < Data.length(); Index = Index+1000) {
-                client.print(Data.substring(Index, Index+1000));
-              }        
-              client.println();
-            }
-                        
-            Feedback="";
-            break;
-          } else {
-            currentLine = "";
-          }
-        } 
-        else if (c != '\r') {
-          currentLine += c;
-        }
-        if ((currentLine.indexOf("/?")!=-1)&&(currentLine.indexOf(" HTTP")!=-1)) {
-          if (Command.indexOf("stop")!=-1) {  
-            client.println();
-            client.println();
-            client.stop();
-          }
-          currentLine="";
-          Feedback="";
-          ExecuteCommand();
-        }
-      }
-    }
-    delay(1);
-    client.stop();
+  if (takeNewPhoto) {
+    capturePhotoSaveSpiffs();
+    takeNewPhoto = false;
   }
+  delay(1);
 }
+
