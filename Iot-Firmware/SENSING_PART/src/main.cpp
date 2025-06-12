@@ -5,10 +5,10 @@
 #include <Adafruit_SSD1306.h>
 #include <BH1750.h>
 #include <Adafruit_NeoPixel.h>
-#include <WebServer.h>
-#include <ElegantOTA.h>
+#include <AViShaOTA.h>
 
-
+const char* ssid = "server";
+const char* password = "jeris6467";
 // OLED display width and height
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
@@ -29,7 +29,7 @@ BH1750 light;
 // Initialize Neopixel
 Adafruit_NeoPixel strip(1, STRIP_PIN, NEO_GRB + NEO_KHZ800);
 
-WebServer server(80);
+AViShaOTA ota("avisha-ota");
 
 void initializeSensors() {
     strip.begin(); // Initialize Neopixel strip
@@ -118,9 +118,8 @@ void sendDataToServer() {
 }
 
 void connectWiFi() {
-    const char* ssid = "risetiklim";
-    const char* password = "iklim6467";
     Serial.print("Connecting to WiFi: ");
+    ota.begin(ssid, password);
     Serial.println(ssid);
     WiFi.begin(ssid, password);
     int retry = 0;
@@ -144,20 +143,14 @@ void setup() {
     Serial.begin(115200);
     connectWiFi(); // Hubungkan ke WiFi sebelum inisialisasi sensor
     initializeSensors(); // Initialize sensors and display
-    server.on("/", []() {
-    server.send(200, "text/plain", "Halo ini Sensor ESP32!");
-    });
-    ElegantOTA.begin(&server);    // Start ElegantOTA
-    server.begin();
-    Serial.println("HTTP server started");
+    ota.setOTAPassword("admin123");
 }
 
 static unsigned long previousMillis;
 const unsigned long interval = 2000;
 
 void loop() {
-    server.handleClient();
-    ElegantOTA.loop();
+    ota.handle();
     unsigned long currentMillis = millis();
     if (currentMillis - previousMillis >= interval) {
     previousMillis = currentMillis;
