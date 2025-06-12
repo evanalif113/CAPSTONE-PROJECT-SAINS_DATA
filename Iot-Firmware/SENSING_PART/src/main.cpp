@@ -33,7 +33,7 @@ AViShaOTA ota("avisha-ota");
 
 void initializeSensors() {
     strip.begin(); // Initialize Neopixel strip
-    strip.setPixelColor(0, strip.Color(0, 255, 0)); // Set first pixel to red
+    strip.setPixelColor(0, strip.Color(0, 255, 255));
     strip.setBrightness(100); // Set brightness of the strip
     strip.show(); // Update the strip to show the color
 
@@ -145,9 +145,15 @@ void sendDataToServer() {
         Serial.print("HTTP Response code: ");
         Serial.println(httpResponseCode);
         if (httpResponseCode == 200) {
+            strip.setPixelColor(0, strip.Color(0, 255, 0));
+            strip.setBrightness(100);
+            strip.show(); 
             Serial.println("Data berhasil dikirim ke server!");
         }
     } else {
+        strip.setPixelColor(0, strip.Color(255, 0, 0));
+        strip.setBrightness(100); 
+        strip.show(); 
         Serial.print("Error code: ");
         Serial.println(httpResponseCode);
         Serial.println("Possible reasons: server not running, wrong URL, firewall, or network issues.");
