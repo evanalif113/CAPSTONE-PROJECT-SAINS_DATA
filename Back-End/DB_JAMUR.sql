@@ -27,14 +27,14 @@ CREATE TABLE IF NOT EXISTS KUMBUNG (
 -- 4. Tabel Sensor
 CREATE TABLE IF NOT EXISTS SENSOR (
     id_sensor INT AUTO_INCREMENT PRIMARY KEY,
-    kumbung_id INT NOT NULL,
+    id_kumbung INT NOT NULL,
     nama VARCHAR(100) NOT NULL,
     nomor_seri VARCHAR(100) UNIQUE NOT NULL,
     status ENUM('active', 'inactive', 'error') DEFAULT 'active',
     tanggal_registrasi DATE DEFAULT CURRENT_DATE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (kumbung_id) REFERENCES KUMBUNG(id_kumbung) ON DELETE CASCADE
+    FOREIGN KEY (id_kumbung) REFERENCES KUMBUNG(id_kumbung) ON DELETE CASCADE
 );
 
 -- 5. Tabel Data Sensor
