@@ -29,7 +29,6 @@ CREATE TABLE IF NOT EXISTS SENSOR (
     id INT AUTO_INCREMENT PRIMARY KEY,
     kumbung_id INT NOT NULL,
     nama VARCHAR(100) NOT NULL,
-    jenis ENUM('suhu', 'kelembapan', 'cahaya', 'moisture', 'lainnya'),
     nomor_seri VARCHAR(100) UNIQUE NOT NULL,
     status ENUM('active', 'inactive', 'error') DEFAULT 'active',
     tanggal_registrasi DATE DEFAULT CURRENT_DATE,
@@ -61,47 +60,4 @@ CREATE TABLE IF NOT EXISTS AKTUATOR (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (kumbung_id) REFERENCES KUMBUNG(id) ON DELETE CASCADE
-);
-
--- 7. Tabel Log Aktuator (aktivitas perangkat)
-CREATE TABLE IF NOT EXISTS LOG_AKTUATOR (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    aktuator_id INT NOT NULL,
-    aksi ENUM('ON', 'OFF') NOT NULL,
-    keterangan TEXT,
-    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (aktuator_id) REFERENCES AKTUATOR(id) ON DELETE CASCADE
-);
-
--- 9. Tabel Pengaturan Threshold
-CREATE TABLE IF NOT EXISTS THRESHOLD (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    kumbung_id INT NOT NULL,
-    
-    suhu_min FLOAT NOT NULL,
-    suhu_max FLOAT NOT NULL,
-    
-    kelembapan_min FLOAT NOT NULL,
-    kelembapan_max FLOAT NOT NULL,
-    
-    moisture_min FLOAT,
-    moisture_max FLOAT,
-    
-    light_min FLOAT,
-    light_max FLOAT,
-
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-
-    FOREIGN KEY (kumbung_id) REFERENCES KUMBUNG(id) ON DELETE CASCADE
-);
-
--- 10. Tabel Notifikasi
-CREATE TABLE IF NOT EXISTS NOTIFIKASI (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    pengguna_id INT NOT NULL,
-    message TEXT NOT NULL,
-    status ENUM('terbaca', 'belum_terbaca') DEFAULT 'belum_terbaca',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (pengguna_id) REFERENCES PENGGUNA(id) ON DELETE CASCADE
 );
