@@ -12,7 +12,7 @@ app.use(bodyParser.json()); // Untuk parsing JSON
 
 // ===== Koneksi MySQL =====
 const db = mysql.createPool({
-  host: 'localhost',
+  host: '127.0.0.1',
   user: 'root',
   password: '',
   database: 'DB_JAMUR'

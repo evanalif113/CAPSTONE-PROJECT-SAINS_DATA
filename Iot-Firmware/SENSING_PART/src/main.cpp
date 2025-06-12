@@ -18,7 +18,7 @@ const char* password = "jeris6467";
 #define MOISTURE_PIN 34  // Tambahkan definisi pin sensor kelembaban tanah
 
 String deviceName = "ESP32_Sensor";
-String ServerPath = "http://192.168.1.100:2518/api/data-sensor/send"; // Ganti dengan URL server Anda
+String ServerPath = "http://192.168.1.101:2518/api/data-sensor/send"; // Ganti dengan URL server Anda
 
 // Initialize OLED display
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
@@ -195,6 +195,11 @@ const unsigned long interval = 5000;
 
 void loop() {
     ota.handle();
+    // Reconnect WiFi if disconnected
+    if (WiFi.status() != WL_CONNECTED) {
+        Serial.println("WiFi disconnected! Attempting to reconnect...");
+        connectWiFi();
+    }
     unsigned long currentMillis = millis();
     if (currentMillis - previousMillis >= interval) {
         previousMillis = currentMillis;
