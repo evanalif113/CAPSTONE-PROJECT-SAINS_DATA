@@ -18,7 +18,7 @@ const char* password = "jeris6467";
 #define MOISTURE_PIN 34  // Tambahkan definisi pin sensor kelembaban tanah
 
 String deviceName = "ESP32_Sensor";
-String ServerPath = "http://example.com/api/sensor"; // Ganti dengan URL server Anda
+String ServerPath = "http://192.168.1.100:2518/api/data-sensor/send"; // Ganti dengan URL server Anda
 
 // Initialize OLED display
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
@@ -61,6 +61,12 @@ void initializeSensors() {
     display.display();
 }
 
+// Global variables to store latest sensor readings
+float latestTemperature = 0;
+float latestHumidity = 0;
+int latestMoisture = 0;
+float latestLux = 0;
+
 void updateSensor() {
     // Read temperature and humidity from SHT31
     float temperature = sht31.readTemperature();
@@ -73,6 +79,12 @@ void updateSensor() {
 
     // Check if readings are valid
     if (!isnan(temperature) && !isnan(humidity) && !isnan(lux)) {
+        // Store latest readings for sending
+        latestTemperature = temperature;
+        latestHumidity = humidity;
+        latestMoisture = moistureValue;
+        latestLux = lux;
+
         // Print data to Serial Monitor
         Serial.print("Temperature: ");
         Serial.print(temperature);
@@ -111,10 +123,36 @@ void updateSensor() {
 }
 
 void sendDataToServer() {
+    if (WiFi.status() != WL_CONNECTED) {
+        Serial.println("WiFi not connected. Skipping data send.");
+        return;
+    }
     HTTPClient http;
-    String serverPath = "http://example.com/api/sensor"; // Ganti dengan URL server Anda
-    http.begin(serverPath);
-    http.addHeader("Content-Type", "application/json");
+    // Build the URL with query parameters using a local variable
+    String url = ServerPath;
+    url += "?id_sensor=1";
+    url += "&temperature=" + String(latestTemperature, 2);
+    url += "&humidity=" + String(latestHumidity, 2);
+    url += "&moisture=" + String(latestMoisture);
+    url += "&light=" + String(latestLux, 2);
+
+    Serial.print("Request URL: ");
+    Serial.println(url);
+
+    http.begin(url);
+    int httpResponseCode = http.GET();
+    if (httpResponseCode > 0) {
+        Serial.print("HTTP Response code: ");
+        Serial.println(httpResponseCode);
+        if (httpResponseCode == 200) {
+            Serial.println("Data berhasil dikirim ke server!");
+        }
+    } else {
+        Serial.print("Error code: ");
+        Serial.println(httpResponseCode);
+        Serial.println("Possible reasons: server not running, wrong URL, firewall, or network issues.");
+    }
+    http.end();
 }
 
 void connectWiFi() {
@@ -147,13 +185,14 @@ void setup() {
 }
 
 static unsigned long previousMillis;
-const unsigned long interval = 2000;
+const unsigned long interval = 5000;
 
 void loop() {
     ota.handle();
     unsigned long currentMillis = millis();
     if (currentMillis - previousMillis >= interval) {
-    previousMillis = currentMillis;
-    updateSensor();
+        previousMillis = currentMillis;
+        updateSensor();
+        sendDataToServer(); // Send data after updating sensor readings
     }
 }

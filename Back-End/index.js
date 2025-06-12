@@ -19,8 +19,8 @@ const db = mysql.createPool({
 });
 
 // ===== ROUTE: GET kirim via URL-encoded =====
-// contoh: GET /api/data/send?id_sensor=1&temperature=24.5&humidity=60&moisture=30&light=500
-app.get('/api/data/send', (req, res) => {
+// contoh: GET /api/data-sensor/send?id_sensor=1&temperature=24.5&humidity=60&moisture=30&light=500
+app.get('/api/data-sensor/send', (req, res) => {
   const { id_sensor, temperature, humidity, moisture, light } = req.query;
 
   if ( !id_sensor || !temperature || !humidity || !moisture || !light) {
@@ -37,6 +37,7 @@ app.get('/api/data/send', (req, res) => {
       console.error(err);
       return res.status(500).send('Gagal menyimpan data.');
     }
+    console.log(`Data berhasil disimpan (GET): id_sensor=${id_sensor}, temperature=${temperature}, humidity=${humidity}, moisture=${moisture}, light=${light}`);
     res.send(`Data diterima via GET: 
       id_sensor=${id_sensor},
       temperature=${temperature}, 
@@ -49,11 +50,11 @@ app.get('/api/data/send', (req, res) => {
 
 
 // ===== ROUTE: POST kirim via JSON =====
-// contoh: POST /api/data/send dengan body: { "temperature": 24.5, "humidity": 60, "moisture": 30, "light": 500 }
-app.post('/api/data/send', (req, res) => {
+// contoh: POST /api/data-sensor/send dengan body: { "temperature": 24.5, "humidity": 60, "moisture": 30, "light": 500 }
+app.post('/api/data-sensor/send', (req, res) => {
   const { id_sensor, temperature, humidity, moisture, light } = req.body;
 
-  if (!id_sensor|| !temperature || !humidity || !moisture || !light) {
+  if (!id_sensor || !temperature || !humidity || !moisture || !light) {
     return res.status(400).send('Semua parameter (id_sensor, temperature, humidity, moisture, light) wajib diisi.');
   }
 
@@ -62,11 +63,12 @@ app.post('/api/data/send', (req, res) => {
     VALUES (?, ?, ?, ?, ?)
   `;
 
-  db.query(sql, [temperature, humidity, moisture, light], (err) => {
+  db.query(sql, [id_sensor, temperature, humidity, moisture, light], (err) => {
     if (err) {
       console.error(err);
       return res.status(500).send('Gagal menyimpan data.');
     }
+    console.log(`Data berhasil disimpan (POST): id_sensor=${id_sensor}, temperature=${temperature}, humidity=${humidity}, moisture=${moisture}, light=${light}`);
     res.send(`Data diterima via POST: 
       id_sensor=${id_sensor},
       temperature=${temperature}, 
@@ -119,8 +121,8 @@ app.get('/api/data/id', (req, res) => {
 // ===== Start Server =====
 app.listen(port, function () {
   console.log(`Server berjalan di http://localhost:${port}`);
-  console.log(`Kirim data via GET  : /api/data/send?temperature=..&humidity=..&moisture=..&light=..`);
-  console.log(`Kirim data via POST : /api/data/send (body JSON)`);
+  console.log(`Kirim data via GET  : /api/data-sensor/send?temperature=..&humidity=..&moisture=..&light=..`);
+  console.log(`Kirim data via POST : /api/data-sensor/send (body JSON)`);
   console.log(`Ambil semua data     : /api/data/all`);
   console.log(`Ambil data by ID     : /api/data/:id`);
 });
