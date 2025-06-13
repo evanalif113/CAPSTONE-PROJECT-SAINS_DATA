@@ -51,7 +51,7 @@ CREATE TABLE IF NOT EXISTS DATA_SENSOR (
 
 -- 6. Tabel Aktuator (kendali perangkat via relay)
 CREATE TABLE IF NOT EXISTS AKTUATOR (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    id_aktuator INT AUTO_INCREMENT PRIMARY KEY,
     id_kumbung INT NOT NULL,
     nama VARCHAR(100) NOT NULL,
     status ENUM('aktif', 'non-aktif') DEFAULT 'aktif',
@@ -66,5 +66,5 @@ CREATE TABLE IF NOT EXISTS LOG_AKTUATOR (
     id_aktuator INT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     status ENUM('on', 'off') NOT NULL,
-    FOREIGN KEY (id_aktuator) REFERENCES AKTUATOR(id) ON DELETE CASCADE
+    FOREIGN KEY (id_aktuator) REFERENCES AKTUATOR(id_aktuator) ON DELETE CASCADE
 );
