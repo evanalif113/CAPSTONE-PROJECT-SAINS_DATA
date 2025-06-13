@@ -54,10 +54,17 @@ CREATE TABLE IF NOT EXISTS AKTUATOR (
     id INT AUTO_INCREMENT PRIMARY KEY,
     id_kumbung INT NOT NULL,
     nama VARCHAR(100) NOT NULL,
-    jenis ENUM('kipas', 'humidifier', 'lampu', 'lainnya') NOT NULL,
-    nomor_relay INT NOT NULL,
     status ENUM('aktif', 'non-aktif') DEFAULT 'aktif',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (id_kumbung) REFERENCES KUMBUNG(id_kumbung) ON DELETE CASCADE
+);
+
+-- 7. Tabel Log Aktuator
+CREATE TABLE IF NOT EXISTS LOG_AKTUATOR (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    id_aktuator INT NOT NULL,
+    aksi ENUM('on', 'off') NOT NULL,
+    tanggal TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_aktuator) REFERENCES AKTUATOR(id) ON DELETE CASCADE
 );

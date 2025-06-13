@@ -47,8 +47,6 @@ app.get('/api/data-sensor/send', (req, res) => {
   });
 });
 
-
-
 // ===== ROUTE: POST kirim via JSON =====
 // contoh: POST /api/data-sensor/send dengan body: { "temperature": 24.5, "humidity": 60, "moisture": 30, "light": 500 }
 app.post('/api/data-sensor/send', (req, res) => {
