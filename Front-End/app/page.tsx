@@ -152,30 +152,28 @@ export default function Dashboard() {
     <div className="flex min-h-screen bg-gray-50">
       {/* Sidebar */}
       <div className="w-16 bg-slate-800 flex flex-col items-center py-4 space-y-6">
-        <div className="w-8 h-8 bg-teal-200 rounded-full flex items-center justify-center">
-          <img
-            src="/img/icon.png"
-            alt="Logo Kumbung Sense"
-            className="w-4 h-4 rounded-full object-cover"
-          />
-        </div>
+        <img
+          src="/img/icon.png"
+          alt="Logo Kumbung Sense"
+          className="w-10 h-10 rounded-full object-cover"
+        />
         <nav className="flex flex-col space-y-4">
           {navItems.map((item, idx) => {
-            const Icon = item.icon
-            const isActive = idx === 0 // Only first item (Beranda) is active here
-            return (
-              <button
-                key={item.name}
-                onClick={() => (window.location.href = item.href)}
-                className={`p-2 rounded-lg transition-colors ${
-                  isActive
-                    ? "text-white bg-slate-700 hover:bg-slate-600"
-                    : "text-gray-400 hover:text-white hover:bg-slate-700"
-                }`}
-              >
-                <Icon />
-              </button>
-            )
+        const Icon = item.icon
+        const isActive = idx === 0 // Only first item (Beranda) is active here
+        return (
+          <button
+            key={item.name}
+            onClick={() => (window.location.href = item.href)}
+            className={`p-2 rounded-lg transition-colors ${
+          isActive
+            ? "text-white bg-slate-700 hover:bg-slate-600"
+            : "text-gray-400 hover:text-white hover:bg-slate-700"
+            }`}
+          >
+            <Icon />
+          </button>
+        )
           })}
         </nav>
         <div className="flex-1"></div>
