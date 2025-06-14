@@ -188,7 +188,11 @@ export default function DataHistory() {
       {/* Sidebar */}
       <div className="w-16 bg-slate-800 flex flex-col items-center py-4 space-y-6">
         <div className="w-8 h-8 bg-teal-200 rounded-full flex items-center justify-center">
-          <div className="w-4 h-4 bg-slate-800 rounded-full"></div>
+          <img
+            src="/img/icon.png"
+            alt="Logo Kumbung Sense"
+            className="w-4 h-4 rounded-full object-cover"
+          />
         </div>
         <nav className="flex flex-col space-y-4">
           <button
@@ -234,7 +238,11 @@ export default function DataHistory() {
         <header className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <div className="w-10 h-10 bg-teal-200 rounded-full flex items-center justify-center">
-              <div className="w-6 h-6 bg-slate-800 rounded-full"></div>
+              <img
+                src="/img/icon.png"
+                alt="Logo Kumbung Sense"
+                className="w-4 h-4 rounded-full object-cover"
+              />
             </div>
             <div>
               <h1 className="text-lg font-semibold text-gray-900">Kumbung Sense</h1>

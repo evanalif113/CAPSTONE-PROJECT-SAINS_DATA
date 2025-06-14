@@ -153,7 +153,11 @@ export default function Dashboard() {
       {/* Sidebar */}
       <div className="w-16 bg-slate-800 flex flex-col items-center py-4 space-y-6">
         <div className="w-8 h-8 bg-teal-200 rounded-full flex items-center justify-center">
-          <div className="w-4 h-4 bg-slate-800 rounded-full"></div>
+          <img
+            src="/img/icon.png"
+            alt="Logo Kumbung Sense"
+            className="w-4 h-4 rounded-full object-cover"
+          />
         </div>
         <nav className="flex flex-col space-y-4">
           {navItems.map((item, idx) => {
