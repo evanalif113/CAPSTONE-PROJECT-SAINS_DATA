@@ -1,6 +1,6 @@
 {
-  "name": "jamur-ais",
-  "version": "0.1.1",
+  "name": "kumbung-sense",
+  "version": "0.1.5",
   "private": true,
   "scripts": {
     "dev": "next dev",
