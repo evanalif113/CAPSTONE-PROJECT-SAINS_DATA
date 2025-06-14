@@ -208,10 +208,6 @@ export default function Dashboard() {
             </div>
           </div>
           <div className="flex items-center space-x-4">
-            <button className="flex items-center px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-              <TagIcon />
-              <span className="ml-2">Tambahkan Tag</span>
-            </button>
             <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
               <MoreIcon />
             </button>
