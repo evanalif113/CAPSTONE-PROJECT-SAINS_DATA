@@ -1,13 +1,14 @@
-"use client"
+"use client";
 
-import { useState } from "react"
+import { useState } from "react";
+import AppHeader from "../components/AppHeader"; // pastikan path ini sesuai struktur Anda
 
 export default function Dashboard() {
-  const [modeAuto, setModeAuto] = useState(true)
-  const [fanEnabled, setFanEnabled] = useState(false)
-  const [humidifierEnabled, setHumidifierEnabled] = useState(true)
-  const [lightEnabled, setLightEnabled] = useState(false)
-  const [selectedPeriod, setSelectedPeriod] = useState("1 Month")
+  const [modeAuto, setModeAuto] = useState(true);
+  const [fanEnabled, setFanEnabled] = useState(false);
+  const [humidifierEnabled, setHumidifierEnabled] = useState(true);
+  const [lightEnabled, setLightEnabled] = useState(false);
+  const [selectedPeriod, setSelectedPeriod] = useState("1 Month");
 
   const periods = [
     "Latest",
@@ -20,14 +21,38 @@ export default function Dashboard() {
     "6 Months",
     "1 Year",
     "Custom",
-  ]
+  ];
 
   const sensorData = [
-    { title: "Temperature", value: "24.5", unit: "°C", status: "Normal", trend: "Turun" },
-    { title: "Air Humidity", value: "85", unit: "%", status: "Normal", trend: "Turun" },
-    { title: "Light Intensity", value: "450", unit: "lux", status: "Normal", trend: "Turun" },
-    { title: "Medium Moisture", value: "75", unit: "%", status: "Normal", trend: "Turun" },
-  ]
+    {
+      title: "Temperature",
+      value: "24.5",
+      unit: "°C",
+      status: "Normal",
+      trend: "Turun",
+    },
+    {
+      title: "Air Humidity",
+      value: "85",
+      unit: "%",
+      status: "Normal",
+      trend: "Turun",
+    },
+    {
+      title: "Light Intensity",
+      value: "450",
+      unit: "lux",
+      status: "Normal",
+      trend: "Turun",
+    },
+    {
+      title: "Medium Moisture",
+      value: "75",
+      unit: "%",
+      status: "Normal",
+      trend: "Turun",
+    },
+  ];
 
   // Custom Toggle Switch Component
   const ToggleSwitch = ({ checked, onChange, disabled = false }) => (
@@ -45,26 +70,26 @@ export default function Dashboard() {
         }`}
       />
     </button>
-  )
+  );
 
   // Icon Components (simplified SVGs)
   const HomeIcon = () => (
     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
       <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
     </svg>
-  )
+  );
 
   const GridIcon = () => (
     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
       <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
     </svg>
-  )
+  );
 
   const BellIcon = () => (
     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
       <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
     </svg>
-  )
+  );
 
   const SettingsIcon = () => (
     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -74,13 +99,17 @@ export default function Dashboard() {
         clipRule="evenodd"
       />
     </svg>
-  )
+  );
 
   const UserIcon = () => (
     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-      <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 0114 0H3z" clipRule="evenodd" />
+      <path
+        fillRule="evenodd"
+        d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 0114 0H3z"
+        clipRule="evenodd"
+      />
     </svg>
-  )
+  );
 
   const LogOutIcon = () => (
     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -90,7 +119,7 @@ export default function Dashboard() {
         clipRule="evenodd"
       />
     </svg>
-  )
+  );
 
   const RefreshIcon = () => (
     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -100,7 +129,7 @@ export default function Dashboard() {
         clipRule="evenodd"
       />
     </svg>
-  )
+  );
 
   const TagIcon = () => (
     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -110,13 +139,13 @@ export default function Dashboard() {
         clipRule="evenodd"
       />
     </svg>
-  )
+  );
 
   const MoreIcon = () => (
     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
       <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
     </svg>
-  )
+  );
 
   // Sidebar navigation items
   const navItems = [
@@ -146,12 +175,17 @@ export default function Dashboard() {
       href: "/profile",
       icon: UserIcon,
     },
-  ]
+  ];
+
+  // Handler untuk logout
+  const handleLogout = () => {
+    window.location.href = "/logout";
+  };
 
   return (
     <div className="flex min-h-screen bg-gray-50">
       {/* Sidebar */}
-      <div className="w-16 bg-slate-800 flex flex-col items-center py-4 space-y-6">
+      <div className="w-20 bg-slate-800 flex flex-col items-center py-4 space-y-6">
         <img
           src="/img/icon.png"
           alt="Logo Kumbung Sense"
@@ -159,58 +193,31 @@ export default function Dashboard() {
         />
         <nav className="flex flex-col space-y-4">
           {navItems.map((item, idx) => {
-        const Icon = item.icon
-        const isActive = idx === 0 // Only first item (Beranda) is active here
-        return (
-          <button
-            key={item.name}
-            onClick={() => (window.location.href = item.href)}
-            className={`p-2 rounded-lg transition-colors ${
-          isActive
-            ? "text-white bg-slate-700 hover:bg-slate-600"
-            : "text-gray-400 hover:text-white hover:bg-slate-700"
-            }`}
-          >
-            <Icon />
-          </button>
-        )
+            const Icon = item.icon;
+            const isActive = idx === 0; // Only first item (Beranda) is active here
+            return (
+              <button
+                key={item.name}
+                onClick={() => (window.location.href = item.href)}
+                className={`flex flex-col items-center p-2 rounded-lg transition-colors ${
+                  isActive
+                    ? "text-white bg-slate-700 hover:bg-slate-600"
+                    : "text-gray-400 hover:text-white hover:bg-slate-700"
+                }`}
+              >
+                <Icon />
+                <span className="text-xs mt-1">{item.name}</span>
+              </button>
+            );
           })}
         </nav>
         <div className="flex-1"></div>
-        <button
-          onClick={() => (window.location.href = "/logout")}
-          className="p-2 text-gray-400 hover:text-white hover:bg-slate-700 rounded-lg transition-colors"
-        >
-          <LogOutIcon />
-        </button>
       </div>
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
-        {/* Header */}
-        <header className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="w-10 h-10 bg-teal-200 rounded-full flex items-center justify-center">
-              <div className="w-6 h-6 bg-slate-800 rounded-full"></div>
-            </div>
-            <div>
-              <h1 className="text-lg font-semibold text-gray-900">Kumbung Sense</h1>
-              <div className="flex items-center space-x-4 text-sm text-gray-500">
-                <div className="flex items-center space-x-1">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span>Online</span>
-                </div>
-                <span>Als1</span>
-                <span>GT Pengempon</span>
-              </div>
-            </div>
-          </div>
-          <div className="flex items-center space-x-4">
-            <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-              <MoreIcon />
-            </button>
-          </div>
-        </header>
+        {/* Header global */}
+        <AppHeader onLogout={handleLogout} />
 
         {/* Dashboard Content */}
         <main className="flex-1 p-6 space-y-6">
@@ -218,7 +225,9 @@ export default function Dashboard() {
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-2xl font-bold text-gray-900">Dashboard</h2>
-              <p className="text-sm text-gray-500 mt-1">Last updated at 10:10:10</p>
+              <p className="text-sm text-gray-500 mt-1">
+                Last updated at 10:10:10
+              </p>
             </div>
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
@@ -229,19 +238,6 @@ export default function Dashboard() {
                 <RefreshIcon />
                 <span className="ml-2">Refresh</span>
               </button>
-              <button
-                onClick={() => (window.location.href = "/data-history")}
-                className="flex items-center px-3 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                  <path
-                    fillRule="evenodd"
-                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                History
-              </button>
             </div>
           </div>
 
@@ -250,21 +246,29 @@ export default function Dashboard() {
             {sensorData.map((sensor, index) => (
               <div key={index} className="bg-gray-100 rounded-lg p-4">
                 <div className="mb-3">
-                  <h3 className="text-sm font-medium text-gray-600">{sensor.title}</h3>
+                  <h3 className="text-sm font-medium text-gray-600">
+                    {sensor.title}
+                  </h3>
                 </div>
                 <div className="space-y-3">
                   <div className="flex items-baseline space-x-1">
-                    <span className="text-3xl font-bold text-gray-900">{sensor.value}</span>
+                    <span className="text-3xl font-bold text-gray-900">
+                      {sensor.value}
+                    </span>
                     <span className="text-sm text-gray-500">{sensor.unit}</span>
                   </div>
                   <div className="flex justify-between text-xs">
                     <div className="flex items-center space-x-1">
                       <span className="text-gray-500">Status</span>
-                      <span className="bg-green-500 text-white px-2 py-1 rounded text-xs">{sensor.status}</span>
+                      <span className="bg-green-500 text-white px-2 py-1 rounded text-xs">
+                        {sensor.status}
+                      </span>
                     </div>
                     <div className="flex items-center space-x-1">
                       <span className="text-gray-500">Tren</span>
-                      <span className="text-red-500 text-xs">{sensor.trend}</span>
+                      <span className="text-red-500 text-xs">
+                        {sensor.trend}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -300,7 +304,9 @@ export default function Dashboard() {
               </div>
               <div className="p-4">
                 <div className="h-48 bg-gray-50 rounded flex items-center justify-center">
-                  <div className="text-gray-400">Chart visualization would go here</div>
+                  <div className="text-gray-400">
+                    Chart visualization would go here
+                  </div>
                 </div>
                 <div className="flex justify-between text-xs text-gray-400 mt-2">
                   <span>Apr 30</span>
@@ -324,7 +330,9 @@ export default function Dashboard() {
               </div>
               <div className="p-4">
                 <div className="h-48 bg-gray-50 rounded flex items-center justify-center">
-                  <div className="text-gray-400">Chart visualization would go here</div>
+                  <div className="text-gray-400">
+                    Chart visualization would go here
+                  </div>
                 </div>
                 <div className="flex justify-between text-xs text-gray-400 mt-2">
                   <span>Apr 30</span>
@@ -343,13 +351,17 @@ export default function Dashboard() {
           {/* System Status */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200">
             <div className="p-4 border-b border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900">System status</h3>
+              <h3 className="text-lg font-semibold text-gray-900">
+                System status
+              </h3>
             </div>
             <div className="p-4 space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex justify-between">
                   <span className="text-gray-600">System status</span>
-                  <span className="bg-green-500 text-white px-2 py-1 rounded text-sm">Online</span>
+                  <span className="bg-green-500 text-white px-2 py-1 rounded text-sm">
+                    Online
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Terakhir data diterima</span>
@@ -374,7 +386,9 @@ export default function Dashboard() {
           {/* Actuator Status */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200">
             <div className="p-4 border-b border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900">Actuator Status</h3>
+              <h3 className="text-lg font-semibold text-gray-900">
+                Actuator Status
+              </h3>
             </div>
             <div className="p-4">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -384,11 +398,17 @@ export default function Dashboard() {
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-gray-600">Humidifier</span>
-                  <ToggleSwitch checked={humidifierEnabled} onChange={setHumidifierEnabled} />
+                  <ToggleSwitch
+                    checked={humidifierEnabled}
+                    onChange={setHumidifierEnabled}
+                  />
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-gray-600">Light</span>
-                  <ToggleSwitch checked={lightEnabled} onChange={setLightEnabled} />
+                  <ToggleSwitch
+                    checked={lightEnabled}
+                    onChange={setLightEnabled}
+                  />
                 </div>
               </div>
             </div>
@@ -396,5 +416,5 @@ export default function Dashboard() {
         </main>
       </div>
     </div>
-  )
+  );
 }
