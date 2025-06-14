@@ -1,11 +1,17 @@
 #include <WiFi.h>
-#include <HTTPClient.h>
 #include <Wire.h>
 #include <Adafruit_SHT31.h>
 #include <Adafruit_SSD1306.h>
 #include <BH1750.h>
 #include <Adafruit_NeoPixel.h>
 #include <AViShaOTA.h>
+
+#ifdef USE_SQL
+    #include <HTTPClient.h>
+#endif
+
+#ifdef USE_FIREBASE
+    #include 
 
 const char* ssid = "server";
 const char* password = "jeris6467";

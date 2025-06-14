@@ -3,7 +3,6 @@ const bodyParser = require('body-parser');
 const mysql = require('mysql2');
 
 const app = express();
-const host = "192.168.1.100";
 const port = 2518;
 
 // ===== Middleware =====
@@ -12,7 +11,7 @@ app.use(bodyParser.urlencoded({extended: false }));
 
 // ===== Koneksi MySQL =====
 const db = mysql.createPool({
-  host: host,
+  host: 'localhost',
   user: 'root',
   password: '',
   database: 'DB_JAMUR'
@@ -35,10 +34,10 @@ const db = mysql.createPool({
       (err, results) => {
         if (err) {
           console.error(err);
-          return res.status(500).json({ message: 'Terjadi kesalahan server.' });
+          return res.status(500).send('Terjadi kesalahan server.');
         }
         if (results.length > 0) {
-          return res.status(409).json({ message: 'Username sudah terdaftar.' });
+          return res.status(409).send('Username sudah terdaftar.');
         }
 
         // Simpan user baru
@@ -48,9 +47,9 @@ const db = mysql.createPool({
           (err2, result) => {
             if (err2) {
               console.error(err2);
-              return res.status(500).json({ message: 'Gagal mendaftar.' });
+              return res.status(500).send('Gagal mendaftar.');
             }
-            res.status(201).json({ message: 'Pendaftaran berhasil.' });
+            res.status(201).send('Pendaftaran berhasil.');
           }
         );
       }
@@ -59,5 +58,5 @@ const db = mysql.createPool({
 
 // ===== Start Server =====
 app.listen(port, function () {
-  console.log(`Server berjalan di ${host}:${port}`);
+  console.log(`Server berjalan di localhost:${port}`);
 });

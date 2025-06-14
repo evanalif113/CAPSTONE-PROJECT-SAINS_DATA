@@ -11,7 +11,7 @@ app.use(bodyParser.urlencoded({extended: false }));
 
 // ===== Koneksi MySQL =====
 const db = mysql.createPool({
-  host: 'http://192.168.1.100',
+  host: 'localhost',
   user: 'root',
   password: '',
   database: 'DB_JAMUR'
