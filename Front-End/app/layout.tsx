@@ -8,19 +8,19 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       {
-        url: "/img/no-bg.png",
-        href: "/img/no-bg.png",
+        url: "/img/icon.png",
+        href: "/img/icon.png",
       },
     ],
     apple: [
       {
-        url: "/img/no-bg.png",
+        url: "/img/icon.png",
         sizes: "180x180",
         type: "image/png",
       },
     ],
   },
-    generator: 'v0.dev'
+  generator: 'v0.dev'
 }
 
 export default function RootLayout({

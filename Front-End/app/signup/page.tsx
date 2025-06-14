@@ -48,15 +48,12 @@ export default function Signup() {
       <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-md">
         {/* Logo */}
         <div className="flex justify-center mb-6">
-          <div className="w-16 h-16 bg-teal-200 rounded-full flex items-center justify-center">
-            <div className="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center">
-              <svg className="w-6 h-6 text-teal-200" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2L13.09 8.26L22 9L13.09 9.74L12 16L10.91 9.74L2 9L10.91 8.26L12 2Z" />
-              </svg>
-            </div>
-          </div>
+          <img
+            src="/img/icon.png"
+            alt="Logo Kumbung Sense"
+            className="w-16 h-16 rounded-full object-cover"
+          />
         </div>
-
         {/* Title */}
         <h1 className="text-2xl font-bold text-center text-gray-900 mb-2">Kumbung Sense</h1>
 
