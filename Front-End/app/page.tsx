@@ -118,6 +118,36 @@ export default function Dashboard() {
     </svg>
   )
 
+  // Sidebar navigation items
+  const navItems = [
+    {
+      name: "Beranda",
+      href: "/",
+      icon: HomeIcon,
+      active: true,
+    },
+    {
+      name: "Data History",
+      href: "/data-history",
+      icon: GridIcon,
+    },
+    {
+      name: "Alerts",
+      href: "/alerts",
+      icon: BellIcon,
+    },
+    {
+      name: "Settings",
+      href: "/settings",
+      icon: SettingsIcon,
+    },
+    {
+      name: "Profile",
+      href: "/profile",
+      icon: UserIcon,
+    },
+  ]
+
   return (
     <div className="flex min-h-screen bg-gray-50">
       {/* Sidebar */}
@@ -126,33 +156,23 @@ export default function Dashboard() {
           <div className="w-4 h-4 bg-slate-800 rounded-full"></div>
         </div>
         <nav className="flex flex-col space-y-4">
-          <button className="p-2 text-white bg-slate-700 rounded-lg hover:bg-slate-600 transition-colors">
-            <HomeIcon />
-          </button>
-          <button
-            onClick={() => (window.location.href = "/data-history")}
-            className="p-2 text-gray-400 hover:text-white hover:bg-slate-700 rounded-lg transition-colors"
-          >
-            <GridIcon />
-          </button>
-          <button
-            onClick={() => (window.location.href = "/alerts")}
-            className="p-2 text-gray-400 hover:text-white hover:bg-slate-700 rounded-lg transition-colors"
-          >
-            <BellIcon />
-          </button>
-          <button
-            onClick={() => (window.location.href = "/settings")}
-            className="p-2 text-gray-400 hover:text-white hover:bg-slate-700 rounded-lg transition-colors"
-          >
-            <SettingsIcon />
-          </button>
-          <button
-            onClick={() => (window.location.href = "/profile")}
-            className="p-2 text-gray-400 hover:text-white hover:bg-slate-700 rounded-lg transition-colors"
-          >
-            <UserIcon />
-          </button>
+          {navItems.map((item, idx) => {
+            const Icon = item.icon
+            const isActive = idx === 0 // Only first item (Beranda) is active here
+            return (
+              <button
+                key={item.name}
+                onClick={() => (window.location.href = item.href)}
+                className={`p-2 rounded-lg transition-colors ${
+                  isActive
+                    ? "text-white bg-slate-700 hover:bg-slate-600"
+                    : "text-gray-400 hover:text-white hover:bg-slate-700"
+                }`}
+              >
+                <Icon />
+              </button>
+            )
+          })}
         </nav>
         <div className="flex-1"></div>
         <button

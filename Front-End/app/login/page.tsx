@@ -103,6 +103,17 @@ export default function Login() {
             )}
           </button>
         </form>
+
+        {/* Signup Link */}
+        <div className="text-center mt-4 text-sm text-gray-600">
+          Belum punya akun?{" "}
+          <a
+            href="/signup"
+            className="text-teal-600 hover:text-teal-800 font-medium transition-colors"
+          >
+            Daftar di sini
+          </a>
+        </div>
       </div>
     </div>
   )
