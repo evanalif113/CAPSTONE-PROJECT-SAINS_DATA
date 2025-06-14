@@ -26,6 +26,9 @@ export default function Signup() {
         setSuccess("Registrasi berhasil! Silakan login.")
         setUsername("")
         setPassword("")
+        setTimeout(() => {
+          window.location.href = "/login"
+        }, 1200)
       } else if (res.status === 409) {
         setError(text || "Username sudah terdaftar.")
       } else if (res.status === 400) {
@@ -34,7 +37,7 @@ export default function Signup() {
         setError(text || "Registrasi gagal.")
       }
     } catch (err) {
-      setError("Terjadi kesalahan server.")
+      setError("Tidak dapat terhubung ke server. Pastikan server backend berjalan dan dapat diakses.")
       console.error("API signup error:", err)
     }
     setIsLoading(false)

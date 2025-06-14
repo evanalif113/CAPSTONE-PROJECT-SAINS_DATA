@@ -2,9 +2,12 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const mysql = require('mysql2');
 
+const cors = require('cors');
 const app = express();
 const port = 2518;
 
+
+app.use(cors());
 // ===== Middleware =====
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({extended: false }));
