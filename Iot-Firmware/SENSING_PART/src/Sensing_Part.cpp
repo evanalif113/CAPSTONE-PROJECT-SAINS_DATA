@@ -12,7 +12,7 @@
 
 #ifdef USE_FIREBASE
     #include 
-
+#endif
 const char* ssid = "server";
 const char* password = "jeris6467";
 // OLED display width and height
