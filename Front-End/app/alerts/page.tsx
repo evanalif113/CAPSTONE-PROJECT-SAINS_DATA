@@ -46,6 +46,15 @@ export default function Alerts() {
       <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
     </svg>
   );
+  const BellIcon = ({ className = "" }) => (
+    <svg
+      className={`w-5 h-5 ${className}`}
+      fill="currentColor"
+      viewBox="0 0 20 20"
+    >
+      <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
+    </svg>
+  );
 
   // Sample data
   const activeAlerts = [
@@ -72,49 +81,6 @@ export default function Alerts() {
     },
   ];
 
-  const alertHistory = [
-    {
-      id: 1,
-      type: "warning",
-      message: "Light intensity below threshold",
-      time: "Yesterday, 14:30",
-      status: "Resolved",
-      icon: "triangle-yellow",
-    },
-    {
-      id: 2,
-      type: "critical",
-      message: "Fan malfunction detected",
-      time: "May 27, 09:15",
-      status: "Resolved",
-      icon: "triangle-red",
-    },
-    {
-      id: 3,
-      type: "warning",
-      message: "Humidity above optimal range (80%)",
-      time: "May 26, 18:45",
-      status: "Resolved",
-      icon: "triangle-yellow",
-    },
-    {
-      id: 4,
-      type: "info",
-      message: "System maintenance completed",
-      time: "May 25, 10:00",
-      status: "Resolved",
-      icon: "bell-blue",
-    },
-    {
-      id: 5,
-      type: "critical",
-      message: "Power interruption detected",
-      time: "May 24, 22:10",
-      status: "Resolved",
-      icon: "triangle-red",
-    },
-  ];
-
   const notificationSettings = [
     { type: "Temperature High", threshold: "> 32°C", email: true, push: true },
     { type: "Temperature Low", threshold: "< 18°C", email: false, push: true },
@@ -135,7 +101,10 @@ export default function Alerts() {
     { type: "Device Fault", threshold: "Any", email: true, push: true },
   ];
 
-  const renderAlertIcon = (iconType) => {
+  // Tipe untuk iconType
+  type IconType = "triangle-red" | "triangle-yellow" | "bell-blue" | string;
+
+  const renderAlertIcon = (iconType: IconType) => {
     switch (iconType) {
       case "triangle-red":
         return <WarningIcon className="text-red-500" />;
@@ -162,9 +131,7 @@ export default function Alerts() {
           {/* Page Header */}
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-gray-900">
-              {activeTab === "Active Alerts"
-                ? "Alarm dan Notifikasi"
-                : "Alerts & Notifications"}
+              Alarm dan Notifikasi
             </h2>
             <div className="flex space-x-2">
               <button
@@ -176,16 +143,6 @@ export default function Alerts() {
                 }`}
               >
                 Active Alerts
-              </button>
-              <button
-                onClick={() => setActiveTab("Alert History")}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  activeTab === "Alert History"
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                }`}
-              >
-                Alert History
               </button>
               <button
                 onClick={() => setActiveTab("Notification Settings")}
@@ -208,7 +165,7 @@ export default function Alerts() {
                   Active Alerts
                 </h3>
                 <span className="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium">
-                  3 Active
+                  {activeAlerts.length} Active
                 </span>
               </div>
               <div className="space-y-4">
@@ -223,43 +180,6 @@ export default function Alerts() {
                         <span className="text-gray-900 font-medium">
                           {alert.message}
                         </span>
-                      </div>
-                      <span className="text-sm text-gray-500">
-                        {alert.time}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Alert History Tab */}
-          {activeTab === "Alert History" && (
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-6">
-                Alert History
-              </h3>
-              <div className="space-y-4">
-                {alertHistory.map((alert) => (
-                  <div
-                    key={alert.id}
-                    className="bg-white rounded-lg border border-gray-200 p-4"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        {renderAlertIcon(alert.icon)}
-                        <div>
-                          <span className="text-gray-900 font-medium block">
-                            {alert.message}
-                          </span>
-                          <div className="flex items-center space-x-2 mt-1">
-                            <CheckIcon className="text-green-500" />
-                            <span className="text-green-600 text-sm font-medium">
-                              {alert.status}
-                            </span>
-                          </div>
-                        </div>
                       </div>
                       <span className="text-sm text-gray-500">
                         {alert.time}
