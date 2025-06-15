@@ -169,6 +169,7 @@ export default function Profile() {
               >
                 Informasi Pribadi
               </button>
+              {/* 
               <button
                 onClick={() => setActiveTab("Security")}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
@@ -199,6 +200,7 @@ export default function Profile() {
               >
                 Aktivitas
               </button>
+              */}
             </div>
           </div>
 
@@ -423,273 +425,28 @@ export default function Profile() {
             </div>
           )}
 
-          {/* Security Tab */}
+          {/* 
+          // Security Tab
           {activeTab === "Security" && (
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-6">
-                Keamanan Akun
-              </h3>
-
-              {/* Password Change */}
-              <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
-                <h4 className="text-md font-medium text-gray-900 mb-4 flex items-center">
-                  <KeyIcon className="mr-2 text-blue-600" />
-                  Ubah Kata Sandi
-                </h4>
-                <form
-                  onSubmit={handleChangePassword}
-                  className="grid grid-cols-1 md:grid-cols-2 gap-6"
-                >
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Kata Sandi Saat Ini
-                    </label>
-                    <input
-                      type="password"
-                      value={password.current}
-                      onChange={(e) =>
-                        setPassword({ ...password, current: e.target.value })
-                      }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      required
-                    />
-                  </div>
-                  <div className="md:col-span-2 border-t border-gray-200 pt-4"></div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Kata Sandi Baru
-                    </label>
-                    <input
-                      type="password"
-                      value={password.new}
-                      onChange={(e) =>
-                        setPassword({ ...password, new: e.target.value })
-                      }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Konfirmasi Kata Sandi Baru
-                    </label>
-                    <input
-                      type="password"
-                      value={password.confirm}
-                      onChange={(e) =>
-                        setPassword({ ...password, confirm: e.target.value })
-                      }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      required
-                    />
-                  </div>
-                  <div className="md:col-span-2 flex justify-end">
-                    <button
-                      type="submit"
-                      className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                    >
-                      Ubah Kata Sandi
-                    </button>
-                  </div>
-                </form>
-              </div>
-
-              {/* Two-Factor Authentication */}
-              <div className="bg-white rounded-lg border border-gray-200 p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h4 className="text-md font-medium text-gray-900 flex items-center">
-                    <KeyIcon className="mr-2 text-blue-600" />
-                    Autentikasi Dua Faktor
-                  </h4>
-                  <div className="flex items-center space-x-2">
-                    <input
-                      type="checkbox"
-                      checked={profileData.twoFactorEnabled}
-                      onChange={(e) =>
-                        setProfileData({
-                          ...profileData,
-                          twoFactorEnabled: e.target.checked,
-                        })
-                      }
-                      className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                    />
-                    <span className="text-sm text-blue-600 font-medium">
-                      {profileData.twoFactorEnabled ? "Aktif" : "Nonaktif"}
-                    </span>
-                  </div>
-                </div>
-                <p className="text-sm text-gray-600 mb-4">
-                  Autentikasi dua faktor menambahkan lapisan keamanan tambahan
-                  ke akun Anda dengan meminta kode verifikasi selain kata sandi
-                  Anda.
-                </p>
-                {profileData.twoFactorEnabled ? (
-                  <button className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
-                    Konfigurasi Ulang
-                  </button>
-                ) : (
-                  <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                    Aktifkan
-                  </button>
-                )}
-              </div>
+              ...Keamanan Akun...
             </div>
           )}
 
-          {/* Notifications Tab */}
+          // Notifications Tab
           {activeTab === "Notifications" && (
             <div>
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-semibold text-gray-900">
-                  Preferensi Notifikasi
-                </h3>
-                <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                  <SaveIcon />
-                  <span className="ml-2">Simpan Preferensi</span>
-                </button>
-              </div>
-
-              <div className="bg-white rounded-lg border border-gray-200 p-6">
-                <h4 className="text-md font-medium text-gray-900 mb-4 flex items-center">
-                  <NotificationIcon className="mr-2 text-blue-600" />
-                  Saluran Notifikasi
-                </h4>
-
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between p-4 border-b border-gray-100">
-                    <div>
-                      <h5 className="font-medium text-gray-900">Email</h5>
-                      <p className="text-sm text-gray-600">
-                        Terima notifikasi melalui email
-                      </p>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <input
-                        type="checkbox"
-                        checked={profileData.notificationPreferences.email}
-                        onChange={(e) =>
-                          setProfileData({
-                            ...profileData,
-                            notificationPreferences: {
-                              ...profileData.notificationPreferences,
-                              email: e.target.checked,
-                            },
-                          })
-                        }
-                        className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                      />
-                      <span className="text-sm text-blue-600 font-medium">
-                        {profileData.notificationPreferences.email
-                          ? "Aktif"
-                          : "Nonaktif"}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between p-4 border-b border-gray-100">
-                    <div>
-                      <h5 className="font-medium text-gray-900">
-                        Push Notification
-                      </h5>
-                      <p className="text-sm text-gray-600">
-                        Terima notifikasi push di perangkat Anda
-                      </p>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <input
-                        type="checkbox"
-                        checked={profileData.notificationPreferences.push}
-                        onChange={(e) =>
-                          setProfileData({
-                            ...profileData,
-                            notificationPreferences: {
-                              ...profileData.notificationPreferences,
-                              push: e.target.checked,
-                            },
-                          })
-                        }
-                        className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                      />
-                      <span className="text-sm text-blue-600 font-medium">
-                        {profileData.notificationPreferences.push
-                          ? "Aktif"
-                          : "Nonaktif"}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between p-4">
-                    <div>
-                      <h5 className="font-medium text-gray-900">SMS</h5>
-                      <p className="text-sm text-gray-600">
-                        Terima notifikasi melalui SMS
-                      </p>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <input
-                        type="checkbox"
-                        checked={profileData.notificationPreferences.sms}
-                        onChange={(e) =>
-                          setProfileData({
-                            ...profileData,
-                            notificationPreferences: {
-                              ...profileData.notificationPreferences,
-                              sms: e.target.checked,
-                            },
-                          })
-                        }
-                        className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                      />
-                      <span className="text-sm text-blue-600 font-medium">
-                        {profileData.notificationPreferences.sms
-                          ? "Aktif"
-                          : "Nonaktif"}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              ...Preferensi Notifikasi...
             </div>
           )}
 
-          {/* Activity Tab */}
+          // Activity Tab
           {activeTab === "Activity" && (
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-6">
-                Riwayat Aktivitas
-              </h3>
-
-              <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-                <div className="grid grid-cols-4 gap-4 p-4 bg-gray-50 border-b border-gray-200 font-medium text-gray-700">
-                  <div>Tanggal & Waktu</div>
-                  <div>Perangkat</div>
-                  <div>Alamat IP</div>
-                  <div>Status</div>
-                </div>
-                {loginHistory.map((entry, index) => (
-                  <div
-                    key={index}
-                    className="grid grid-cols-4 gap-4 p-4 border-b border-gray-100 last:border-b-0"
-                  >
-                    <div className="text-gray-900">{entry.date}</div>
-                    <div className="text-gray-600">{entry.device}</div>
-                    <div className="text-gray-600">{entry.ip}</div>
-                    <div>
-                      <span
-                        className={`px-2 py-1 rounded text-xs font-medium ${
-                          entry.status === "Success"
-                            ? "bg-green-100 text-green-800"
-                            : "bg-red-100 text-red-800"
-                        }`}
-                      >
-                        {entry.status === "Success" ? "Berhasil" : "Gagal"}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
+              ...Riwayat Aktivitas...
             </div>
           )}
+          */}
         </main>
       </div>
     </div>
