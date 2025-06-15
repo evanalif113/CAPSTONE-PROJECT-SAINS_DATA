@@ -149,6 +149,15 @@ export default function Dashboard() {
             </div>
           </div>
 
+          {/* Manual Override Indicator */}
+          {modeAuto === false && (
+            <div>
+              <div className="px-4 py-2 bg-yellow-500 text-white rounded-lg font-semibold shadow inline-block">
+                Manual Override Aktif
+              </div>
+            </div>
+          )}
+
           {/* Sensor Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {sensorData.map((sensor, index) => (
