@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import AppHeader from "../components/AppHeader";
-
 import Sidebar from "@/components/Sidebar";
 import { getNavItems } from "@/components/navItems";
 import {
@@ -13,9 +12,28 @@ import {
   UserIcon,
   RefreshIcon,
 } from "@/components/Icon";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  CartesianGrid,
+} from "recharts";
 
 const navItems = getNavItems("/");
-//Importing necessary components and icons
+
+const chartData = [
+  { name: "Apr 30", temperature: 24, humidity: 85 },
+  { name: "May 04", temperature: 25, humidity: 80 },
+  { name: "May 08", temperature: 23, humidity: 82 },
+  { name: "May 12", temperature: 22, humidity: 78 },
+  { name: "May 16", temperature: 24, humidity: 81 },
+  { name: "May 20", temperature: 26, humidity: 79 },
+  { name: "May 24", temperature: 25, humidity: 77 },
+  { name: "May 28", temperature: 24, humidity: 80 },
+];
 
 export default function Dashboard() {
   const [modeAuto, setModeAuto] = useState(true);
@@ -69,7 +87,15 @@ export default function Dashboard() {
   ];
 
   // Custom Toggle Switch Component
-  const ToggleSwitch = ({ checked, onChange, disabled = false }) => (
+  const ToggleSwitch = ({
+    checked,
+    onChange,
+    disabled = false,
+  }: {
+    checked: boolean;
+    onChange: (val: boolean) => void;
+    disabled?: boolean;
+  }) => (
     <button
       type="button"
       className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
@@ -185,21 +211,22 @@ export default function Dashboard() {
                 </h3>
               </div>
               <div className="p-4">
-                <div className="h-48 bg-gray-50 rounded flex items-center justify-center">
-                  <div className="text-gray-400">
-                    Chart visualization would go here
-                  </div>
-                </div>
-                <div className="flex justify-between text-xs text-gray-400 mt-2">
-                  <span>Apr 30</span>
-                  <span>May 04</span>
-                  <span>May 08</span>
-                  <span>May 12</span>
-                  <span>May 16</span>
-                  <span>May 20</span>
-                  <span>May 24</span>
-                  <span>May 28</span>
-                </div>
+                <ResponsiveContainer width="100%" height={200}>
+                  <LineChart data={chartData}>
+                    <CartesianGrid stroke="#eee" strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip />
+                    <Line
+                      type="monotone"
+                      dataKey="temperature"
+                      stroke="#ef4444"
+                      strokeWidth={2}
+                      dot={{ r: 4 }}
+                      activeDot={{ r: 6 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
               </div>
             </div>
 
@@ -211,21 +238,22 @@ export default function Dashboard() {
                 </h3>
               </div>
               <div className="p-4">
-                <div className="h-48 bg-gray-50 rounded flex items-center justify-center">
-                  <div className="text-gray-400">
-                    Chart visualization would go here
-                  </div>
-                </div>
-                <div className="flex justify-between text-xs text-gray-400 mt-2">
-                  <span>Apr 30</span>
-                  <span>May 04</span>
-                  <span>May 08</span>
-                  <span>May 12</span>
-                  <span>May 16</span>
-                  <span>May 20</span>
-                  <span>May 24</span>
-                  <span>May 28</span>
-                </div>
+                <ResponsiveContainer width="100%" height={200}>
+                  <LineChart data={chartData}>
+                    <CartesianGrid stroke="#eee" strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip />
+                    <Line
+                      type="monotone"
+                      dataKey="humidity"
+                      stroke="#3b82f6"
+                      strokeWidth={2}
+                      dot={{ r: 4 }}
+                      activeDot={{ r: 6 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
               </div>
             </div>
           </div>

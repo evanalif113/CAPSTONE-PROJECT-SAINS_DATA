@@ -4,6 +4,15 @@ import { useState } from "react";
 import AppHeader from "../../components/AppHeader";
 import Sidebar from "@/components/Sidebar";
 import { getNavItems } from "@/components/navItems";
+import {
+  LineChart as ReLineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  CartesianGrid,
+} from "recharts";
 
 export default function DataHistory() {
   const [activeTab, setActiveTab] = useState("Environmental Trends");
@@ -38,132 +47,53 @@ export default function DataHistory() {
     </svg>
   );
 
-  // Simple Chart Component
-  const LineChart = ({ title, color, colorClass }) => {
-    // Sample data points for demonstration
-    const dataPoints1 = [800, 750, 500, 250, 300, 50, 100, 50, 150, 900];
-    const dataPoints2 = [850, 300, 250, 400, 550, 750, 500, 750, 850, 950];
+  // Data untuk chart (dummy, bisa diganti dengan data asli)
+  const chartData = [
+    { name: "0", temperature: 24, humidity: 85, light: 450, moisture: 75 },
+    { name: "1", temperature: 25, humidity: 80, light: 500, moisture: 70 },
+    { name: "2", temperature: 23, humidity: 82, light: 480, moisture: 72 },
+    { name: "3", temperature: 22, humidity: 78, light: 470, moisture: 68 },
+    { name: "4", temperature: 24, humidity: 81, light: 490, moisture: 74 },
+    { name: "5", temperature: 26, humidity: 79, light: 510, moisture: 76 },
+    { name: "6", temperature: 25, humidity: 77, light: 520, moisture: 73 },
+    { name: "7", temperature: 24, humidity: 80, light: 530, moisture: 75 },
+  ];
 
-    const maxValue = 1000;
-    const chartWidth = 800;
-    const chartHeight = 200;
-
-    const createPath = (points) => {
-      return points
-        .map((point, index) => {
-          const x = (index / (points.length - 1)) * chartWidth;
-          const y = chartHeight - (point / maxValue) * chartHeight;
-          return `${index === 0 ? "M" : "L"} ${x} ${y}`;
-        })
-        .join(" ");
-    };
-
-    return (
-      <div className="mb-8">
-        <div className="flex items-center mb-4">
-          <div className={`w-3 h-3 rounded-full mr-3 ${colorClass}`}></div>
-          <h3 className="text-lg font-medium text-gray-900">{title}</h3>
-        </div>
-        <div className="bg-white p-4 rounded-lg border border-gray-200">
-          <svg
-            width="100%"
-            height="250"
-            viewBox={`0 0 ${chartWidth} 250`}
-            className="overflow-visible"
-          >
-            {/* Grid lines */}
-            <defs>
-              <pattern
-                id="grid"
-                width="80"
-                height="50"
-                patternUnits="userSpaceOnUse"
-              >
-                <path
-                  d="M 80 0 L 0 0 0 50"
-                  fill="none"
-                  stroke="#e5e7eb"
-                  strokeWidth="1"
-                />
-              </pattern>
-            </defs>
-            <rect width="100%" height={chartHeight} fill="url(#grid)" />
-
-            {/* Y-axis labels */}
-            <g className="text-xs fill-gray-500">
-              <text x="-10" y="15">
-                1000
-              </text>
-              <text x="-10" y="65">
-                750
-              </text>
-              <text x="-10" y="115">
-                500
-              </text>
-              <text x="-10" y="165">
-                250
-              </text>
-              <text x="-10" y="210">
-                0
-              </text>
-            </g>
-
-            {/* X-axis labels */}
-            <g className="text-xs fill-gray-500">
-              {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((num, index) => (
-                <text
-                  key={num}
-                  x={index * (chartWidth / 9)}
-                  y="230"
-                  textAnchor="middle"
-                >
-                  {num}
-                </text>
-              ))}
-            </g>
-
-            {/* Data lines */}
-            <path
-              d={createPath(dataPoints1)}
-              fill="none"
-              stroke="#06b6d4"
-              strokeWidth="2"
-              className="drop-shadow-sm"
-            />
-            <path
-              d={createPath(dataPoints2)}
-              fill="none"
-              stroke="#92400e"
-              strokeWidth="2"
-              className="drop-shadow-sm"
-            />
-
-            {/* Data points */}
-            {dataPoints1.map((point, index) => (
-              <circle
-                key={`point1-${index}`}
-                cx={(index / (dataPoints1.length - 1)) * chartWidth}
-                cy={chartHeight - (point / maxValue) * chartHeight}
-                r="3"
-                fill="#06b6d4"
-                className="drop-shadow-sm"
-              />
-            ))}
-            {dataPoints2.map((point, index) => (
-              <circle
-                key={`point2-${index}`}
-                cx={(index / (dataPoints2.length - 1)) * chartWidth}
-                cy={chartHeight - (point / maxValue) * chartHeight}
-                r="3"
-                fill="#92400e"
-                className="drop-shadow-sm"
-              />
-            ))}
-          </svg>
-        </div>
-      </div>
-    );
+  // Komponen Chart Reusable
+  type ChartProps = {
+    title: string;
+    dataKey: string;
+    color: string;
+    colorClass: string;
+    unit: string;
   };
+
+  const Chart = ({ title, dataKey, color, colorClass, unit }: ChartProps) => (
+    <div className="mb-8">
+      <div className="flex items-center mb-4">
+        <div className={`w-3 h-3 rounded-full mr-3 ${colorClass}`}></div>
+        <h3 className="text-lg font-medium text-gray-900">{title}</h3>
+      </div>
+      <div className="bg-white p-4 rounded-lg border border-gray-200">
+        <ResponsiveContainer width="100%" height={220}>
+          <ReLineChart data={chartData}>
+            <CartesianGrid stroke="#e5e7eb" strokeDasharray="3 3" />
+            <XAxis dataKey="name" />
+            <YAxis unit={unit} />
+            <Tooltip />
+            <Line
+              type="monotone"
+              dataKey={dataKey}
+              stroke={color}
+              strokeWidth={2}
+              dot={{ r: 4 }}
+              activeDot={{ r: 6 }}
+            />
+          </ReLineChart>
+        </ResponsiveContainer>
+      </div>
+    </div>
+  );
 
   return (
     <div className="flex min-h-screen bg-gray-50">
@@ -248,25 +178,33 @@ export default function DataHistory() {
           {/* Charts */}
           {activeTab === "Environmental Trends" && (
             <div className="space-y-8">
-              <LineChart
+              <Chart
                 title="Temperature"
+                dataKey="temperature"
                 color="#ef4444"
                 colorClass="bg-red-500"
+                unit="°C"
               />
-              <LineChart
+              <Chart
                 title="Air Humidity"
+                dataKey="humidity"
                 color="#3b82f6"
                 colorClass="bg-blue-500"
+                unit="%"
               />
-              <LineChart
+              <Chart
                 title="Light Intensity"
+                dataKey="light"
                 color="#f59e0b"
                 colorClass="bg-yellow-500"
+                unit="lux"
               />
-              <LineChart
+              <Chart
                 title="Moisture"
+                dataKey="moisture"
                 color="#10b981"
                 colorClass="bg-green-500"
+                unit="%"
               />
             </div>
           )}
