@@ -1,3 +1,6 @@
+#define USE_SQL
+//#define USE_FIREBASE
+
 #include <WiFi.h>
 #include <Wire.h>
 #include <Adafruit_SHT31.h>
@@ -11,13 +14,15 @@
 #endif
 
 #ifdef USE_FIREBASE
-    #include 
+    #include <FirebaseClient.h>
 #endif
 const char* ssid = "server";
 const char* password = "jeris6467";
 // OLED display width and height
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
+
+
 
 // Strip Pin Indicator
 #define STRIP_PIN 5
