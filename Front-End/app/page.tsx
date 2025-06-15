@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import AppHeader from "../components/AppHeader"; // pastikan path ini sesuai struktur Anda
+import AppHeader from "../components/AppHeader";
+import Sidebar from "../components/Sidebar";
 
 export default function Dashboard() {
   const [modeAuto, setModeAuto] = useState(true);
@@ -184,35 +185,8 @@ export default function Dashboard() {
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-      {/* Sidebar */}
-      <div className="w-20 bg-slate-800 flex flex-col items-center py-4 space-y-6">
-        <img
-          src="/img/icon.png"
-          alt="Logo Kumbung Sense"
-          className="w-10 h-10 rounded-full object-cover"
-        />
-        <nav className="flex flex-col space-y-4">
-          {navItems.map((item, idx) => {
-            const Icon = item.icon;
-            const isActive = idx === 0; // Only first item (Beranda) is active here
-            return (
-              <button
-                key={item.name}
-                onClick={() => (window.location.href = item.href)}
-                className={`flex flex-col items-center p-2 rounded-lg transition-colors ${
-                  isActive
-                    ? "text-white bg-slate-700 hover:bg-slate-600"
-                    : "text-gray-400 hover:text-white hover:bg-slate-700"
-                }`}
-              >
-                <Icon />
-                <span className="text-xs mt-1">{item.name}</span>
-              </button>
-            );
-          })}
-        </nav>
-        <div className="flex-1"></div>
-      </div>
+      {/* Sidebar Global */}
+      <Sidebar navItems={navItems} />
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col">

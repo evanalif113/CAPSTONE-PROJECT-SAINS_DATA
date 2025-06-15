@@ -1,30 +1,31 @@
-"use client"
+"use client";
 
-import { useState } from "react"
+import { useState } from "react";
+import AppHeader from "../../components/AppHeader";
 
 export default function DataHistory() {
-  const [activeTab, setActiveTab] = useState("Environmental Trends")
-  const [startDate, setStartDate] = useState("2023-05-01")
-  const [endDate, setEndDate] = useState("2023-05-31")
+  const [activeTab, setActiveTab] = useState("Environmental Trends");
+  const [startDate, setStartDate] = useState("2023-05-01");
+  const [endDate, setEndDate] = useState("2023-05-31");
 
   // Icon Components
   const HomeIcon = () => (
     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
       <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
     </svg>
-  )
+  );
 
   const GridIcon = () => (
     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
       <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
     </svg>
-  )
+  );
 
   const BellIcon = () => (
     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
       <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
     </svg>
-  )
+  );
 
   const SettingsIcon = () => (
     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -34,13 +35,17 @@ export default function DataHistory() {
         clipRule="evenodd"
       />
     </svg>
-  )
+  );
 
   const UserIcon = () => (
     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-      <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+      <path
+        fillRule="evenodd"
+        d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+        clipRule="evenodd"
+      />
     </svg>
-  )
+  );
 
   const LogOutIcon = () => (
     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -50,7 +55,7 @@ export default function DataHistory() {
         clipRule="evenodd"
       />
     </svg>
-  )
+  );
 
   const CalendarIcon = () => (
     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -60,7 +65,7 @@ export default function DataHistory() {
         clipRule="evenodd"
       />
     </svg>
-  )
+  );
 
   const DownloadIcon = () => (
     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -70,7 +75,7 @@ export default function DataHistory() {
         clipRule="evenodd"
       />
     </svg>
-  )
+  );
 
   const TagIcon = () => (
     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -80,33 +85,47 @@ export default function DataHistory() {
         clipRule="evenodd"
       />
     </svg>
-  )
+  );
 
   const MoreIcon = () => (
     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
       <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
     </svg>
-  )
+  );
+
+  // Sidebar navigation items
+  const navItems = [
+    { name: "Beranda", href: "/", icon: HomeIcon },
+    {
+      name: "Data History",
+      href: "/data-history",
+      icon: GridIcon,
+      active: true,
+    },
+    { name: "Alerts", href: "/alerts", icon: BellIcon },
+    { name: "Settings", href: "/settings", icon: SettingsIcon },
+    { name: "Profile", href: "/profile", icon: UserIcon },
+  ];
 
   // Simple Chart Component
   const LineChart = ({ title, color, colorClass }) => {
     // Sample data points for demonstration
-    const dataPoints1 = [800, 750, 500, 250, 300, 50, 100, 50, 150, 900]
-    const dataPoints2 = [850, 300, 250, 400, 550, 750, 500, 750, 850, 950]
+    const dataPoints1 = [800, 750, 500, 250, 300, 50, 100, 50, 150, 900];
+    const dataPoints2 = [850, 300, 250, 400, 550, 750, 500, 750, 850, 950];
 
-    const maxValue = 1000
-    const chartWidth = 800
-    const chartHeight = 200
+    const maxValue = 1000;
+    const chartWidth = 800;
+    const chartHeight = 200;
 
     const createPath = (points) => {
       return points
         .map((point, index) => {
-          const x = (index / (points.length - 1)) * chartWidth
-          const y = chartHeight - (point / maxValue) * chartHeight
-          return `${index === 0 ? "M" : "L"} ${x} ${y}`
+          const x = (index / (points.length - 1)) * chartWidth;
+          const y = chartHeight - (point / maxValue) * chartHeight;
+          return `${index === 0 ? "M" : "L"} ${x} ${y}`;
         })
-        .join(" ")
-    }
+        .join(" ");
+    };
 
     return (
       <div className="mb-8">
@@ -115,11 +134,26 @@ export default function DataHistory() {
           <h3 className="text-lg font-medium text-gray-900">{title}</h3>
         </div>
         <div className="bg-white p-4 rounded-lg border border-gray-200">
-          <svg width="100%" height="250" viewBox={`0 0 ${chartWidth} 250`} className="overflow-visible">
+          <svg
+            width="100%"
+            height="250"
+            viewBox={`0 0 ${chartWidth} 250`}
+            className="overflow-visible"
+          >
             {/* Grid lines */}
             <defs>
-              <pattern id="grid" width="80" height="50" patternUnits="userSpaceOnUse">
-                <path d="M 80 0 L 0 0 0 50" fill="none" stroke="#e5e7eb" strokeWidth="1" />
+              <pattern
+                id="grid"
+                width="80"
+                height="50"
+                patternUnits="userSpaceOnUse"
+              >
+                <path
+                  d="M 80 0 L 0 0 0 50"
+                  fill="none"
+                  stroke="#e5e7eb"
+                  strokeWidth="1"
+                />
               </pattern>
             </defs>
             <rect width="100%" height={chartHeight} fill="url(#grid)" />
@@ -146,15 +180,32 @@ export default function DataHistory() {
             {/* X-axis labels */}
             <g className="text-xs fill-gray-500">
               {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((num, index) => (
-                <text key={num} x={index * (chartWidth / 9)} y="230" textAnchor="middle">
+                <text
+                  key={num}
+                  x={index * (chartWidth / 9)}
+                  y="230"
+                  textAnchor="middle"
+                >
                   {num}
                 </text>
               ))}
             </g>
 
             {/* Data lines */}
-            <path d={createPath(dataPoints1)} fill="none" stroke="#06b6d4" strokeWidth="2" className="drop-shadow-sm" />
-            <path d={createPath(dataPoints2)} fill="none" stroke="#92400e" strokeWidth="2" className="drop-shadow-sm" />
+            <path
+              d={createPath(dataPoints1)}
+              fill="none"
+              stroke="#06b6d4"
+              strokeWidth="2"
+              className="drop-shadow-sm"
+            />
+            <path
+              d={createPath(dataPoints2)}
+              fill="none"
+              stroke="#92400e"
+              strokeWidth="2"
+              className="drop-shadow-sm"
+            />
 
             {/* Data points */}
             {dataPoints1.map((point, index) => (
@@ -180,92 +231,50 @@ export default function DataHistory() {
           </svg>
         </div>
       </div>
-    )
-  }
+    );
+  };
+
+  // Handler untuk logout
+  const handleLogout = () => {
+    window.location.href = "/logout";
+  };
 
   return (
     <div className="flex min-h-screen bg-gray-50">
       {/* Sidebar */}
-      <div className="w-16 bg-slate-800 flex flex-col items-center py-4 space-y-6">
-        <div className="w-8 h-8 bg-teal-200 rounded-full flex items-center justify-center">
-          <img
-            src="/img/icon.png"
-            alt="Logo Kumbung Sense"
-            className="w-4 h-4 rounded-full object-cover"
-          />
-        </div>
+      <div className="w-20 bg-slate-800 flex flex-col items-center py-4 space-y-6">
+        <img
+          src="/img/icon.png"
+          alt="Logo Kumbung Sense"
+          className="w-10 h-10 rounded-full object-cover"
+        />
         <nav className="flex flex-col space-y-4">
-          <button
-            onClick={() => (window.location.href = "/")}
-            className="p-2 text-gray-400 hover:text-white hover:bg-slate-700 rounded-lg transition-colors"
-          >
-            <HomeIcon />
-          </button>
-          <button className="p-2 text-white bg-slate-700 rounded-lg hover:bg-slate-600 transition-colors">
-            <GridIcon />
-          </button>
-          <button
-            onClick={() => (window.location.href = "/alerts")}
-            className="p-2 text-gray-400 hover:text-white hover:bg-slate-700 rounded-lg transition-colors"
-          >
-            <BellIcon />
-          </button>
-          <button
-            onClick={() => (window.location.href = "/settings")}
-            className="p-2 text-gray-400 hover:text-white hover:bg-slate-700 rounded-lg transition-colors"
-          >
-            <SettingsIcon />
-          </button>
-          <button
-            onClick={() => (window.location.href = "/profile")}
-            className="p-2 text-gray-400 hover:text-white hover:bg-slate-700 rounded-lg transition-colors"
-          >
-            <UserIcon />
-          </button>
+          {navItems.map((item, idx) => {
+            const Icon = item.icon;
+            const isActive = item.active;
+            return (
+              <button
+                key={item.name}
+                onClick={() => (window.location.href = item.href)}
+                className={`flex flex-col items-center p-2 rounded-lg transition-colors ${
+                  isActive
+                    ? "text-white bg-slate-700 hover:bg-slate-600"
+                    : "text-gray-400 hover:text-white hover:bg-slate-700"
+                }`}
+              >
+                <Icon />
+                <span className="text-xs mt-1">{item.name}</span>
+              </button>
+            );
+          })}
         </nav>
         <div className="flex-1"></div>
-        <button
-          onClick={() => (window.location.href = "/logout")}
-          className="p-2 text-gray-400 hover:text-white hover:bg-slate-700 rounded-lg transition-colors"
-        >
-          <LogOutIcon />
-        </button>
       </div>
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
-        {/* Header */}
-        <header className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="w-10 h-10 bg-teal-200 rounded-full flex items-center justify-center">
-              <img
-                src="/img/icon.png"
-                alt="Logo Kumbung Sense"
-                className="w-4 h-4 rounded-full object-cover"
-              />
-            </div>
-            <div>
-              <h1 className="text-lg font-semibold text-gray-900">Kumbung Sense</h1>
-              <div className="flex items-center space-x-4 text-sm text-gray-500">
-                <div className="flex items-center space-x-1">
-                  <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
-                  <span>Offline</span>
-                </div>
-                <span>Als1</span>
-                <span>GT Pengempon</span>
-              </div>
-            </div>
-          </div>
-          <div className="flex items-center space-x-4">
-            <button className="flex items-center px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-              <TagIcon />
-              <span className="ml-2">Tambahkan Tag</span>
-            </button>
-            <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-              <MoreIcon />
-            </button>
-          </div>
-        </header>
+        {/* Header global */}
+        <AppHeader onLogout={handleLogout} />
 
         {/* Data History Content */}
         <main className="flex-1 p-6">
@@ -308,7 +317,9 @@ export default function DataHistory() {
                     onChange={(e) => setStartDate(e.target.value)}
                     className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
-                  <CalendarIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                    <CalendarIcon />
+                  </span>
                 </div>
                 <span className="text-gray-500">to</span>
                 <div className="relative">
@@ -318,7 +329,9 @@ export default function DataHistory() {
                     onChange={(e) => setEndDate(e.target.value)}
                     className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
-                  <CalendarIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                    <CalendarIcon />
+                  </span>
                 </div>
               </div>
             </div>
@@ -337,20 +350,38 @@ export default function DataHistory() {
           {/* Charts */}
           {activeTab === "Environmental Trends" && (
             <div className="space-y-8">
-              <LineChart title="Temperature" color="#ef4444" colorClass="bg-red-500" />
-              <LineChart title="Air Humidity" color="#3b82f6" colorClass="bg-blue-500" />
-              <LineChart title="Light Intensity" color="#f59e0b" colorClass="bg-yellow-500" />
-              <LineChart title="Moisture" color="#10b981" colorClass="bg-green-500" />
+              <LineChart
+                title="Temperature"
+                color="#ef4444"
+                colorClass="bg-red-500"
+              />
+              <LineChart
+                title="Air Humidity"
+                color="#3b82f6"
+                colorClass="bg-blue-500"
+              />
+              <LineChart
+                title="Light Intensity"
+                color="#f59e0b"
+                colorClass="bg-yellow-500"
+              />
+              <LineChart
+                title="Moisture"
+                color="#10b981"
+                colorClass="bg-green-500"
+              />
             </div>
           )}
 
           {activeTab === "Log Aktuator" && (
             <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
-              <p className="text-gray-500">Actuator log data would be displayed here</p>
+              <p className="text-gray-500">
+                Actuator log data would be displayed here
+              </p>
             </div>
           )}
         </main>
       </div>
     </div>
-  )
+  );
 }

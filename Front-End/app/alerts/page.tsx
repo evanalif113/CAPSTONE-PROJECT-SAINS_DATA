@@ -1,28 +1,29 @@
-"use client"
+"use client";
 
-import { useState } from "react"
+import { useState } from "react";
+import AppHeader from "../../components/AppHeader";
 
 export default function Alerts() {
-  const [activeTab, setActiveTab] = useState("Active Alerts")
+  const [activeTab, setActiveTab] = useState("Active Alerts");
 
   // Icon Components
   const HomeIcon = () => (
     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
       <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
     </svg>
-  )
+  );
 
   const GridIcon = () => (
     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
       <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
     </svg>
-  )
+  );
 
   const BellIcon = () => (
     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
       <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
     </svg>
-  )
+  );
 
   const SettingsIcon = () => (
     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -32,13 +33,17 @@ export default function Alerts() {
         clipRule="evenodd"
       />
     </svg>
-  )
+  );
 
   const UserIcon = () => (
     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-      <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+      <path
+        fillRule="evenodd"
+        d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+        clipRule="evenodd"
+      />
     </svg>
-  )
+  );
 
   const LogOutIcon = () => (
     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -48,7 +53,7 @@ export default function Alerts() {
         clipRule="evenodd"
       />
     </svg>
-  )
+  );
 
   const TagIcon = () => (
     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -58,13 +63,13 @@ export default function Alerts() {
         clipRule="evenodd"
       />
     </svg>
-  )
+  );
 
   const MoreIcon = () => (
     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
       <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
     </svg>
-  )
+  );
 
   const WarningIcon = () => (
     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -74,7 +79,7 @@ export default function Alerts() {
         clipRule="evenodd"
       />
     </svg>
-  )
+  );
 
   const CheckIcon = () => (
     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -84,20 +89,20 @@ export default function Alerts() {
         clipRule="evenodd"
       />
     </svg>
-  )
+  );
 
   const EmailIcon = () => (
     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
       <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
       <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
     </svg>
-  )
+  );
 
   const NotificationIcon = () => (
     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
       <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
     </svg>
-  )
+  );
 
   // Sample data
   const activeAlerts = [
@@ -122,7 +127,7 @@ export default function Alerts() {
       time: "2 hours ago",
       icon: "triangle-red",
     },
-  ]
+  ];
 
   const alertHistory = [
     {
@@ -165,121 +170,95 @@ export default function Alerts() {
       status: "Resolved",
       icon: "triangle-red",
     },
-  ]
+  ];
 
   const notificationSettings = [
     { type: "Temperature High", threshold: "> 32°C", email: true, push: true },
     { type: "Temperature Low", threshold: "< 18°C", email: false, push: true },
     { type: "Humidity High", threshold: "> 75%", email: true, push: false },
     { type: "Humidity Low", threshold: "< 60%", email: true, push: true },
-    { type: "Light Intensity Low", threshold: "< 500 lux", email: false, push: true },
-    { type: "Medium Moisture Low", threshold: "< 35%", email: true, push: true },
+    {
+      type: "Light Intensity Low",
+      threshold: "< 500 lux",
+      email: false,
+      push: true,
+    },
+    {
+      type: "Medium Moisture Low",
+      threshold: "< 35%",
+      email: true,
+      push: true,
+    },
     { type: "Device Fault", threshold: "Any", email: true, push: true },
-  ]
+  ];
 
   const renderAlertIcon = (iconType) => {
     switch (iconType) {
       case "triangle-red":
-        return <WarningIcon className="text-red-500" />
+        return <WarningIcon className="text-red-500" />;
       case "triangle-yellow":
-        return <WarningIcon className="text-yellow-500" />
+        return <WarningIcon className="text-yellow-500" />;
       case "bell-blue":
-        return <BellIcon className="text-blue-500" />
+        return <BellIcon className="text-blue-500" />;
       default:
-        return <WarningIcon className="text-gray-500" />
+        return <WarningIcon className="text-gray-500" />;
     }
-  }
+  };
+
+  const navItems = [
+    { name: "Beranda", href: "/", icon: HomeIcon },
+    { name: "Data History", href: "/data-history", icon: GridIcon },
+    { name: "Alerts", href: "/alerts", icon: BellIcon, active: true },
+    { name: "Settings", href: "/settings", icon: SettingsIcon },
+    { name: "Profile", href: "/profile", icon: UserIcon },
+  ];
+
+  const handleLogout = () => {
+    window.location.href = "/logout";
+  };
 
   return (
     <div className="flex min-h-screen bg-gray-50">
       {/* Sidebar */}
-      <div className="w-16 bg-slate-800 flex flex-col items-center py-4 space-y-6">
-        <div className="w-8 h-8 bg-teal-200 rounded-full flex items-center justify-center">
-          <img
-            src="/img/icon.png"
-            alt="Logo Kumbung Sense"
-            className="w-4 h-4 rounded-full object-cover"
-          />
-        </div>
+      <div className="w-20 bg-slate-800 flex flex-col items-center py-4 space-y-6">
+        <img
+          src="/img/icon.png"
+          alt="Logo Kumbung Sense"
+          className="w-10 h-10 rounded-full object-cover"
+        />
         <nav className="flex flex-col space-y-4">
-          <button
-            onClick={() => (window.location.href = "/")}
-            className="p-2 text-gray-400 hover:text-white hover:bg-slate-700 rounded-lg transition-colors"
-          >
-            <HomeIcon />
-          </button>
-          <button
-            onClick={() => (window.location.href = "/data-history")}
-            className="p-2 text-gray-400 hover:text-white hover:bg-slate-700 rounded-lg transition-colors"
-          >
-            <GridIcon />
-          </button>
-          <button className="p-2 text-white bg-slate-700 rounded-lg hover:bg-slate-600 transition-colors">
-            <BellIcon />
-          </button>
-          <button
-            onClick={() => (window.location.href = "/settings")}
-            className="p-2 text-gray-400 hover:text-white hover:bg-slate-700 rounded-lg transition-colors"
-          >
-            <SettingsIcon />
-          </button>
-          <button
-            onClick={() => (window.location.href = "/profile")}
-            className="p-2 text-gray-400 hover:text-white hover:bg-slate-700 rounded-lg transition-colors"
-          >
-            <UserIcon />
-          </button>
+          {navItems.map((item, idx) => {
+            const Icon = item.icon;
+            const isActive = item.active;
+            return (
+              <button
+                key={item.name}
+                onClick={() => (window.location.href = item.href)}
+                className={`flex flex-col items-center p-2 rounded-lg transition-colors ${
+                  isActive
+                    ? "text-white bg-slate-700 hover:bg-slate-600"
+                    : "text-gray-400 hover:text-white hover:bg-slate-700"
+                }`}
+              >
+                <Icon />
+                <span className="text-xs mt-1">{item.name}</span>
+              </button>
+            );
+          })}
         </nav>
         <div className="flex-1"></div>
-        <button
-          onClick={() => (window.location.href = "/logout")}
-          className="p-2 text-gray-400 hover:text-white hover:bg-slate-700 rounded-lg transition-colors"
-        >
-          <LogOutIcon />
-        </button>
       </div>
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
-        {/* Header */}
-        <header className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="w-10 h-10 bg-teal-200 rounded-full flex items-center justify-center">
-              <img
-                src="/img/icon.png"
-                alt="Logo Kumbung Sense"
-                className="w-4 h-4 rounded-full object-cover"
-              />
-            </div>
-            <div>
-              <h1 className="text-lg font-semibold text-gray-900">Kumbung Sense</h1>
-              <div className="flex items-center space-x-4 text-sm text-gray-500">
-                <div className="flex items-center space-x-1">
-                  <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
-                  <span>Offline</span>
-                </div>
-                <span>Als1</span>
-                <span>GT Pengempon</span>
-              </div>
-            </div>
-          </div>
-          <div className="flex items-center space-x-4">
-            <button className="flex items-center px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-              <TagIcon />
-              <span className="ml-2">Tambahkan Tag</span>
-            </button>
-            <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-              <MoreIcon />
-            </button>
-          </div>
-        </header>
-
-        {/* Alerts Content */}
-        <main className="flex-1 p-6">
+        <AppHeader onLogout={handleLogout} />
+        <main className="flex-1 p-6 space-y-6">
           {/* Page Header */}
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-gray-900">
-              {activeTab === "Active Alerts" ? "Alarm dan Notifikasi" : "Alerts & Notifications"}
+              {activeTab === "Active Alerts"
+                ? "Alarm dan Notifikasi"
+                : "Alerts & Notifications"}
             </h2>
             <div className="flex space-x-2">
               <button
@@ -319,18 +298,29 @@ export default function Alerts() {
           {activeTab === "Active Alerts" && (
             <div>
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-semibold text-gray-900">Active Alerts</h3>
-                <span className="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium">3 Active</span>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Active Alerts
+                </h3>
+                <span className="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium">
+                  3 Active
+                </span>
               </div>
               <div className="space-y-4">
                 {activeAlerts.map((alert) => (
-                  <div key={alert.id} className="bg-white rounded-lg border border-gray-200 p-4">
+                  <div
+                    key={alert.id}
+                    className="bg-white rounded-lg border border-gray-200 p-4"
+                  >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
                         {renderAlertIcon(alert.icon)}
-                        <span className="text-gray-900 font-medium">{alert.message}</span>
+                        <span className="text-gray-900 font-medium">
+                          {alert.message}
+                        </span>
                       </div>
-                      <span className="text-sm text-gray-500">{alert.time}</span>
+                      <span className="text-sm text-gray-500">
+                        {alert.time}
+                      </span>
                     </div>
                   </div>
                 ))}
@@ -341,22 +331,33 @@ export default function Alerts() {
           {/* Alert History Tab */}
           {activeTab === "Alert History" && (
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-6">Alert History</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-6">
+                Alert History
+              </h3>
               <div className="space-y-4">
                 {alertHistory.map((alert) => (
-                  <div key={alert.id} className="bg-white rounded-lg border border-gray-200 p-4">
+                  <div
+                    key={alert.id}
+                    className="bg-white rounded-lg border border-gray-200 p-4"
+                  >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
                         {renderAlertIcon(alert.icon)}
                         <div>
-                          <span className="text-gray-900 font-medium block">{alert.message}</span>
+                          <span className="text-gray-900 font-medium block">
+                            {alert.message}
+                          </span>
                           <div className="flex items-center space-x-2 mt-1">
                             <CheckIcon className="text-green-500" />
-                            <span className="text-green-600 text-sm font-medium">{alert.status}</span>
+                            <span className="text-green-600 text-sm font-medium">
+                              {alert.status}
+                            </span>
                           </div>
                         </div>
                       </div>
-                      <span className="text-sm text-gray-500">{alert.time}</span>
+                      <span className="text-sm text-gray-500">
+                        {alert.time}
+                      </span>
                     </div>
                   </div>
                 ))}
@@ -367,7 +368,9 @@ export default function Alerts() {
           {/* Notification Settings Tab */}
           {activeTab === "Notification Settings" && (
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-6">Notification Settings</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-6">
+                Notification Settings
+              </h3>
               <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
                 <div className="grid grid-cols-4 gap-4 p-4 bg-gray-50 border-b border-gray-200 font-medium text-gray-700">
                   <div>Alert Type</div>
@@ -376,7 +379,10 @@ export default function Alerts() {
                   <div>Push</div>
                 </div>
                 {notificationSettings.map((setting, index) => (
-                  <div key={index} className="grid grid-cols-4 gap-4 p-4 border-b border-gray-100 last:border-b-0">
+                  <div
+                    key={index}
+                    className="grid grid-cols-4 gap-4 p-4 border-b border-gray-100 last:border-b-0"
+                  >
                     <div className="text-gray-900">{setting.type}</div>
                     <div className="text-gray-600">{setting.threshold}</div>
                     <div className="flex items-center space-x-2">
@@ -410,5 +416,5 @@ export default function Alerts() {
         </main>
       </div>
     </div>
-  )
+  );
 }
