@@ -13,6 +13,12 @@ import {
   ResponsiveContainer,
   CartesianGrid,
 } from "recharts";
+import {
+  TemperatureIcon,
+  HumidityIcon,
+  LightIntensityIcon,
+  MoistureIcon,
+} from "@/components/Icon";
 
 export default function DataHistory() {
   const [activeTab, setActiveTab] = useState("Environmental Trends");
@@ -68,11 +74,11 @@ export default function DataHistory() {
     unit: string;
   };
 
-  const Chart = ({ title, dataKey, color, colorClass, unit }: ChartProps) => (
+  const Chart = ({ title, dataKey, color, colorClass, unit, Icon }: ChartProps & { Icon: React.FC }) => (
     <div className="mb-8">
       <div className="flex items-center mb-4">
-        <div className={`w-3 h-3 rounded-full mr-3 ${colorClass}`}></div>
-        <h3 className="text-lg font-medium text-gray-900">{title}</h3>
+        <Icon />
+        <h3 className="text-lg font-medium text-gray-900 ml-3">{title}</h3>
       </div>
       <div className="bg-white p-4 rounded-lg border border-gray-200">
         <ResponsiveContainer width="100%" height={220}>
@@ -184,6 +190,7 @@ export default function DataHistory() {
                 color="#ef4444"
                 colorClass="bg-red-500"
                 unit="°C"
+                Icon={TemperatureIcon}
               />
               <Chart
                 title="Air Humidity"
@@ -191,6 +198,7 @@ export default function DataHistory() {
                 color="#3b82f6"
                 colorClass="bg-blue-500"
                 unit="%"
+                Icon={HumidityIcon}
               />
               <Chart
                 title="Light Intensity"
@@ -198,6 +206,7 @@ export default function DataHistory() {
                 color="#f59e0b"
                 colorClass="bg-yellow-500"
                 unit="lux"
+                Icon={LightIntensityIcon}
               />
               <Chart
                 title="Moisture"
@@ -205,6 +214,7 @@ export default function DataHistory() {
                 color="#10b981"
                 colorClass="bg-green-500"
                 unit="%"
+                Icon={MoistureIcon}
               />
             </div>
           )}
