@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AppHeader from "../components/AppHeader";
 import Sidebar from "@/components/Sidebar";
 import { getNavItems } from "@/components/navItems";
@@ -28,16 +28,31 @@ import {
 
 const navItems = getNavItems("/");
 
-const chartData = [
-  { name: "Apr 30", temperature: 24, humidity: 85, light: 450, moisture: 75 },
-  { name: "May 04", temperature: 25, humidity: 80, light: 500, moisture: 70 },
-  { name: "May 08", temperature: 23, humidity: 82, light: 480, moisture: 72 },
-  { name: "May 12", temperature: 22, humidity: 78, light: 470, moisture: 68 },
-  { name: "May 16", temperature: 24, humidity: 81, light: 490, moisture: 74 },
-  { name: "May 20", temperature: 26, humidity: 79, light: 510, moisture: 76 },
-  { name: "May 24", temperature: 25, humidity: 77, light: 520, moisture: 73 },
-  { name: "May 28", temperature: 24, humidity: 80, light: 530, moisture: 75 },
-];
+// Helper untuk membuat data 24 jam terakhir
+function generateInitialChartData() {
+  const now = new Date();
+  const arr = [];
+  let temp = 24,
+    hum = 85,
+    light = 450,
+    moist = 75;
+  for (let i = 23; i >= 0; i--) {
+    const d = new Date(now);
+    d.setHours(now.getHours() - i);
+    arr.push({
+      name: d.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+      }),
+      temperature: Math.round(temp + Math.sin(i / 3) * 2 + Math.random()),
+      humidity: Math.round(hum + Math.cos(i / 4) * 2 + Math.random()),
+      light: Math.round(light + Math.sin(i / 2) * 10 + Math.random() * 5),
+      moisture: Math.round(moist + Math.cos(i / 5) * 2 + Math.random()),
+    });
+  }
+  return arr;
+}
 
 export default function Dashboard() {
   const [modeAuto, setModeAuto] = useState(true);
@@ -45,6 +60,44 @@ export default function Dashboard() {
   const [humidifierEnabled, setHumidifierEnabled] = useState(true);
   const [lightEnabled, setLightEnabled] = useState(false);
   const [selectedPeriod, setSelectedPeriod] = useState("1 Month");
+  const [chartData, setChartData] = useState(generateInitialChartData());
+
+  // Simulasi update data realtime setiap 2 detik
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setChartData((prev) => {
+        const now = new Date();
+        const name = now.toLocaleTimeString("en-US", {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+        });
+        const last = prev[prev.length - 1];
+        const newPoint = {
+          name,
+          temperature: Math.max(
+            20,
+            Math.min(30, last.temperature + (Math.random() - 0.5) * 2)
+          ),
+          humidity: Math.max(
+            70,
+            Math.min(90, last.humidity + (Math.random() - 0.5) * 2)
+          ),
+          light: Math.max(
+            400,
+            Math.min(600, last.light + (Math.random() - 0.5) * 10)
+          ),
+          moisture: Math.max(
+            60,
+            Math.min(80, last.moisture + (Math.random() - 0.5) * 2)
+          ),
+        };
+        // Pastikan hanya 24 data (1 hari, 1 jam sekali)
+        return [...prev.slice(1), newPoint];
+      });
+    }, 2000);
+    return () => clearInterval(interval);
+  }, []);
 
   const periods = [
     "Latest",
@@ -121,6 +174,16 @@ export default function Dashboard() {
     window.location.href = "/logout";
   };
 
+  // Helper untuk min/max domain YAxis
+  function getYAxisDomain(data: any[], key: string) {
+    const vals = data.map((d) => d[key]);
+    const min = Math.min(...vals);
+    const max = Math.max(...vals);
+    // Tambahkan sedikit padding
+    const pad = (max - min) * 0.1 || 1;
+    return [Math.floor(min - pad), Math.ceil(max + pad)];
+  }
+
   // Chart Card Component with Icon
   const ChartCard = ({
     title,
@@ -146,8 +209,8 @@ export default function Dashboard() {
         <ResponsiveContainer width="100%" height={200}>
           <LineChart data={chartData}>
             <CartesianGrid stroke="#eee" strokeDasharray="3 3" />
-            <XAxis dataKey="name" />
-            <YAxis unit={unit} />
+            <XAxis dataKey="name" minTickGap={10} />
+            <YAxis unit={unit} domain={getYAxisDomain(chartData, dataKey)} />
             <Tooltip />
             <Line
               type="monotone"
@@ -156,6 +219,8 @@ export default function Dashboard() {
               strokeWidth={2}
               dot={{ r: 4 }}
               activeDot={{ r: 6 }}
+              isAnimationActive={true}
+              animationDuration={800}
             />
           </LineChart>
         </ResponsiveContainer>
