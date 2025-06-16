@@ -219,8 +219,8 @@ export default function Dashboard() {
               strokeWidth={2}
               dot={{ r: 4 }}
               activeDot={{ r: 6 }}
-              isAnimationActive={true}
-              animationDuration={800}
+              isAnimationActive={false}
+              animationDuration={0}
             />
           </LineChart>
         </ResponsiveContainer>
