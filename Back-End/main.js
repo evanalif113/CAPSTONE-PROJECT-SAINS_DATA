@@ -94,7 +94,7 @@ app.get('/api/data/all', (req, res) => {
   const sql = `
     SELECT id_sensor, temperature, humidity, moisture, light, created_at 
     FROM DATA_SENSOR 
-    ORDER BY created_at DESC
+    ORDER BY id_sensor DESC
   `;
 
   db.query(sql, (err, results) => {
