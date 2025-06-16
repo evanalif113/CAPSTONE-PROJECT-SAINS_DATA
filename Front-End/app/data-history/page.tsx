@@ -14,6 +14,8 @@ import {
   CartesianGrid,
 } from "recharts";
 import {
+  CalendarIcon,
+  DownloadIcon,
   TemperatureIcon,
   HumidityIcon,
   LightIntensityIcon,
@@ -32,26 +34,6 @@ export default function DataHistory() {
 
   // Ambil navItems dengan menu aktif
   const navItems = getNavItems("/data-history");
-
-  // Ikon-ikon yang dipakai di konten
-  const CalendarIcon = () => (
-    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-      <path
-        fillRule="evenodd"
-        d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
-        clipRule="evenodd"
-      />
-    </svg>
-  );
-  const DownloadIcon = () => (
-    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-      <path
-        fillRule="evenodd"
-        d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
-        clipRule="evenodd"
-      />
-    </svg>
-  );
 
   // Data untuk chart (dummy, bisa diganti dengan data asli)
   const chartData = [
@@ -124,7 +106,7 @@ export default function DataHistory() {
                     : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                 }`}
               >
-                Environmental Trends
+                Variabel Lingkungan
               </button>
               <button
                 onClick={() => setActiveTab("Log Aktuator")}
@@ -222,7 +204,7 @@ export default function DataHistory() {
           {activeTab === "Log Aktuator" && (
             <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
               <p className="text-gray-500">
-                Actuator log data would be displayed here
+                Data Log Aktuator akan terisi secara otomatis saat ada aktivitas pada sistem.
               </p>
             </div>
           )}
