@@ -159,6 +159,7 @@ export default function Profile() {
               Profil Pengguna
             </h2>
             <div className="flex space-x-2">
+              {/*
               <button
                 onClick={() => setActiveTab("Personal Information")}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
@@ -169,6 +170,7 @@ export default function Profile() {
               >
                 Informasi Pribadi
               </button>
+              */}
               {/* 
               <button
                 onClick={() => setActiveTab("Security")}
