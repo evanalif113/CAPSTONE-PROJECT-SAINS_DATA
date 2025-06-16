@@ -1,4 +1,5 @@
 import React from "react";
+import { LogOutIcon } from "./Icon";
 
 type AppHeaderProps = {
   onLogout: () => void;
@@ -28,17 +29,11 @@ const AppHeader: React.FC<AppHeaderProps> = ({ onLogout }) => (
     <div className="flex items-center space-x-4">
       <button
         onClick={onLogout}
-        className="flex items-center px-2 py-1 bg-red-600 hover:bg-red-700 text-white rounded text-sm font-semibold transition-colors"
+        className="p-2 bg-red-600 hover:bg-red-700 text-white rounded-full transition-colors"
         title="Logout"
+        aria-label="Logout"
       >
-        <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-          <path
-            fillRule="evenodd"
-            d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z"
-            clipRule="evenodd"
-          />
-        </svg>
-        Logout
+        <LogOutIcon />
       </button>
     </div>
   </header>
