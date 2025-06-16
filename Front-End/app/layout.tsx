@@ -19,8 +19,7 @@ export const metadata: Metadata = {
         type: "image/png",
       },
     ],
-  },
-  generator: 'v0.dev'
+  }
 }
 
 export default function RootLayout({
