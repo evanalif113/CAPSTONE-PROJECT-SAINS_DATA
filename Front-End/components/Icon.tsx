@@ -4,6 +4,7 @@ import {
   Home,
   Grid,
   Bell,
+  ChartBar,
   Calendar,
   Download,
   Settings,
@@ -22,6 +23,7 @@ const HomeIcon = (props: React.ComponentProps<typeof Home>) => <Home size={20} {
 const GridIcon = (props: React.ComponentProps<typeof Grid>) => <Grid size={20} {...props} />;
 const BellIcon = (props: React.ComponentProps<typeof Bell>) => <Bell size={20} {...props} />;
 const CalendarIcon = (props: React.ComponentProps<typeof Calendar>) => <Calendar size={20} {...props} />;
+const ChartBarIcon = (props: React.ComponentProps<typeof ChartBar>) => <ChartBar size={20} {...props} />;
 const DownloadIcon = (props: React.ComponentProps<typeof Download>) => <Download size={20} {...props} />;
 const SettingsIcon = (props: React.ComponentProps<typeof Settings>) => <Settings size={20} {...props} />;
 const UserIcon = (props: React.ComponentProps<typeof User>) => <User size={20} {...props} />;
@@ -41,6 +43,7 @@ export {
   GridIcon,
   BellIcon,
   CalendarIcon,
+  ChartBarIcon,
   DownloadIcon,
   SettingsIcon,
   UserIcon,
