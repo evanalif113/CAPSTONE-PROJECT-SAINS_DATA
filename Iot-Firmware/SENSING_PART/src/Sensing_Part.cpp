@@ -1,9 +1,9 @@
 #define USE_SQL
 //#define USE_FIREBASE
-//#define USE_BH1750
+#define USE_BH1750
 #define USE_SHT31
-//#define USE_OLED
-//#define USE_NEOPIXEL
+#define USE_OLED
+#define USE_NEOPIXEL
 
 #include <WiFi.h>
 #include <Wire.h>
@@ -35,6 +35,8 @@
 
 const char* ssid = "server";
 const char* password = "jeris6467";
+uint8_t id_sensor = 2;
+
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
 #define STRIP_PIN 5
@@ -173,7 +175,7 @@ void sendDataToServer() {
     }
     HTTPClient http;
     String url = ServerPath;
-    url += "?id_sensor=1";
+    url += "?id_sensor=" + String(id_sensor);
     url += "&temperature=" + String(latestTemperature, 2);
     url += "&humidity=" + String(latestHumidity, 2);
     url += "&moisture=" + String(latestMoisture);
