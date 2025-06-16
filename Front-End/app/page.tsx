@@ -11,6 +11,10 @@ import {
   SettingsIcon,
   UserIcon,
   RefreshIcon,
+  TemperatureIcon,
+  HumidityIcon,
+  LightIntensityIcon,
+  MoistureIcon,
 } from "@/components/Icon";
 import {
   LineChart,
@@ -25,14 +29,14 @@ import {
 const navItems = getNavItems("/");
 
 const chartData = [
-  { name: "Apr 30", temperature: 24, humidity: 85 },
-  { name: "May 04", temperature: 25, humidity: 80 },
-  { name: "May 08", temperature: 23, humidity: 82 },
-  { name: "May 12", temperature: 22, humidity: 78 },
-  { name: "May 16", temperature: 24, humidity: 81 },
-  { name: "May 20", temperature: 26, humidity: 79 },
-  { name: "May 24", temperature: 25, humidity: 77 },
-  { name: "May 28", temperature: 24, humidity: 80 },
+  { name: "Apr 30", temperature: 24, humidity: 85, light: 450, moisture: 75 },
+  { name: "May 04", temperature: 25, humidity: 80, light: 500, moisture: 70 },
+  { name: "May 08", temperature: 23, humidity: 82, light: 480, moisture: 72 },
+  { name: "May 12", temperature: 22, humidity: 78, light: 470, moisture: 68 },
+  { name: "May 16", temperature: 24, humidity: 81, light: 490, moisture: 74 },
+  { name: "May 20", temperature: 26, humidity: 79, light: 510, moisture: 76 },
+  { name: "May 24", temperature: 25, humidity: 77, light: 520, moisture: 73 },
+  { name: "May 28", temperature: 24, humidity: 80, light: 530, moisture: 75 },
 ];
 
 export default function Dashboard() {
@@ -116,6 +120,48 @@ export default function Dashboard() {
   const handleLogout = () => {
     window.location.href = "/logout";
   };
+
+  // Chart Card Component with Icon
+  const ChartCard = ({
+    title,
+    dataKey,
+    color,
+    Icon,
+    unit,
+  }: {
+    title: string;
+    dataKey: string;
+    color: string;
+    Icon: React.FC;
+    unit: string;
+  }) => (
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+      <div className="p-4 border-b border-gray-200 flex items-center">
+        <Icon />
+        <h3 className={`text-sm font-medium ml-2`} style={{ color }}>
+          {title} Trend (24h)
+        </h3>
+      </div>
+      <div className="p-4">
+        <ResponsiveContainer width="100%" height={200}>
+          <LineChart data={chartData}>
+            <CartesianGrid stroke="#eee" strokeDasharray="3 3" />
+            <XAxis dataKey="name" />
+            <YAxis unit={unit} />
+            <Tooltip />
+            <Line
+              type="monotone"
+              dataKey={dataKey}
+              stroke={color}
+              strokeWidth={2}
+              dot={{ r: 4 }}
+              activeDot={{ r: 6 }}
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+    </div>
+  );
 
   return (
     <div className="flex min-h-screen bg-gray-50">
@@ -212,59 +258,34 @@ export default function Dashboard() {
 
           {/* Charts */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-              <div className="p-4 border-b border-gray-200">
-                <h3 className="text-sm font-medium text-red-500 flex items-center">
-                  <div className="w-2 h-2 bg-red-500 rounded-full mr-2"></div>
-                  Temperature Trend (24h)
-                </h3>
-              </div>
-              <div className="p-4">
-                <ResponsiveContainer width="100%" height={200}>
-                  <LineChart data={chartData}>
-                    <CartesianGrid stroke="#eee" strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
-                    <Line
-                      type="monotone"
-                      dataKey="temperature"
-                      stroke="#ef4444"
-                      strokeWidth={2}
-                      dot={{ r: 4 }}
-                      activeDot={{ r: 6 }}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-              <div className="p-4 border-b border-gray-200">
-                <h3 className="text-sm font-medium text-blue-500 flex items-center">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
-                  Humidity Trend (24h)
-                </h3>
-              </div>
-              <div className="p-4">
-                <ResponsiveContainer width="100%" height={200}>
-                  <LineChart data={chartData}>
-                    <CartesianGrid stroke="#eee" strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
-                    <Line
-                      type="monotone"
-                      dataKey="humidity"
-                      stroke="#3b82f6"
-                      strokeWidth={2}
-                      dot={{ r: 4 }}
-                      activeDot={{ r: 6 }}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
+            <ChartCard
+              title="Temperature"
+              dataKey="temperature"
+              color="#ef4444"
+              Icon={TemperatureIcon}
+              unit="°C"
+            />
+            <ChartCard
+              title="Humidity"
+              dataKey="humidity"
+              color="#3b82f6"
+              Icon={HumidityIcon}
+              unit="%"
+            />
+            <ChartCard
+              title="Light Intensity"
+              dataKey="light"
+              color="#f59e0b"
+              Icon={LightIntensityIcon}
+              unit="lux"
+            />
+            <ChartCard
+              title="Moisture"
+              dataKey="moisture"
+              color="#10b981"
+              Icon={MoistureIcon}
+              unit="%"
+            />
           </div>
 
           {/* System Status */}

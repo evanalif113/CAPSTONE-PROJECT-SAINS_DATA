@@ -72,6 +72,34 @@ const MoreIcon = () => (
     <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
   </svg>
 );
+
+// Additional icons
+const TemperatureIcon = () => (
+  <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+    <path d="M12 2a2 2 0 00-2 2v10.28a4 4 0 102 0V4a2 2 0 00-2-2z" />
+    <circle cx="12" cy="18" r="4" />
+  </svg>
+);
+
+const HumidityIcon = () => (
+  <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+    <path d="M12 2C12 2 5 10 5 15a7 7 0 0014 0c0-5-7-13-7-13z" />
+  </svg>
+);
+
+const LightIntensityIcon = () => (
+  <svg className="w-5 h-5 text-yellow-500" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="5" />
+    <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
+  </svg>
+);
+
+const MoistureIcon = () => (
+  <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+    <path d="M12 2.69l5.66 9.8A7 7 0 115.34 12.49l6.66-9.8z" />
+  </svg>
+);
+
 // Exporting all icons for use in other components
 export {
   HomeIcon,
@@ -83,4 +111,8 @@ export {
   RefreshIcon,
   TagIcon,
   MoreIcon,
+  TemperatureIcon,
+  HumidityIcon,
+  LightIntensityIcon,
+  MoistureIcon,
 };
