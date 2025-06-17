@@ -9,6 +9,8 @@ import {
   Download,
   Settings,
   User,
+  ArrowUp,
+  ArrowDown,
   LogOut,
   RefreshCw,
   Tag,
@@ -27,6 +29,8 @@ const ChartBarIcon = (props: React.ComponentProps<typeof ChartBar>) => <ChartBar
 const DownloadIcon = (props: React.ComponentProps<typeof Download>) => <Download size={20} {...props} />;
 const SettingsIcon = (props: React.ComponentProps<typeof Settings>) => <Settings size={20} {...props} />;
 const UserIcon = (props: React.ComponentProps<typeof User>) => <User size={20} {...props} />;
+const ArrowUpIcon = (props: React.ComponentProps<typeof ArrowUp>) => <ArrowUp size={18} {...props} />;
+const ArrowDownIcon = (props: React.ComponentProps<typeof ArrowDown>) => <ArrowDown size={18} {...props} />;
 const LogOutIcon = (props: React.ComponentProps<typeof LogOut>) => <LogOut size={20} {...props} />;
 const RefreshIcon = (props: React.ComponentProps<typeof RefreshCw>) => <RefreshCw size={18} {...props} />;
 const TagIcon = (props: React.ComponentProps<typeof Tag>) => <Tag size={18} {...props} />;
@@ -47,6 +51,8 @@ export {
   DownloadIcon,
   SettingsIcon,
   UserIcon,
+  ArrowUpIcon,
+  ArrowDownIcon,
   LogOutIcon,
   RefreshIcon,
   TagIcon,

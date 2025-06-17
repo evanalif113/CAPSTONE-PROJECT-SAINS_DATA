@@ -10,25 +10,21 @@ import {
   BellIcon,
   SettingsIcon,
   UserIcon,
+  ArrowUpIcon,
+  ArrowDownIcon,
   RefreshIcon,
   TemperatureIcon,
   HumidityIcon,
   LightIntensityIcon,
   MoistureIcon,
 } from "@/components/Icon";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  CartesianGrid,
-} from "recharts";
+import dynamic from "next/dynamic";
+import { ArrowUp, ArrowDown } from "lucide-react";
 
 const navItems = getNavItems("/");
+const Plot = dynamic(() => import("react-plotly.js"), { ssr: false });
 
-// Helper untuk membuat data 24 jam terakhir
+// Helper untuk membuat data 24 hari terakhir (interval harian)
 function generateInitialChartData() {
   const now = new Date();
   const arr = [];
@@ -38,18 +34,22 @@ function generateInitialChartData() {
     moist = 75;
   for (let i = 23; i >= 0; i--) {
     const d = new Date(now);
-    d.setHours(now.getHours() - i);
+    d.setDate(now.getDate() - i);
     arr.push({
-      name: d.toLocaleTimeString("en-US", {
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false,
+      name: d.toLocaleDateString("en-US", {
+        month: "short",
+        day: "2-digit",
       }),
-      temperature: Math.round(temp + Math.sin(i / 3) * 2 + Math.random()),
-      humidity: Math.round(hum + Math.cos(i / 4) * 2 + Math.random()),
-      light: Math.round(light + Math.sin(i / 2) * 10 + Math.random() * 5),
-      moisture: Math.round(moist + Math.cos(i / 5) * 2 + Math.random()),
+      temperature: temp,
+      humidity: hum,
+      light: light,
+      moisture: moist,
     });
+    // Simulasikan perubahan awal
+    temp += (Math.random() - 0.5) * 0.5;
+    hum += (Math.random() - 0.5) * 0.5;
+    light += (Math.random() - 0.5) * 2;
+    moist += (Math.random() - 0.5) * 0.5;
   }
   return arr;
 }
@@ -61,43 +61,36 @@ export default function Dashboard() {
   const [lightEnabled, setLightEnabled] = useState(false);
   const [selectedPeriod, setSelectedPeriod] = useState("1 Month");
   const [chartData, setChartData] = useState(generateInitialChartData());
-
-  // Simulasi update data realtime setiap 2 detik
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setChartData((prev) => {
-        const now = new Date();
-        const name = now.toLocaleTimeString("en-US", {
-          hour: "2-digit",
-          minute: "2-digit",
-          hour12: false,
-        });
-        const last = prev[prev.length - 1];
-        const newPoint = {
-          name,
-          temperature: Math.max(
-            20,
-            Math.min(30, last.temperature + (Math.random() - 0.5) * 2)
-          ),
-          humidity: Math.max(
-            70,
-            Math.min(90, last.humidity + (Math.random() - 0.5) * 2)
-          ),
-          light: Math.max(
-            400,
-            Math.min(600, last.light + (Math.random() - 0.5) * 10)
-          ),
-          moisture: Math.max(
-            60,
-            Math.min(80, last.moisture + (Math.random() - 0.5) * 2)
-          ),
-        };
-        // Pastikan hanya 24 data (1 hari, 1 jam sekali)
-        return [...prev.slice(1), newPoint];
-      });
-    }, 2000);
-    return () => clearInterval(interval);
-  }, []);
+  const [sensorData, setSensorData] = useState([
+    {
+      title: "Temperature",
+      value: chartData[chartData.length - 1].temperature.toFixed(1),
+      unit: "°C",
+      status: "Normal",
+      trend: "Naik",
+    },
+    {
+      title: "Air Humidity",
+      value: chartData[chartData.length - 1].humidity.toFixed(0),
+      unit: "%",
+      status: "Normal",
+      trend: "Naik",
+    },
+    {
+      title: "Light Intensity",
+      value: chartData[chartData.length - 1].light.toFixed(0),
+      unit: "lux",
+      status: "Normal",
+      trend: "Naik",
+    },
+    {
+      title: "Medium Moisture",
+      value: chartData[chartData.length - 1].moisture.toFixed(0),
+      unit: "%",
+      status: "Normal",
+      trend: "Naik",
+    },
+  ]);
 
   const periods = [
     "Latest",
@@ -112,38 +105,6 @@ export default function Dashboard() {
     "Custom",
   ];
 
-  const sensorData = [
-    {
-      title: "Temperature",
-      value: "24.5",
-      unit: "°C",
-      status: "Normal",
-      trend: "Turun",
-    },
-    {
-      title: "Air Humidity",
-      value: "85",
-      unit: "%",
-      status: "Normal",
-      trend: "Turun",
-    },
-    {
-      title: "Light Intensity",
-      value: "450",
-      unit: "lux",
-      status: "Normal",
-      trend: "Turun",
-    },
-    {
-      title: "Medium Moisture",
-      value: "75",
-      unit: "%",
-      status: "Normal",
-      trend: "Turun",
-    },
-  ];
-
-  // Custom Toggle Switch Component
   const ToggleSwitch = ({
     checked,
     onChange,
@@ -169,22 +130,19 @@ export default function Dashboard() {
     </button>
   );
 
-  // Handler untuk logout
   const handleLogout = () => {
     window.location.href = "/logout";
   };
 
-  // Helper untuk min/max domain YAxis
+  // Helper untuk min/max domain YAxis (berdasarkan data dummy, tanpa padding)
   function getYAxisDomain(data: any[], key: string) {
     const vals = data.map((d) => d[key]);
     const min = Math.min(...vals);
     const max = Math.max(...vals);
-    // Tambahkan sedikit padding
-    const pad = (max - min) * 0.1 || 1;
-    return [Math.floor(min - pad), Math.ceil(max + pad)];
+    return [min, max];
   }
 
-  // Chart Card Component with Icon
+  // Chart Card Component with Icon, menggunakan Plotly
   const ChartCard = ({
     title,
     dataKey,
@@ -197,45 +155,142 @@ export default function Dashboard() {
     color: string;
     Icon: React.FC;
     unit: string;
-  }) => (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-      <div className="p-4 border-b border-gray-200 flex items-center">
-        <Icon />
-        <h3 className={`text-sm font-medium ml-2`} style={{ color }}>
-          {title} Trend (24h)
-        </h3>
+  }) => {
+    const yDomain = getYAxisDomain(chartData, dataKey);
+    return (
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="p-4 border-b border-gray-200 flex items-center">
+          <Icon />
+          <h3 className={`text-sm font-medium ml-2`} style={{ color }}>
+            {title} Trend (24h)
+          </h3>
+        </div>
+        <div className="p-4">
+          <Plot
+            data={[
+              {
+                x: chartData.map((d) => d.name),
+                y: chartData.map((d) => d[dataKey]),
+                type: "scatter",
+                mode: "lines+markers",
+                marker: { color },
+                line: { color, width: 3 },
+                name: title,
+              },
+            ]}
+            layout={{
+              autosize: true,
+              height: 200,
+              margin: { l: 40, r: 10, t: 10, b: 40 },
+              xaxis: {
+                title: "Time",
+                tickmode: "auto",
+                nticks: 8,
+                showgrid: true,
+                zeroline: false,
+              },
+              yaxis: {
+                title: unit,
+                range: yDomain,
+                showgrid: true,
+                zeroline: false,
+              },
+              plot_bgcolor: "#fff",
+              paper_bgcolor: "#fff",
+              font: { size: 12 },
+            }}
+            config={{ displayModeBar: false, responsive: true }}
+            style={{ width: "100%", height: "200px" }}
+            useResizeHandler
+          />
+        </div>
       </div>
-      <div className="p-4">
-        <ResponsiveContainer width="100%" height={200}>
-          <LineChart data={chartData}>
-            <CartesianGrid stroke="#eee" strokeDasharray="3 3" />
-            <XAxis dataKey="name" minTickGap={10} />
-            <YAxis unit={unit} domain={getYAxisDomain(chartData, dataKey)} />
-            <Tooltip />
-            <Line
-              type="monotone"
-              dataKey={dataKey}
-              stroke={color}
-              strokeWidth={2}
-              dot={{ r: 4 }}
-              activeDot={{ r: 6 }}
-              isAnimationActive={false}
-              animationDuration={0}
-            />
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
-    </div>
-  );
+    );
+  };
+
+  // Simulasi update data realtime setiap 2 detik (interval harian)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setChartData((prev) => {
+        // Ambil tanggal terakhir dari data sebelumnya
+        const lastDate = prev.length
+          ? (() => {
+              const lastLabel = prev[prev.length - 1].name;
+              const d = new Date();
+              // Parse label "May 01"
+              const [monthStr, dayStr] = lastLabel.split(" ");
+              d.setMonth(
+                [
+                  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+                ].indexOf(monthStr)
+              );
+              d.setDate(Number(dayStr));
+              return d;
+            })()
+          : new Date();
+        // Tambah 1 hari dari tanggal terakhir
+        const nextDate = new Date(lastDate.getTime() + 24 * 60 * 60 * 1000);
+        const name = nextDate.toLocaleDateString("en-US", {
+          month: "short",
+          day: "2-digit",
+        });
+        const last = prev[prev.length - 1];
+        // Simulasikan perubahan naik/turun
+        const tempDelta = (Math.random() - 0.5) * 2;
+        const humDelta = (Math.random() - 0.5) * 2;
+        const lightDelta = (Math.random() - 0.5) * 10;
+        const moistDelta = (Math.random() - 0.5) * 2;
+        const newPoint = {
+          name,
+          temperature: Math.max(20, Math.min(30, last.temperature + tempDelta)),
+          humidity: Math.max(70, Math.min(90, last.humidity + humDelta)),
+          light: Math.max(400, Math.min(600, last.light + lightDelta)),
+          moisture: Math.max(60, Math.min(80, last.moisture + moistDelta)),
+        };
+        // Update sensorData tren naik/turun
+        setSensorData([
+          {
+            title: "Temperature",
+            value: newPoint.temperature.toFixed(1),
+            unit: "°C",
+            status: "Normal",
+            trend: tempDelta >= 0 ? "Naik" : "Turun",
+          },
+          {
+            title: "Air Humidity",
+            value: newPoint.humidity.toFixed(0),
+            unit: "%",
+            status: "Normal",
+            trend: humDelta >= 0 ? "Naik" : "Turun",
+          },
+          {
+            title: "Light Intensity",
+            value: newPoint.light.toFixed(0),
+            unit: "lux",
+            status: "Normal",
+            trend: lightDelta >= 0 ? "Naik" : "Turun",
+          },
+          {
+            title: "Medium Moisture",
+            value: newPoint.moisture.toFixed(0),
+            unit: "%",
+            status: "Normal",
+            trend: moistDelta >= 0 ? "Naik" : "Turun",
+          },
+        ]);
+        // Pastikan hanya 24 data (24 hari)
+        return [...prev.slice(1), newPoint];
+      });
+    }, 2000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-      {/* Sidebar Global */}
       <Sidebar navItems={navItems} />
 
-      {/* Main Content */}
       <div className="flex-1 flex flex-col">
-        {/* Header global */}
         <AppHeader onLogout={handleLogout} />
 
         {/* Dashboard Content */}
@@ -294,8 +349,12 @@ export default function Dashboard() {
                     </div>
                     <div className="flex items-center space-x-1">
                       <span className="text-gray-500">Tren</span>
-                      <span className="text-red-500 text-xs">
-                        {sensor.trend}
+                      <span className="flex items-center">
+                        {sensor.trend.toLowerCase() === "turun" ? (
+                          <ArrowDown size={14} className="ml-1" color="#ef4444" />
+                        ) : (
+                          <ArrowUp size={14} className="ml-1" color="#22c55e" />
+                        )}
                       </span>
                     </div>
                   </div>
