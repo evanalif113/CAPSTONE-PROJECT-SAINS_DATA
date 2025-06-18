@@ -470,19 +470,19 @@ export default function Dashboard() {
             </div>
             <div className="p-4">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Fan</span>
+                <div className="flex flex-col items-center">
+                  <span className="text-gray-600 mb-2">Fan</span>
                   <ToggleSwitch checked={fanEnabled} onChange={setFanEnabled} />
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Humidifier</span>
+                <div className="flex flex-col items-center">
+                  <span className="text-gray-600 mb-2">Humidifier</span>
                   <ToggleSwitch
                     checked={humidifierEnabled}
                     onChange={setHumidifierEnabled}
                   />
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Light</span>
+                <div className="flex flex-col items-center">
+                  <span className="text-gray-600 mb-2">Light</span>
                   <ToggleSwitch
                     checked={lightEnabled}
                     onChange={setLightEnabled}
