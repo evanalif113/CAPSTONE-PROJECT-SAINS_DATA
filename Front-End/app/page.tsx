@@ -221,8 +221,18 @@ export default function Dashboard() {
               const [monthStr, dayStr] = lastLabel.split(" ");
               d.setMonth(
                 [
-                  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-                  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+                  "Jan",
+                  "Feb",
+                  "Mar",
+                  "Apr",
+                  "May",
+                  "Jun",
+                  "Jul",
+                  "Aug",
+                  "Sep",
+                  "Oct",
+                  "Nov",
+                  "Dec",
                 ].indexOf(monthStr)
               );
               d.setDate(Number(dayStr));
@@ -351,7 +361,11 @@ export default function Dashboard() {
                       <span className="text-gray-500">Tren</span>
                       <span className="flex items-center">
                         {sensor.trend.toLowerCase() === "turun" ? (
-                          <ArrowDown size={14} className="ml-1" color="#ef4444" />
+                          <ArrowDown
+                            size={14}
+                            className="ml-1"
+                            color="#ef4444"
+                          />
                         ) : (
                           <ArrowUp size={14} className="ml-1" color="#22c55e" />
                         )}
