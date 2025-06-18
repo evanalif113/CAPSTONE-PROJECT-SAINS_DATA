@@ -144,6 +144,7 @@ export default function Alerts() {
               >
                 Active Alerts
               </button>
+              {/*
               <button
                 onClick={() => setActiveTab("Notification Settings")}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
@@ -154,6 +155,7 @@ export default function Alerts() {
               >
                 Notification Settings
               </button>
+              */}
             </div>
           </div>
 
@@ -191,7 +193,8 @@ export default function Alerts() {
             </div>
           )}
 
-          {/* Notification Settings Tab */}
+          {/* 
+          // Notification Settings Tab
           {activeTab === "Notification Settings" && (
             <div>
               <h3 className="text-lg font-semibold text-gray-900 mb-6">
@@ -239,6 +242,7 @@ export default function Alerts() {
               </div>
             </div>
           )}
+          */}
         </main>
       </div>
     </div>
