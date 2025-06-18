@@ -7,8 +7,9 @@
 
 #include <WiFi.h>
 #include <Wire.h>
-#include <AViShaOTA.h>
 #include <WiFiManager.h> // Tambahkan ini
+#include <ESPAsyncWebServer.h>
+#include <ElegantOTA.h>
 
 #ifdef USE_SHT31
     #include <Adafruit_SHT31.h>
@@ -46,6 +47,8 @@ uint8_t id_sensor = 2;
 String deviceName = "ESP32_Sensor";
 String ServerPath = "http://192.168.1.101:2518/api/data-sensor/send";
 
+WebServer server(80);
+
 #ifdef USE_OLED
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 #endif
@@ -61,8 +64,6 @@ BH1750 light;
 #ifdef USE_NEOPIXEL
 Adafruit_NeoPixel strip(1, STRIP_PIN, NEO_GRB + NEO_KHZ800);
 #endif
-
-AViShaOTA ota("avisha-ota");
 
 // Global variables to store latest sensor readings
 float latestTemperature = 0;
@@ -216,7 +217,7 @@ void connectWiFi() {
     WiFiManager wm;
     // Jika sudah pernah connect, akan otomatis connect
     // Jika belum, ESP32 akan membuat AP captive portal untuk konfigurasi WiFi
-    bool res = wm.autoConnect("ESP32-Setup", "12345678"); // SSID dan password AP sementara
+    bool res = wm.autoConnect("ESP32-Sensing-Setup", "admin123"); // SSID dan password AP sementara
     if(!res) {
         Serial.println("Gagal connect WiFi, restart ESP...");
         delay(3000);
@@ -233,14 +234,21 @@ void setup() {
     Serial.begin(115200);
     connectWiFi();         // Gunakan WiFiManager
     initializeSensors();
-    ota.setOTAPassword("admin123");
+
+   server.on("/", []() {
+    server.send(200, "text/plain", "to update go to" + String(WiFi.localIP()) + "/update");
+  });
+
+    ElegantOTA.begin(&server);    // Inisialisasi ElegantOTA
+    server.begin();
 }
 
 static unsigned long previousMillis;
 const unsigned long interval = 5000;
 
 void loop() {
-    ota.handle();
+    server.handleClient();
+    ElegantOTA.loop();
     if (WiFi.status() != WL_CONNECTED) {
         Serial.println("WiFi disconnected! Attempting to reconnect...");
         connectWiFi();
