@@ -7,9 +7,8 @@
 
 #include <WiFi.h>
 #include <Wire.h>
+#include <WiFiManager.h> // Tambahkan ini
 #include <ESPAsyncWebServer.h>
-#include <AsyncTCP.h>
-#include "LittleFS.h"
 #include <ElegantOTA.h>
 
 #ifdef USE_SHT31
@@ -30,8 +29,6 @@
 
 #ifdef USE_SQL
     #include <HTTPClient.h>
-    String deviceName = "ESP32_Sensor";
-    String ServerPath = "http://192.168.1.104:2518/api/data-sensor/send";
 #endif
 
 #ifdef USE_FIREBASE
@@ -44,29 +41,13 @@ uint8_t id_sensor = 2;
 
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
-#define STRIP_PIN 5
-#define MOISTURE_PIN 4
+#define INDI_PIN 5
+#define MOISTURE_PIN 5
 
-// Create AsyncWebServer object on port 80
+String deviceName = "ESP32_Sensor";
+String ServerPath = "http://192.168.1.101:2518/api/data-sensor/send";
+
 WebServer server(80);
-
-// Search for parameter in HTTP POST request
-const char* SSID = "ssid";
-const char* PASS = "pass";
-const char* USERNAME = "username";
-const char* PASSWORD = "password";
-
-//Variables to save values from HTML form
-String ssid;
-String pass;
-String username;
-String password;
-
-// File paths to save input values permanently
-const char* ssidPath = "/ssid.txt";
-const char* passPath = "/pass.txt";
-const char* userPath = "/username.txt";
-const char* passwordPath = "/password.txt";
 
 #ifdef USE_OLED
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
@@ -81,22 +62,14 @@ BH1750 light;
 #endif
 
 #ifdef USE_NEOPIXEL
-Adafruit_NeoPixel strip(1, STRIP_PIN, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel strip(1, INDI_PIN, NEO_GRB + NEO_KHZ800);
 #endif
 
 // Global variables to store latest sensor readings
 float latestTemperature = 0;
 float latestHumidity = 0;
-float latestMoisture = 0;
+int latestMoisture = 0;
 float latestLux = 0;
-
-// Initialize LittleFS
-void initLittleFS() {
-  if (!LittleFS.begin(true)) {
-    Serial.println("An error has occurred while mounting LittleFS");
-  }
-  Serial.println("LittleFS mounted successfully");
-}
 
 void initializeSensors() {
 #ifdef USE_NEOPIXEL
@@ -241,7 +214,19 @@ void sendDataToServer() {
 }
 
 void connectWiFi() {
-    
+    WiFiManager wm;
+    // Jika sudah pernah connect, akan otomatis connect
+    // Jika belum, ESP32 akan membuat AP captive portal untuk konfigurasi WiFi
+    bool res = wm.autoConnect("ESP32-Sensing-Setup", "admin123"); // SSID dan password AP sementara
+    if(!res) {
+        Serial.println("Gagal connect WiFi, restart ESP...");
+        delay(3000);
+        ESP.restart();
+    } else {
+        Serial.println("WiFi connected!");
+        Serial.print("IP address: ");
+        Serial.println(WiFi.localIP());
+    }
 }
 
 void setup() {
