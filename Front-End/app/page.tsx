@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import AppHeader from "../components/AppHeader";
+import AppHeader from "@/components/AppHeader";
 import Sidebar from "@/components/Sidebar";
 import { getNavItems } from "@/components/navItems";
 import {
