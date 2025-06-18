@@ -24,6 +24,9 @@ import { ArrowUp, ArrowDown } from "lucide-react";
 const navItems = getNavItems("/");
 const Plot = dynamic(() => import("react-plotly.js"), { ssr: false });
 
+// Tipe union untuk key sensor
+type SensorKey = "temperature" | "humidity" | "light" | "moisture";
+
 // Helper untuk membuat data 24 hari terakhir (interval harian)
 function generateInitialChartData() {
   const now = new Date();
@@ -135,7 +138,7 @@ export default function Dashboard() {
   };
 
   // Helper untuk min/max domain YAxis (berdasarkan data dummy, tanpa padding)
-  function getYAxisDomain(data: any[], key: string) {
+  function getYAxisDomain(data: any[], key: SensorKey) {
     const vals = data.map((d) => d[key]);
     const min = Math.min(...vals);
     const max = Math.max(...vals);
@@ -151,7 +154,7 @@ export default function Dashboard() {
     unit,
   }: {
     title: string;
-    dataKey: string;
+    dataKey: SensorKey;
     color: string;
     Icon: React.FC;
     unit: string;
