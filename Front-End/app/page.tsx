@@ -456,10 +456,7 @@ export default function Dashboard() {
                   <span className="text-gray-600">Uptime</span>
                   <span className="text-gray-900">5 hari 32 menit</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Level Baterai</span>
-                  <span className="text-gray-900">100%</span>
-                </div>
+                {/* Level Baterai dihapus */}
               </div>
             </div>
           </div>
