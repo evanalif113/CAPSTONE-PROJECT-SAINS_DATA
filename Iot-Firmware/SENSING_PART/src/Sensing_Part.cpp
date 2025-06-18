@@ -7,8 +7,9 @@
 
 #include <WiFi.h>
 #include <Wire.h>
-#include <WiFiManager.h> // Tambahkan ini
 #include <ESPAsyncWebServer.h>
+#include <AsyncTCP.h>
+#include "LittleFS.h"
 #include <ElegantOTA.h>
 
 #ifdef USE_SHT31
@@ -29,6 +30,8 @@
 
 #ifdef USE_SQL
     #include <HTTPClient.h>
+    String deviceName = "ESP32_Sensor";
+    String ServerPath = "http://192.168.1.104:2518/api/data-sensor/send";
 #endif
 
 #ifdef USE_FIREBASE
@@ -42,12 +45,28 @@ uint8_t id_sensor = 2;
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
 #define STRIP_PIN 5
-#define MOISTURE_PIN 5
+#define MOISTURE_PIN 4
 
-String deviceName = "ESP32_Sensor";
-String ServerPath = "http://192.168.1.101:2518/api/data-sensor/send";
+// Create AsyncWebServer object on port 80
+AsyncWebServer server(80);
 
-WebServer server(80);
+// Search for parameter in HTTP POST request
+const char* PARAM_INPUT_1 = "ssid";
+const char* PARAM_INPUT_2 = "pass";
+const char* PARAM_INPUT_3 = "ip";
+const char* PARAM_INPUT_4 = "gateway";
+
+//Variables to save values from HTML form
+String ssid;
+String pass;
+String ip;
+String gateway;
+
+// File paths to save input values permanently
+const char* ssidPath = "/ssid.txt";
+const char* passPath = "/pass.txt";
+const char* ipPath = "/ip.txt";
+const char* gatewayPath = "/gateway.txt";
 
 #ifdef USE_OLED
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
@@ -68,7 +87,7 @@ Adafruit_NeoPixel strip(1, STRIP_PIN, NEO_GRB + NEO_KHZ800);
 // Global variables to store latest sensor readings
 float latestTemperature = 0;
 float latestHumidity = 0;
-int latestMoisture = 0;
+float latestMoisture = 0;
 float latestLux = 0;
 
 void initializeSensors() {
@@ -214,19 +233,7 @@ void sendDataToServer() {
 }
 
 void connectWiFi() {
-    WiFiManager wm;
-    // Jika sudah pernah connect, akan otomatis connect
-    // Jika belum, ESP32 akan membuat AP captive portal untuk konfigurasi WiFi
-    bool res = wm.autoConnect("ESP32-Sensing-Setup", "admin123"); // SSID dan password AP sementara
-    if(!res) {
-        Serial.println("Gagal connect WiFi, restart ESP...");
-        delay(3000);
-        ESP.restart();
-    } else {
-        Serial.println("WiFi connected!");
-        Serial.print("IP address: ");
-        Serial.println(WiFi.localIP());
-    }
+    
 }
 
 void setup() {
