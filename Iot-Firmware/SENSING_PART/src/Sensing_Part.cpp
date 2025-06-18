@@ -236,7 +236,7 @@ void setup() {
     initializeSensors();
 
    server.on("/", []() {
-    server.send(200, "text/plain", "to update go to" + WiFi.localIP() + "/update");
+    server.send(200, "text/plain", "to update go to " + WiFi.localIP().toString() + "/update");
   });
 
     ElegantOTA.begin(&server);    // Inisialisasi ElegantOTA
