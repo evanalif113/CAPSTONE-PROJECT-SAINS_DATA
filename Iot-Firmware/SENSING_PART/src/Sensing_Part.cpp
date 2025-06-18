@@ -8,6 +8,7 @@
 #include <WiFi.h>
 #include <Wire.h>
 #include <AViShaOTA.h>
+#include <WiFiManager.h> // Tambahkan ini
 
 #ifdef USE_SHT31
     #include <Adafruit_SHT31.h>
@@ -31,16 +32,16 @@
 
 #ifdef USE_FIREBASE
     #include <FirebaseClient.h>
+    #define ENABLE_USER_AUTH
+    #define ENABLE_DATABASE
 #endif
 
-const char* ssid = "server";
-const char* password = "jeris6467";
 uint8_t id_sensor = 2;
 
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
 #define STRIP_PIN 5
-#define MOISTURE_PIN 34
+#define MOISTURE_PIN 5
 
 String deviceName = "ESP32_Sensor";
 String ServerPath = "http://192.168.1.101:2518/api/data-sensor/send";
@@ -212,29 +213,25 @@ void sendDataToServer() {
 }
 
 void connectWiFi() {
-    Serial.print("Connecting to WiFi: ");
-    ota.begin(ssid, password);
-    Serial.println(ssid);
-    WiFi.begin(ssid, password);
-    int retry = 0;
-    while (WiFi.status() != WL_CONNECTED) {
-        delay(500);
-        Serial.print(".");
-        retry++;
-        if (retry > 40) {
-            Serial.println("\nFailed to connect to WiFi!");
-            return;
-        }
+    WiFiManager wm;
+    // Jika sudah pernah connect, akan otomatis connect
+    // Jika belum, ESP32 akan membuat AP captive portal untuk konfigurasi WiFi
+    bool res = wm.autoConnect("ESP32-Setup", "12345678"); // SSID dan password AP sementara
+    if(!res) {
+        Serial.println("Gagal connect WiFi, restart ESP...");
+        delay(3000);
+        ESP.restart();
+    } else {
+        Serial.println("WiFi connected!");
+        Serial.print("IP address: ");
+        Serial.println(WiFi.localIP());
     }
-    Serial.println("\nWiFi connected!");
-    Serial.print("IP address: ");
-    Serial.println(WiFi.localIP());
 }
 
 void setup() {
     Wire.begin();
     Serial.begin(115200);
-    connectWiFi();
+    connectWiFi();         // Gunakan WiFiManager
     initializeSensors();
     ota.setOTAPassword("admin123");
 }
