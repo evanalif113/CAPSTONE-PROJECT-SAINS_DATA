@@ -2,9 +2,11 @@
 
 import type React from "react"
 import { useState } from "react"
+// Tambahkan import firebase auth
+import { auth, createUserWithEmailAndPassword } from "../../lib/firebase"
 
 export default function Signup() {
-  const [username, setUsername] = useState("")
+  const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
@@ -16,29 +18,16 @@ export default function Signup() {
     setError("")
     setSuccess("")
     try {
-      const url = `http://localhost:2518/api/signup?username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`
-      const res = await fetch(url, {
-        method: "GET",
-      })
-      const text = await res.text()
-      console.log("API signup response:", { status: res.status, text })
-      if (res.status === 201) {
-        setSuccess("Registrasi berhasil! Silakan login.")
-        setUsername("")
-        setPassword("")
-        setTimeout(() => {
-          window.location.href = "/login"
-        }, 1200)
-      } else if (res.status === 409) {
-        setError(text || "Username sudah terdaftar.")
-      } else if (res.status === 400) {
-        setError(text || "Username dan password wajib diisi.")
-      } else {
-        setError(text || "Registrasi gagal.")
-      }
-    } catch (err) {
-      setError("Tidak dapat terhubung ke server. Pastikan server backend berjalan dan dapat diakses.")
-      console.error("API signup error:", err)
+      // Signup dengan Firebase Auth
+      await createUserWithEmailAndPassword(auth, email, password)
+      setSuccess("Registrasi berhasil! Silakan login.")
+      setEmail("")
+      setPassword("")
+      setTimeout(() => {
+        window.location.href = "/login"
+      }, 1200)
+    } catch (err: any) {
+      setError(err.message || "Registrasi gagal.")
     }
     setIsLoading(false)
   }
@@ -69,13 +58,13 @@ export default function Signup() {
 
         {/* Signup Form */}
         <form onSubmit={handleSignup} className="space-y-6">
-          {/* Username Field */}
+          {/* Email Field */}
           <div>
             <input
-              type="text"
-              placeholder="Username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               required
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-colors"
             />
@@ -121,3 +110,4 @@ export default function Signup() {
     </div>
   )
 }
+  

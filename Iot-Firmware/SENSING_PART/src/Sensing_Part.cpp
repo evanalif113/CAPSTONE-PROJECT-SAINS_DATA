@@ -42,7 +42,7 @@ uint8_t id_sensor = 2;
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
 #define INDI_PIN 5
-#define MOISTURE_PIN 5
+#define MOISTURE_PIN 4
 
 String deviceName = "ESP32_Sensor";
 String ServerPath = "http://192.168.1.101:2518/api/data-sensor/send";

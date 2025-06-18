@@ -1,6 +1,8 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app"
 import { getDatabase, ref, query, orderByKey, limitToLast, get, onValue, off, startAt, endAt} from "firebase/database"
+// Tambahkan import untuk Auth
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "firebase/auth"
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -21,5 +23,22 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
+// Inisialisasi Auth
+const auth = getAuth(app);
 
-export { database, ref, query, orderByKey, limitToLast, get, onValue, off, startAt, endAt };
+export {
+  database,
+  ref,
+  query,
+  orderByKey,
+  limitToLast,
+  get,
+  onValue,
+  off,
+  startAt,
+  endAt,
+  auth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+};
