@@ -3,7 +3,7 @@
 import type React from "react"
 import { useState } from "react"
 // Tambahkan import firebase auth
-import { auth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "../../lib/firebase"
+import { auth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "@/lib/firebase"
 
 export default function Signup() {
   const [email, setEmail] = useState("")
@@ -43,7 +43,7 @@ export default function Signup() {
       await signInWithEmailAndPassword(auth, email, password);
       setSuccess("Login berhasil! Mengalihkan...");
       setTimeout(() => {
-        window.location.href = "/main"; // redirect ke dashboard
+        window.location.href = "/dashboard"; // redirect ke dashboard
       }, 1200);
     } catch (err: any) {
       setError(err.message || "Login gagal.");
