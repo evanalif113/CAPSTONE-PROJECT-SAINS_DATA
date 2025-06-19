@@ -4,7 +4,7 @@ import { HomeIcon, ChartBarIcon,BIIcon, DeviceIcon, BellIcon, SettingsIcon, User
 export const baseNavItems = [
   { name: "Beranda", href: "/", icon: HomeIcon },
   { name: "Data", href: "/data-history", icon: ChartBarIcon },
-  { name: "Kondisi", href: "/condition", icon: CpuIcon },
+  { name: "Kondisi", href: "/condition", icon: DeviceIcon },
   { name: "Intelijen", href: "/intelligence", icon: BIIcon },
   { name: "Perangkat", href: "/device", icon: DeviceIcon },
   { name: "Notifikasi", href: "/alerts", icon: BellIcon },
