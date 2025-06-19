@@ -1,15 +1,18 @@
-#define USE_SQL
-//#define USE_FIREBASE
+//#define USE_SQL
+#define USE_FIREBASE
 #define USE_BH1750
 #define USE_SHT31
 #define USE_OLED
 #define USE_NEOPIXEL
 
 #include <WiFi.h>
+#include <WiFiClientSecure.h>
 #include <Wire.h>
-#include <WiFiManager.h> // Tambahkan ini
+#include <WiFiManager.h>
+#include <ArduinoJson.h>
 #include <ESPAsyncWebServer.h>
 #include <ElegantOTA.h>
+#include "time.h"
 
 #ifdef USE_SHT31
     #include <Adafruit_SHT31.h>
@@ -32,9 +35,9 @@
 #endif
 
 #ifdef USE_FIREBASE
-    #include <FirebaseClient.h>
     #define ENABLE_USER_AUTH
     #define ENABLE_DATABASE
+    #include <FirebaseClient.h>
 #endif
 
 uint8_t id_sensor = 2;
@@ -42,12 +45,30 @@ uint8_t id_sensor = 2;
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
 #define INDI_PIN 5
-#define MOISTURE_PIN 4
+#define MOISTURE_PIN 34
 
+#ifdef USE_SQL
 String deviceName = "ESP32_Sensor";
 String ServerPath = "http://192.168.1.101:2518/api/data-sensor/send";
+#endif
 
 WebServer server(80);
+
+#define API_KEY "AIzaSyD14wZkvP46yP3jQAwzUBOSh9kf8m-7vwg"
+#define DATABASE_URL "kumbung-sense.firebaseapp.com"
+#define USER_EMAIL "esp32@gmail.com"
+#define USER_PASSWORD "1234567"
+
+void processData(AsyncResult &aResult);
+
+WiFiClientSecure ssl_client;
+
+using AsyncClient = AsyncClientClass;
+AsyncClient Client(ssl_client);
+
+UserAuth user_auth(API_KEY, USER_EMAIL, USER_PASSWORD);
+FirebaseApp app;
+RealtimeDatabase Database;
 
 #ifdef USE_OLED
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
@@ -69,7 +90,7 @@ Adafruit_NeoPixel strip(1, INDI_PIN, NEO_GRB + NEO_KHZ800);
 float latestTemperature = 0;
 float latestHumidity = 0;
 int latestMoisture = 0;
-float latestLux = 0;
+float latestLight = 0;
 
 void initializeSensors() {
 #ifdef USE_NEOPIXEL
@@ -130,7 +151,7 @@ void updateSensor() {
         latestTemperature = temperature;
         latestHumidity = humidity;
         latestMoisture = moistureValue;
-        latestLux = lux;
+        latestLight = lux;
 
         Serial.print("Temperature: ");
         Serial.print(temperature);
@@ -181,7 +202,7 @@ void sendDataToSQLServer() {
     url += "&temperature=" + String(latestTemperature, 2);
     url += "&humidity=" + String(latestHumidity, 2);
     url += "&moisture=" + String(latestMoisture);
-    url += "&light=" + String(latestLux, 2);
+    url += "&light=" + String(latestLight, 2);
 
     Serial.print("Request URL: ");
     Serial.println(url);
@@ -213,10 +234,54 @@ void sendDataToSQLServer() {
 #endif
 }
 
-void sendDataToFirebase() {
-    #ifdef USE_FIREBASE
-    #endif
-};
+unsigned long getTime() {
+  time_t now;
+  struct tm timeinfo;
+  if (!getLocalTime(&timeinfo)) {
+    Serial.println("Failed to obtain time");
+    return (0);
+  }
+  time(&now);
+  return now;
+}
+
+void FirebaseSetup() {
+    configTime(0, 0, "time.google.com", "pool.ntp.org"); // Initialize NTP Client
+    Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
+
+    ssl_client.setInsecure();
+
+    initializeApp(Client, app, getAuth(user_auth), processData, "authTask");
+    app.getApp<RealtimeDatabase>(Database);
+    Database.url(DATABASE_URL);
+    Database.setSSEFilters("get,put,patch,keep-alive,cancel,auth_revoked");   
+}
+
+void FirebaseData() {
+  // Update NTP time
+  unsigned long timestamp;
+  timestamp = getTime();// Get current epoch time
+
+  //JSON Constructor by ArduinoJSON
+  JsonDocument docW;
+
+
+  docW["temperature"] = latestTemperature;
+  docW["humidity"] = latestHumidity;
+  docW["light"] = latestLight;
+  docW["moisture"] = latestMoisture;
+  docW["timestamp"] = timestamp;
+
+  String dataTani;
+
+  docW.shrinkToFit();  // optional
+  serializeJson(docW, dataTani);
+    String uid = app.getUid();
+  // Dynamically use timestamp in the path
+  String dbPath = "/"+uid+"/data/" + timestamp;
+  Database.set<object_t>(Client, dbPath.c_str(), object_t(dataTani), processData, "setTask");
+}
+
 void connectWiFi() {
     WiFiManager wm;
     // Jika sudah pernah connect, akan otomatis connect
