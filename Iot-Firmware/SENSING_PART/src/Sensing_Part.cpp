@@ -260,7 +260,6 @@ void SendDataToFirebase() {
   //JSON Constructor by ArduinoJSON
   JsonDocument docW;
 
-
   docW["temperature"] = latestTemperature;
   docW["humidity"] = latestHumidity;
   docW["light"] = latestLight;
@@ -274,7 +273,7 @@ void SendDataToFirebase() {
    String uid = app.getUid();
    Serial.printf("Firebase UID: %s\n", uid.c_str());
   // Dynamically use timestamp in the path
-  String dbPath = "/auto_weather_stat/"+uid+"/data/" + timestamp;
+  String dbPath = "/"+uid+"/sensor/data/" + timestamp;
   Database.set<object_t>(aClient, dbPath.c_str(), object_t(dataTani), processData, "setTask");
 }
 
