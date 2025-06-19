@@ -35,7 +35,7 @@ const GridIcon = (props: React.ComponentProps<typeof Grid>) => (
 const BellIcon = (props: React.ComponentProps<typeof Bell>) => (
   <Bell size={20} {...props} />
 );
-const CpuIcon = (props: React.ComponentProps<typeof Cpu>) => (
+const DeviceIcon = (props: React.ComponentProps<typeof Cpu>) => (
   <Cpu size={20} {...props} />
 );
 const CalendarIcon = (props: React.ComponentProps<typeof Calendar>) => (
@@ -104,7 +104,7 @@ export {
   HomeIcon,
   GridIcon,
   BellIcon,
-  CpuIcon,
+  DeviceIcon,
   CalendarIcon,
   ChartBarIcon,
   DownloadIcon,
