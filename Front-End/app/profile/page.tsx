@@ -8,20 +8,23 @@ import { getNavItems } from "@/components/navItems";
 export default function Profile() {
   const [activeTab, setActiveTab] = useState("Personal Information");
   const [isEditing, setIsEditing] = useState(false);
+
+    // Handler untuk logout
+  const handleLogout = () => {
+    window.location.href = "/logout";
+  };
+
+  // Ambil navItems dengan menu aktif
+  const navItems = getNavItems("/profile");
+
   const [profileData, setProfileData] = useState({
     name: "Admin User",
     email: "admin@example.com",
-    phone: "+62 812 3456 7890",
     role: "Administrator",
-    department: "Operations",
     joinDate: "2023-01-15",
-    language: "Bahasa Indonesia",
-    timezone: "UTC+7",
-    twoFactorEnabled: true,
     notificationPreferences: {
       email: true,
       push: true,
-      sms: false,
     },
   });
 
@@ -31,13 +34,7 @@ export default function Profile() {
     confirm: "",
   });
 
-  // Handler untuk logout
-  const handleLogout = () => {
-    window.location.href = "/logout";
-  };
 
-  // Ambil navItems dengan menu aktif
-  const navItems = getNavItems("/profile");
 
   // Ikon-ikon yang dipakai di konten
   const EditIcon = () => (
@@ -301,27 +298,6 @@ export default function Profile() {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Nomor Telepon
-                      </label>
-                      {isEditing ? (
-                        <input
-                          type="tel"
-                          value={profileData.phone}
-                          onChange={(e) =>
-                            setProfileData({
-                              ...profileData,
-                              phone: e.target.value,
-                            })
-                          }
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        />
-                      ) : (
-                        <p className="text-gray-900">{profileData.phone}</p>
-                      )}
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
                         Peran
                       </label>
                       {isEditing ? (
@@ -347,79 +323,9 @@ export default function Profile() {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Departemen
-                      </label>
-                      {isEditing ? (
-                        <input
-                          type="text"
-                          value={profileData.department}
-                          onChange={(e) =>
-                            setProfileData({
-                              ...profileData,
-                              department: e.target.value,
-                            })
-                          }
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        />
-                      ) : (
-                        <p className="text-gray-900">
-                          {profileData.department}
-                        </p>
-                      )}
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
                         Tanggal Bergabung
                       </label>
                       <p className="text-gray-900">{profileData.joinDate}</p>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Bahasa
-                      </label>
-                      {isEditing ? (
-                        <select
-                          value={profileData.language}
-                          onChange={(e) =>
-                            setProfileData({
-                              ...profileData,
-                              language: e.target.value,
-                            })
-                          }
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        >
-                          <option>Bahasa Indonesia</option>
-                          <option>English</option>
-                        </select>
-                      ) : (
-                        <p className="text-gray-900">{profileData.language}</p>
-                      )}
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Zona Waktu
-                      </label>
-                      {isEditing ? (
-                        <select
-                          value={profileData.timezone}
-                          onChange={(e) =>
-                            setProfileData({
-                              ...profileData,
-                              timezone: e.target.value,
-                            })
-                          }
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        >
-                          <option>UTC+7</option>
-                          <option>UTC+8</option>
-                          <option>UTC+9</option>
-                        </select>
-                      ) : (
-                        <p className="text-gray-900">{profileData.timezone}</p>
-                      )}
                     </div>
                   </div>
                 </div>

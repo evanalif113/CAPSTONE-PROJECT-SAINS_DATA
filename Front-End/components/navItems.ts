@@ -4,7 +4,7 @@ import { HomeIcon, ChartBarIcon, BellIcon, SettingsIcon, UserIcon } from "./Icon
 export const baseNavItems = [
   { name: "Beranda", href: "/", icon: HomeIcon },
   { name: "Data", href: "/data-history", icon: ChartBarIcon },
-  { name: "Perangkat", href: "/perangkat", icon: CpuIcon }, // Bisa diganti dengan ikon grafik yang sesuai
+  { name: "Perangkat", href: "/device", icon: CpuIcon }, // Bisa diganti dengan ikon grafik yang sesuai
   { name: "Notifikasi", href: "/alerts", icon: BellIcon },
   { name: "Pengaturan", href: "/settings", icon: SettingsIcon },
   { name: "Profil", href: "/profile", icon: UserIcon },
