@@ -4,6 +4,7 @@ import {
   Home,
   Grid,
   Bell,
+  Cpu,
   ChartBar,
   Calendar,
   Download,
@@ -33,6 +34,9 @@ const GridIcon = (props: React.ComponentProps<typeof Grid>) => (
 );
 const BellIcon = (props: React.ComponentProps<typeof Bell>) => (
   <Bell size={20} {...props} />
+);
+const CpuIcon = (props: React.ComponentProps<typeof Cpu>) => (
+  <Cpu size={20} {...props} />
 );
 const CalendarIcon = (props: React.ComponentProps<typeof Calendar>) => (
   <Calendar size={20} {...props} />
@@ -100,6 +104,7 @@ export {
   HomeIcon,
   GridIcon,
   BellIcon,
+  CpuIcon,
   CalendarIcon,
   ChartBarIcon,
   DownloadIcon,
