@@ -33,7 +33,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       if (user) {
         setUser(user);
         const token = await user.getIdToken();
-        Cookies.set('firebaseIdToken', token, { expires: 7, secure: true });
+        Cookies.set('firebaseIdToken', token, { 
+          expires: 7, 
+          secure: true 
+        });
       } else {
         setUser(null);
         Cookies.remove('firebaseIdToken');

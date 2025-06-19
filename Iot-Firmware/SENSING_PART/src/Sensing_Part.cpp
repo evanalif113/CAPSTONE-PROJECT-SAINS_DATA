@@ -169,7 +169,7 @@ void updateSensor() {
     }
 }
 
-void sendDataToServer() {
+void sendDataToSQLServer() {
 #ifdef USE_SQL
     if (WiFi.status() != WL_CONNECTED) {
         Serial.println("WiFi not connected. Skipping data send.");
@@ -213,6 +213,10 @@ void sendDataToServer() {
 #endif
 }
 
+void sendDataToFirebase() {
+    #ifdef USE_FIREBASE
+    #endif
+};
 void connectWiFi() {
     WiFiManager wm;
     // Jika sudah pernah connect, akan otomatis connect
@@ -257,6 +261,6 @@ void loop() {
     if (currentMillis - previousMillis >= interval) {
         previousMillis = currentMillis;
         updateSensor();
-        sendDataToServer();
+        sendDataToSQLServer();
     }
 }
