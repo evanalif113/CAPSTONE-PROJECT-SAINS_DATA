@@ -4,14 +4,14 @@
 #define USE_SHT31
 #define USE_OLED
 #define USE_NEOPIXEL
+#define ENABLE_USER_AUTH
+#define ENABLE_DATABASE
 
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
-#include <Wire.h>
 #include <WiFiManager.h>
+#include <FirebaseClient.h>
 #include <ArduinoJson.h>
-#include <ESPAsyncWebServer.h>
-#include <ElegantOTA.h>
 #include "time.h"
 
 #ifdef USE_SHT31
@@ -34,12 +34,6 @@
     #include <HTTPClient.h>
 #endif
 
-#ifdef USE_FIREBASE
-    #define ENABLE_USER_AUTH
-    #define ENABLE_DATABASE
-    #include <FirebaseClient.h>
-#endif
-
 uint8_t id_sensor = 2;
 
 #define SCREEN_WIDTH 128
@@ -52,19 +46,20 @@ String deviceName = "ESP32_Sensor";
 String ServerPath = "http://192.168.1.101:2518/api/data-sensor/send";
 #endif
 
-WebServer server(80);
-
 #define API_KEY "AIzaSyD14wZkvP46yP3jQAwzUBOSh9kf8m-7vwg"
-#define DATABASE_URL "kumbung-sense.firebaseapp.com"
+#define DATABASE_URL "https://kumbung-sense-default-rtdb.asia-southeast1.firebasedatabase.app/"
 #define USER_EMAIL "esp32@gmail.com"
 #define USER_PASSWORD "1234567"
+
+// Pin dan LED indicator
+uint8_t ledPin = 2; // GPIO 2
 
 void processData(AsyncResult &aResult);
 
 WiFiClientSecure ssl_client;
 
 using AsyncClient = AsyncClientClass;
-AsyncClient Client(ssl_client);
+AsyncClient aClient(ssl_client);
 
 UserAuth user_auth(API_KEY, USER_EMAIL, USER_PASSWORD);
 FirebaseApp app;
@@ -245,19 +240,19 @@ unsigned long getTime() {
   return now;
 }
 
-void FirebaseSetup() {
+void SetupFirebase() {
     configTime(0, 0, "time.google.com", "pool.ntp.org"); // Initialize NTP Client
     Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
     ssl_client.setInsecure();
 
-    initializeApp(Client, app, getAuth(user_auth), processData, "authTask");
+    initializeApp(aClient, app, getAuth(user_auth), processData, "authTask");
     app.getApp<RealtimeDatabase>(Database);
     Database.url(DATABASE_URL);
     Database.setSSEFilters("get,put,patch,keep-alive,cancel,auth_revoked");   
 }
 
-void FirebaseData() {
+void SendDataToFirebase() {
   // Update NTP time
   unsigned long timestamp;
   timestamp = getTime();// Get current epoch time
@@ -276,10 +271,38 @@ void FirebaseData() {
 
   docW.shrinkToFit();  // optional
   serializeJson(docW, dataTani);
-    String uid = app.getUid();
+   String uid = app.getUid();
+   Serial.printf("Firebase UID: %s\n", uid.c_str());
   // Dynamically use timestamp in the path
-  String dbPath = "/"+uid+"/data/" + timestamp;
-  Database.set<object_t>(Client, dbPath.c_str(), object_t(dataTani), processData, "setTask");
+  String dbPath = "/auto_weather_stat/"+uid+"/data/" + timestamp;
+  Database.set<object_t>(aClient, dbPath.c_str(), object_t(dataTani), processData, "setTask");
+}
+
+void processData(AsyncResult &aResult)
+{
+    // Exits when no result available when calling from the loop.
+    if (!aResult.isResult())
+        return;
+
+    if (aResult.isEvent())
+    {
+        Firebase.printf("Event task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.eventLog().message().c_str(), aResult.eventLog().code());
+    }
+
+    if (aResult.isDebug())
+    {
+        Firebase.printf("Debug task: %s, msg: %s\n", aResult.uid().c_str(), aResult.debug().c_str());
+    }
+
+    if (aResult.isError())
+    {
+        Firebase.printf("Error task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.error().message().c_str(), aResult.error().code());
+    }
+
+    if (aResult.available())
+    {
+        Firebase.printf("task: %s, payload: %s\n", aResult.uid().c_str(), aResult.c_str());
+    }
 }
 
 void connectWiFi() {
@@ -299,33 +322,32 @@ void connectWiFi() {
 }
 
 void setup() {
-    Wire.begin();
     Serial.begin(115200);
+    pinMode(ledPin, OUTPUT);
+    digitalWrite(ledPin, HIGH); // Matikan LED awalnya
+    Wire.begin();
     connectWiFi();         // Gunakan WiFiManager
     initializeSensors();
-
-   server.on("/", []() {
-    server.send(200, "text/plain", "to update go to " + WiFi.localIP().toString() + "/update");
-  });
-
-    ElegantOTA.begin(&server);    // Inisialisasi ElegantOTA
-    server.begin();
+    SetupFirebase();       // Inisialisasi Firebase
+    digitalWrite(ledPin, LOW); // Nyalakan LED jika setup berhasil
 }
 
 static unsigned long previousMillis;
 const unsigned long interval = 5000;
 
 void loop() {
-    server.handleClient();
-    ElegantOTA.loop();
+    app.loop();
     if (WiFi.status() != WL_CONNECTED) {
         Serial.println("WiFi disconnected! Attempting to reconnect...");
         connectWiFi();
     }
     unsigned long currentMillis = millis();
     if (currentMillis - previousMillis >= interval) {
-        previousMillis = currentMillis;
+        digitalWrite(ledPin, HIGH);
         updateSensor();
-        sendDataToSQLServer();
+        //sendDataToSQLServer();
+        SendDataToFirebase(); // Kirim data ke Firebase
+        digitalWrite(ledPin, LOW);
+        previousMillis = currentMillis;
     }
 }
