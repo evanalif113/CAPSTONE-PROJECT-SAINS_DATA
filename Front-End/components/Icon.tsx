@@ -8,6 +8,7 @@ import {
   ChartBar,
   Calendar,
   Download,
+  Lightbulb,
   Settings,
   User,
   ArrowUp,
@@ -46,6 +47,9 @@ const ChartBarIcon = (props: React.ComponentProps<typeof ChartBar>) => (
 );
 const DownloadIcon = (props: React.ComponentProps<typeof Download>) => (
   <Download size={20} {...props} />
+);
+const BIIcon = (props: React.ComponentProps<typeof Lightbulb>) => (
+  <Lightbulb size={20} {...props} />
 );
 const SettingsIcon = (props: React.ComponentProps<typeof Settings>) => (
   <Settings size={20} {...props} />
@@ -103,6 +107,7 @@ const NotificationIcon = (props: React.ComponentProps<typeof LucideBell>) => (
 export {
   HomeIcon,
   GridIcon,
+  BIIcon,
   BellIcon,
   DeviceIcon,
   CalendarIcon,
