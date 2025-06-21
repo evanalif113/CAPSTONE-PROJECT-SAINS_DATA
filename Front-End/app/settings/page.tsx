@@ -5,6 +5,13 @@ import AppHeader from "@/components/AppHeader";
 import Sidebar from "@/components/Sidebar";
 import { getNavItems } from "@/components/navItems";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import { 
+  Save, 
+  Mail, 
+  Bell, 
+  User, 
+  Plus 
+} from "lucide-react";
 
 export default function Settings() {
   const [activeTab, setActiveTab] = useState("Thresholds");
@@ -263,7 +270,7 @@ export default function Settings() {
               </div>
               <div className="mt-8 flex justify-end">
                 <button className="flex items-center px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                  <SaveIcon />
+                  <Save />
                   <span className="ml-2">Save Thresholds</span>
                 </button>
               </div>
@@ -281,7 +288,7 @@ export default function Settings() {
                 <div className="bg-white rounded-lg border border-gray-200 p-6">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center space-x-3">
-                      <EmailIcon className="text-blue-600" />
+                      <Mail className="text-blue-600" />
                       <h4 className="text-md font-medium text-gray-900">
                         Email Setup
                       </h4>
@@ -346,7 +353,7 @@ export default function Settings() {
                 <div className="bg-white rounded-lg border border-gray-200 p-6">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center space-x-3">
-                      <NotificationIcon className="text-blue-600" />
+                      <Bell className="text-blue-600" />
                       <h4 className="text-md font-medium text-gray-900">
                         Push Notification Setup
                       </h4>
@@ -409,7 +416,7 @@ export default function Settings() {
               </div>
               <div className="mt-8 flex justify-end">
                 <button className="flex items-center px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                  <SaveIcon />
+                  <Save />
                   <span className="ml-2">Save Notification Settings</span>
                 </button>
               </div>
@@ -497,7 +504,7 @@ export default function Settings() {
               </div>
               <div className="mt-8 flex justify-end">
                 <button className="flex items-center px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                  <SaveIcon />
+                  <Save />
                   <span className="ml-2">Save System Preferences</span>
                 </button>
               </div>
@@ -512,7 +519,7 @@ export default function Settings() {
                   Admin Management
                 </h3>
                 <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                  <PlusIcon />
+                  <Plus />
                   <span className="ml-2">Add User</span>
                 </button>
               </div>
@@ -531,7 +538,7 @@ export default function Settings() {
                   >
                     <div className="flex items-center space-x-3">
                       <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
-                        <UserIcon className="w-4 h-4 text-gray-500" />
+                        <User className="w-4 h-4 text-gray-500" />
                       </div>
                       <span className="text-gray-900">{user.name}</span>
                     </div>

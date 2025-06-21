@@ -28,8 +28,8 @@ const AppHeader: React.FC = () => {
               <div className="w-2 h-2 bg-green-500 rounded-full"></div>
               <span>Online</span>
             </div>
-            <span>Als1</span>
-            <span>GT Pengempon</span>
+            <span>Ais</span>
+            <span>Kumbung Pengempon</span>
           </div>
         </div>
       </div>
