@@ -1,26 +1,26 @@
-"use client"
+"use client";
 
-import type React from "react"
-
-import { useState } from "react"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Login() {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [rememberMe, setRememberMe] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
+    e.preventDefault();
+    setIsLoading(true);
 
     // Simulate login process
     setTimeout(() => {
-      setIsLoading(false)
+      setIsLoading(false);
       // Redirect to dashboard
-      window.location.href = "/"
-    }, 1500)
-  }
+      router.replace("/dashboard");
+    }, 1500);
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
@@ -34,13 +34,19 @@ export default function Login() {
           />
         </div>
         {/* Title */}
-        <h1 className="text-2xl font-bold text-center text-gray-900 mb-2">Kumbung Sense</h1>
+        <h1 className="text-2xl font-bold text-center text-gray-900 mb-2">
+          Kumbung Sense
+        </h1>
 
         {/* Subtitle */}
-        <p className="text-center text-gray-600 mb-6">Teknologi IoT untuk Kumbung yang Lebih Cerdas dan Terjaga</p>
+        <p className="text-center text-gray-600 mb-6">
+          Teknologi IoT untuk Kumbung yang Lebih Cerdas dan Terjaga
+        </p>
 
         {/* Login instruction */}
-        <p className="text-center text-gray-500 text-sm mb-8">Masuk untuk mengakses dashboard monitoring kumbungmu</p>
+        <p className="text-center text-gray-500 text-sm mb-8">
+          Masuk untuk mengakses dashboard monitoring kumbungmu
+        </p>
 
         {/* Login Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -79,7 +85,10 @@ export default function Login() {
               />
               <span className="text-sm text-gray-600">Ingat saya</span>
             </label>
-            <button type="button" className="text-sm text-teal-600 hover:text-teal-700 transition-colors">
+            <button
+              type="button"
+              className="text-sm text-teal-600 hover:text-teal-700 transition-colors"
+            >
               Lupa sandi?
             </button>
           </div>
@@ -113,5 +122,5 @@ export default function Login() {
         </div>
       </div>
     </div>
-  )
+  );
 }

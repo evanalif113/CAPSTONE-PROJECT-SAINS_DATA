@@ -2,27 +2,14 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/context/AuthContext";
 
-export default function HomePage() {
-  const { user, loading } = useAuth();
+// Root page: selalu redirect ke /login
+export default function Home() {
   const router = useRouter();
-
   useEffect(() => {
-    if (loading) return;
-
-    if (user) {
-      router.replace("/dashboard");
-    } else {
-      router.replace("/login");
-    }
-  }, [user, loading, router]);
-
-  return (
-    <div className="flex items-center justify-center h-screen text-gray-500 text-sm">
-      Memuat...
-    </div>
-  );
+    router.replace("/login");
+  }, [router]);
+  return null;
 }
-// This page redirects users based on their authentication status.
-// If the user is authenticated, they are redirected to the dashboard.
+// This page redirects users to the login page.
+// Always redirects to /login regardless of authentication status.

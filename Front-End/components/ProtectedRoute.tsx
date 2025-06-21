@@ -1,9 +1,11 @@
-import { useAuth } from '@/context/AuthContext';
-import { useRouter } from 'next/router';
-import { useEffect, ReactNode } from 'react';
+"use client";
+
+import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
+import { useEffect, ReactNode } from "react";
 
 interface ProtectedRouteProps {
-    children: ReactNode
+  children: ReactNode;
 }
 
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
@@ -12,12 +14,12 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
 
   useEffect(() => {
     if (!loading && !user) {
-      router.push('/login');
+      router.replace("/login");
     }
   }, [user, loading, router]);
 
   if (loading || !user) {
-    return <div>Loading...</div>;
+    return <div>Memuat...</div>;
   }
 
   return <>{children}</>;

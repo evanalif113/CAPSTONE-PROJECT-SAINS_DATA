@@ -54,7 +54,17 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   }, []);
 
   const logout = async () => {
-    await firebaseSignOut(auth);
+    setLoading(true);
+    setUser(null); // Pastikan user langsung null agar UI langsung update
+    Cookies.remove("firebaseIdToken");
+    try {
+      await firebaseSignOut(auth);
+    } catch (e) {
+      // Optional: tampilkan error
+      console.error("Logout error:", e);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const value = { user, loading, logout };

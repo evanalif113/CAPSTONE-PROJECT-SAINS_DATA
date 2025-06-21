@@ -1,7 +1,7 @@
 import type React from "react";
 import type { Metadata } from "next";
 import "./globals.css";
-import { AuthProvider } from "@/context/AuthContext"; // pastikan file ini ada dan pakai `"use client"`
+import { AuthProvider } from "@/context/AuthContext";
 
 export const metadata: Metadata = {
   title: "Kumbung Sense",
