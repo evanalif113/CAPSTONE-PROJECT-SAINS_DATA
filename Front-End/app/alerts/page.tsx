@@ -1,14 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import AppHeader from "../../components/AppHeader";
+import AppHeader from "@/components/AppHeader";
 import Sidebar from "@/components/Sidebar";
 import { getNavItems } from "@/components/navItems";
 import {
-  Warning,
-  Check,
-  Email,
-  Notification,
+  TriangleAlert,
+  ClockAlert,
   Bell,
 } from "lucide-react";
 
@@ -74,13 +72,13 @@ export default function Alerts() {
   const renderAlertIcon = (iconType: IconType) => {
     switch (iconType) {
       case "triangle-red":
-        return <WarningIcon className="text-red-500" />;
+        return <TriangleAlert className="text-red-500" />;
       case "triangle-yellow":
-        return <WarningIcon className="text-yellow-500" />;
+        return <ClockAlert className="text-yellow-500" />;
       case "bell-blue":
-        return <BellIcon className="text-blue-500" />;
+        return <Bell className="text-blue-500" />;
       default:
-        return <WarningIcon className="text-gray-500" />;
+        return <TriangleAlert className="text-gray-500" />;
     }
   };
 
