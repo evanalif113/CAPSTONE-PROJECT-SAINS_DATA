@@ -4,6 +4,7 @@ import { useState } from "react";
 import AppHeader from "@/components/AppHeader";
 import Sidebar from "@/components/Sidebar";
 import { getNavItems } from "@/components/navItems";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
 const navItems = getNavItems("/device");
 
@@ -121,6 +122,7 @@ export default function DevicePage() {
   };
 
   return (
+    <ProtectedRoute>
     <div className="flex min-h-screen bg-gray-50">
       <Sidebar navItems={navItems} />
       <div className="flex-1 flex flex-col">
@@ -174,5 +176,6 @@ export default function DevicePage() {
         </main>
       </div>
     </div>
+    </ProtectedRoute>
   );
 }
