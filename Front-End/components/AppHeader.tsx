@@ -1,5 +1,5 @@
 import React from "react";
-import { LogOutIcon } from "./Icon";
+import { LogOut } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 
@@ -40,7 +40,7 @@ const AppHeader: React.FC = () => {
           title="Logout"
           aria-label="Logout"
         >
-          <LogOutIcon />
+          <LogOut />
         </button>
       </div>
     </header>

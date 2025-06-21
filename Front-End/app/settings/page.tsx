@@ -1,9 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import AppHeader from "../../components/AppHeader";
+import AppHeader from "@/components/AppHeader";
 import Sidebar from "@/components/Sidebar";
 import { getNavItems } from "@/components/navItems";
+import { 
+  User,
+  Save,
+  Mail,
+  Bell,
+  Plus,
+} from "lucide-react";
 
 export default function Settings() {
   const [activeTab, setActiveTab] = useState("Thresholds");
@@ -92,46 +99,6 @@ export default function Settings() {
 
   // Ambil navItems dengan menu aktif
   const navItems = getNavItems("/settings");
-
-  // Ikon-ikon yang dipakai di konten
-  const SaveIcon = () => (
-    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-      <path
-        fillRule="evenodd"
-        d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
-        clipRule="evenodd"
-      />
-    </svg>
-  );
-  const EmailIcon = () => (
-    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-      <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-      <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-    </svg>
-  );
-  const NotificationIcon = () => (
-    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-      <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
-    </svg>
-  );
-  const PlusIcon = () => (
-    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-      <path
-        fillRule="evenodd"
-        d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
-        clipRule="evenodd"
-      />
-    </svg>
-  );
-  const UserIcon = () => (
-    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-      <path
-        fillRule="evenodd"
-        d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-        clipRule="evenodd"
-      />
-    </svg>
-  );
 
   return (
     <div className="flex min-h-screen bg-gray-50">
@@ -301,7 +268,7 @@ export default function Settings() {
               </div>
               <div className="mt-8 flex justify-end">
                 <button className="flex items-center px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                  <SaveIcon />
+                  <Save/>
                   <span className="ml-2">Save Thresholds</span>
                 </button>
               </div>
@@ -319,7 +286,7 @@ export default function Settings() {
                 <div className="bg-white rounded-lg border border-gray-200 p-6">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center space-x-3">
-                      <EmailIcon className="text-blue-600" />
+                      <Mail className="text-blue-600" />
                       <h4 className="text-md font-medium text-gray-900">
                         Email Setup
                       </h4>
@@ -384,7 +351,7 @@ export default function Settings() {
                 <div className="bg-white rounded-lg border border-gray-200 p-6">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center space-x-3">
-                      <NotificationIcon className="text-blue-600" />
+                      <Bell className="text-blue-600" />
                       <h4 className="text-md font-medium text-gray-900">
                         Push Notification Setup
                       </h4>
@@ -447,7 +414,7 @@ export default function Settings() {
               </div>
               <div className="mt-8 flex justify-end">
                 <button className="flex items-center px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                  <SaveIcon />
+                  <Save />
                   <span className="ml-2">Save Notification Settings</span>
                 </button>
               </div>
@@ -535,7 +502,7 @@ export default function Settings() {
               </div>
               <div className="mt-8 flex justify-end">
                 <button className="flex items-center px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                  <SaveIcon />
+                  <Save/>
                   <span className="ml-2">Save System Preferences</span>
                 </button>
               </div>
@@ -550,7 +517,7 @@ export default function Settings() {
                   Admin Management
                 </h3>
                 <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                  <PlusIcon />
+                  <Plus />
                   <span className="ml-2">Add User</span>
                 </button>
               </div>
@@ -569,7 +536,7 @@ export default function Settings() {
                   >
                     <div className="flex items-center space-x-3">
                       <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
-                        <UserIcon className="w-4 h-4 text-gray-500" />
+                        <User className="w-4 h-4 text-gray-500" />
                       </div>
                       <span className="text-gray-900">{user.name}</span>
                     </div>

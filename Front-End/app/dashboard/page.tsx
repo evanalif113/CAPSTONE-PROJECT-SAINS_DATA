@@ -140,10 +140,6 @@ export default function DashboardPage() {
     </button>
   );
 
-  const handleLogout = () => {
-    window.location.href = "/logout";
-  };
-
   // Helper untuk min/max domain YAxis (berdasarkan data dummy, tanpa padding)
   function getYAxisDomain(data: any[], key: SensorKey) {
     const vals = data.map((d) => d[key]);

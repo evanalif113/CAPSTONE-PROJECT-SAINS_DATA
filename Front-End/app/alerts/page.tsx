@@ -5,12 +5,12 @@ import AppHeader from "../../components/AppHeader";
 import Sidebar from "@/components/Sidebar";
 import { getNavItems } from "@/components/navItems";
 import {
-  WarningIcon,
-  CheckIcon,
-  EmailIcon,
-  NotificationIcon,
-  BellIcon,
-} from "@/components/Icon";
+  Warning,
+  Check,
+  Email,
+  Notification,
+  Bell,
+} from "lucide-react";
 
 export default function Alerts() {
   const [activeTab, setActiveTab] = useState("Active Alerts");
