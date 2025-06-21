@@ -4,6 +4,7 @@ import { useState } from "react";
 import AppHeader from "@/components/AppHeader";
 import Sidebar from "@/components/Sidebar";
 import { getNavItems } from "@/components/navItems";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
 export default function Settings() {
   const [activeTab, setActiveTab] = useState("Thresholds");
@@ -563,5 +564,6 @@ export default function Settings() {
         </main>
       </div>
     </div>
+  </ProtectedRoute>
   );
 }
