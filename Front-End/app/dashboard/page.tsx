@@ -1,6 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
+import { signOut } from "firebase/auth";
+import { useAuth } from "@/context/AuthContext";
+import { auth } from "@/lib/firebaseConfig"; // Menggunakan path yang benar
 import AppHeader from "@/components/AppHeader";
 import Sidebar from "@/components/Sidebar";
 import { getNavItems } from "@/components/navItems";
@@ -18,7 +23,6 @@ import {
   LightIntensityIcon,
   MoistureIcon,
 } from "@/components/Icon";
-import dynamic from "next/dynamic";
 import { ArrowUp, ArrowDown } from "lucide-react";
 import ProtectedRoute from "@/components/ProtectedRoute";
 
@@ -58,7 +62,9 @@ function generateInitialChartData() {
   return arr;
 }
 
-export default function Dashboard() {
+export default function DashboardPage() {
+  const { user } = useAuth();
+  const router = useRouter();
   const [modeAuto, setModeAuto] = useState(true);
   const [fanEnabled, setFanEnabled] = useState(false);
   const [humidifierEnabled, setHumidifierEnabled] = useState(true);

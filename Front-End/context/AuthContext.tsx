@@ -1,82 +1,53 @@
-"use client";
+// context/AuthContext.tsx
+'use client';
 
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  ReactNode,
-} from "react";
-import {
-  onAuthStateChanged,
-  signOut as firebaseSignOut,
-  User,
-} from "firebase/auth";
-import { auth } from "@/lib/firebase";
-import Cookies from "js-cookie";
+import { signOut } from 'firebase/auth';
+import { useRouter } from 'next/navigation';
+import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { onAuthStateChanged, User } from 'firebase/auth';
+import { auth } from '@/lib/firebaseConfig';
 
-// Tentukan tipe untuk nilai context
 interface AuthContextType {
   user: User | null;
   loading: boolean;
   logout: () => Promise<void>;
 }
 
-// Buat context dengan nilai awal undefined
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Definisikan tipe untuk props dari provider
-interface AuthProviderProps {
-  children: ReactNode;
-}
-
-export const AuthProvider = ({ children }: AuthProviderProps) => {
+export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        setUser(user);
-        const token = await user.getIdToken();
-        Cookies.set("firebaseIdToken", token, {
-          expires: 7,
-          secure: true,
-        });
-      } else {
-        setUser(null);
-        Cookies.remove("firebaseIdToken");
-      }
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setUser(user);
       setLoading(false);
     });
-
     return () => unsubscribe();
   }, []);
 
   const logout = async () => {
-    setLoading(true);
-    setUser(null); // Pastikan user langsung null agar UI langsung update
-    Cookies.remove("firebaseIdToken");
     try {
-      await firebaseSignOut(auth);
-    } catch (e) {
-      // Optional: tampilkan error
-      console.error("Logout error:", e);
-    } finally {
-      setLoading(false);
+      await signOut(auth);
+      router.push('/login');
+    } catch (error) {
+      console.error('Gagal logout:', error);
     }
   };
 
-  const value = { user, loading, logout };
+  return (
+    <AuthContext.Provider value={{ user, loading, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-};
-
-// Hook kustom untuk menggunakan context dengan pengecekan tipe
 export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider");
+    throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
 };

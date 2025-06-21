@@ -1,0 +1,29 @@
+// middleware.ts
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+
+export function middleware(request: NextRequest) {
+  const path = request.nextUrl.pathname;
+
+  // Cek token dari cookie (di sini kita cek cookie `firebase-auth-token` jika ada)
+  // Untuk Firebase Auth client-side, token biasanya tidak disimpan di cookie secara default,
+  // jadi middleware ini lebih sebagai lapisan tambahan atau untuk setup dengan session cookie
+  const sessionToken = request.cookies.get('sessionToken')?.value;
+
+  // Jika mencoba mengakses halaman terproteksi tanpa token, redirect ke login
+  if (path.startsWith('/dashboard') && !sessionToken) {
+    return NextResponse.redirect(new URL('/login', request.url));
+  }
+
+  // Jika sudah login (ada token) dan mencoba mengakses login, redirect ke dashboard
+  if (path === '/login' && sessionToken) {
+    return NextResponse.redirect(new URL('/dashboard', request.url));
+  }
+
+  return NextResponse.next();
+}
+
+// Tentukan rute mana yang akan dijalankan oleh middleware ini
+export const config = {
+  matcher: ['/dashboard/:path*', '/login'],
+};

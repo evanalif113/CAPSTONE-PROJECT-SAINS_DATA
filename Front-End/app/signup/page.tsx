@@ -3,7 +3,7 @@
 import type React from "react"
 import { useState } from "react"
 // Tambahkan import firebase auth
-import { auth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "@/lib/firebase"
+import { auth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "@/lib/firebaseConfig"
 
 export default function Signup() {
   const [email, setEmail] = useState("")

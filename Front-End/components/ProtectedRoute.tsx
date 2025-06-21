@@ -1,6 +1,7 @@
 import { useAuth } from '@/context/AuthContext';
-import { useRouter } from 'next/router';
+import { useRouter } from "next/navigation";
 import { useEffect, ReactNode } from 'react';
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 interface ProtectedRouteProps {
     children: ReactNode
@@ -17,7 +18,7 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   }, [user, loading, router]);
 
   if (loading || !user) {
-    return <div>Loading...</div>;
+    return <LoadingSpinner />;
   }
 
   return <>{children}</>;
