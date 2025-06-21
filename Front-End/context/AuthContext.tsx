@@ -1,13 +1,19 @@
+"use client";
+
 import {
   createContext,
   useContext,
   useEffect,
   useState,
   ReactNode,
-} from 'react';
-import { onAuthStateChanged, signOut as firebaseSignOut, User } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
-import Cookies from 'js-cookie';
+} from "react";
+import {
+  onAuthStateChanged,
+  signOut as firebaseSignOut,
+  User,
+} from "firebase/auth";
+import { auth } from "@/lib/firebase";
+import Cookies from "js-cookie";
 
 // Tentukan tipe untuk nilai context
 interface AuthContextType {
@@ -33,13 +39,13 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       if (user) {
         setUser(user);
         const token = await user.getIdToken();
-        Cookies.set('firebaseIdToken', token, { 
-          expires: 7, 
-          secure: true 
+        Cookies.set("firebaseIdToken", token, {
+          expires: 7,
+          secure: true,
         });
       } else {
         setUser(null);
-        Cookies.remove('firebaseIdToken');
+        Cookies.remove("firebaseIdToken");
       }
       setLoading(false);
     });
@@ -60,7 +66,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };
