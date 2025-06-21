@@ -4,13 +4,6 @@ import { useState } from "react";
 import AppHeader from "@/components/AppHeader";
 import Sidebar from "@/components/Sidebar";
 import { getNavItems } from "@/components/navItems";
-import { 
-  User,
-  Save,
-  Mail,
-  Bell,
-  Plus,
-} from "lucide-react";
 
 export default function Settings() {
   const [activeTab, setActiveTab] = useState("Thresholds");
@@ -101,62 +94,63 @@ export default function Settings() {
   const navItems = getNavItems("/settings");
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      {/* Sidebar Global */}
-      <Sidebar navItems={navItems} />
+    <ProtectedRoute>
+      <div className="flex min-h-screen bg-gray-50">
+        {/* Sidebar Global */}
+        <Sidebar navItems={navItems} />
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col">
-        <AppHeader onLogout={handleLogout} />
+        {/* Main Content */}
+        <div className="flex-1 flex flex-col">
+          <AppHeader onLogout={handleLogout} />
 
-        {/* Settings Content */}
-        <main className="flex-1 p-6">
-          {/* Page Header */}
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">Settings</h2>
-            <div className="flex space-x-2">
-              <button
-                onClick={() => setActiveTab("Thresholds")}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  activeTab === "Thresholds"
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                }`}
-              >
-                Thresholds
-              </button>
-              <button
-                onClick={() => setActiveTab("Notification Channels")}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  activeTab === "Notification Channels"
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                }`}
-              >
-                Notification Channels
-              </button>
-              <button
-                onClick={() => setActiveTab("System Preferences")}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  activeTab === "System Preferences"
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                }`}
-              >
-                System Preferences
-              </button>
-              <button
-                onClick={() => setActiveTab("Admin Management")}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  activeTab === "Admin Management"
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                }`}
-              >
-                Admin Management
-              </button>
+          {/* Settings Content */}
+          <main className="flex-1 p-6">
+            {/* Page Header */}
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">Settings</h2>
+              <div className="flex space-x-2">
+                <button
+                  onClick={() => setActiveTab("Thresholds")}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    activeTab === "Thresholds"
+                      ? "bg-blue-600 text-white"
+                      : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                  }`}
+                >
+                  Thresholds
+                </button>
+                <button
+                  onClick={() => setActiveTab("Notification Channels")}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    activeTab === "Notification Channels"
+                      ? "bg-blue-600 text-white"
+                      : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                  }`}
+                >
+                  Notification Channels
+                </button>
+                <button
+                  onClick={() => setActiveTab("System Preferences")}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    activeTab === "System Preferences"
+                      ? "bg-blue-600 text-white"
+                      : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                  }`}
+                >
+                  System Preferences
+                </button>
+                <button
+                  onClick={() => setActiveTab("Admin Management")}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    activeTab === "Admin Management"
+                      ? "bg-blue-600 text-white"
+                      : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                  }`}
+                >
+                  Admin Management
+                </button>
+              </div>
             </div>
-          </div>
 
           {/* Thresholds Tab */}
           {activeTab === "Thresholds" && (
@@ -268,7 +262,7 @@ export default function Settings() {
               </div>
               <div className="mt-8 flex justify-end">
                 <button className="flex items-center px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                  <Save/>
+                  <SaveIcon />
                   <span className="ml-2">Save Thresholds</span>
                 </button>
               </div>
@@ -286,7 +280,7 @@ export default function Settings() {
                 <div className="bg-white rounded-lg border border-gray-200 p-6">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center space-x-3">
-                      <Mail className="text-blue-600" />
+                      <EmailIcon className="text-blue-600" />
                       <h4 className="text-md font-medium text-gray-900">
                         Email Setup
                       </h4>
@@ -351,7 +345,7 @@ export default function Settings() {
                 <div className="bg-white rounded-lg border border-gray-200 p-6">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center space-x-3">
-                      <Bell className="text-blue-600" />
+                      <NotificationIcon className="text-blue-600" />
                       <h4 className="text-md font-medium text-gray-900">
                         Push Notification Setup
                       </h4>
@@ -414,7 +408,7 @@ export default function Settings() {
               </div>
               <div className="mt-8 flex justify-end">
                 <button className="flex items-center px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                  <Save />
+                  <SaveIcon />
                   <span className="ml-2">Save Notification Settings</span>
                 </button>
               </div>
@@ -502,7 +496,7 @@ export default function Settings() {
               </div>
               <div className="mt-8 flex justify-end">
                 <button className="flex items-center px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                  <Save/>
+                  <SaveIcon />
                   <span className="ml-2">Save System Preferences</span>
                 </button>
               </div>
@@ -517,7 +511,7 @@ export default function Settings() {
                   Admin Management
                 </h3>
                 <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                  <Plus />
+                  <PlusIcon />
                   <span className="ml-2">Add User</span>
                 </button>
               </div>
@@ -536,7 +530,7 @@ export default function Settings() {
                   >
                     <div className="flex items-center space-x-3">
                       <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
-                        <User className="w-4 h-4 text-gray-500" />
+                        <UserIcon className="w-4 h-4 text-gray-500" />
                       </div>
                       <span className="text-gray-900">{user.name}</span>
                     </div>

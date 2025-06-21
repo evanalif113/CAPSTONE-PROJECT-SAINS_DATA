@@ -4,7 +4,6 @@ import { useState } from "react";
 import AppHeader from "@/components/AppHeader";
 import Sidebar from "@/components/Sidebar";
 import { getNavItems } from "@/components/navItems";
-import { Plus } from "lucide-react";
 
 const navItems = getNavItems("/device");
 
@@ -136,7 +135,7 @@ export default function DevicePage() {
                 onClick={() => setShowModal(true)}
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
               >
-                <Plus/>Tambah Device
+                + Tambah Device
               </button>
             </div>
             <div className="bg-white rounded-lg shadow border border-gray-200 p-4">
