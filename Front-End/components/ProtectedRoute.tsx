@@ -13,7 +13,7 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
 
   useEffect(() => {
     if (!loading && !user) {
-      router.push('/login');
+      router.push('/authentication'); // Ganti dengan rute yang sesuai
     }
   }, [user, loading, router]);
 

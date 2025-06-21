@@ -31,7 +31,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = async () => {
     try {
       await signOut(auth);
-      router.push('/login');
+      router.push('/authentication'); // Ganti dengan rute yang sesuai
     } catch (error) {
       console.error('Gagal logout:', error);
     }

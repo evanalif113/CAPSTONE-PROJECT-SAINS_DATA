@@ -9,7 +9,7 @@ const AppHeader: React.FC = () => {
 
   const handleLogout = async () => {
     await logout();
-    router.replace("/login");
+    router.replace("/authentication"); // Ganti dengan rute yang sesuai
   };
 
   return (

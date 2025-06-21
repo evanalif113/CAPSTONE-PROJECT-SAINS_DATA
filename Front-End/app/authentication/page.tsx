@@ -5,7 +5,7 @@ import { useState } from "react"
 // Tambahkan import firebase auth
 import { auth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "@/lib/firebaseConfig"
 
-export default function Signup() {
+export default function Authentication() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
