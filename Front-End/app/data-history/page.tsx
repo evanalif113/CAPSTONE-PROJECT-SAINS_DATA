@@ -14,8 +14,6 @@ import {
   CartesianGrid,
 } from "recharts";
 import {
-  ArrowUpIcon,
-  ArrowDownIcon,
   CalendarIcon,
   DownloadIcon,
   TemperatureIcon,

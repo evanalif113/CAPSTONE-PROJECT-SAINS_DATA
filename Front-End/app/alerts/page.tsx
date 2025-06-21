@@ -11,7 +11,6 @@ import {
   NotificationIcon,
   BellIcon,
 } from "@/components/Icon";
-import ProtectedRoute from "@/components/ProtectedRoute";
 
 export default function Alerts() {
   const [activeTab, setActiveTab] = useState("Active Alerts");
