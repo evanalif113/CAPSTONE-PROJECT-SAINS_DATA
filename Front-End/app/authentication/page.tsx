@@ -25,7 +25,7 @@ export default function Authentication() {
       setEmail("")
       setPassword("")
       setTimeout(() => {
-        window.location.href = "/login"
+        window.location.href = "/authentication"; // redirect ke halaman login
       }, 1200)
     } catch (err: any) {
       setError(err.message || "Registrasi gagal.")
