@@ -4,6 +4,7 @@ import { useState } from "react";
 import AppHeader from "@/components/AppHeader";
 import Sidebar from "@/components/Sidebar";
 import { getNavItems } from "@/components/navItems";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
 const navItems = getNavItems("/device");
 
@@ -121,58 +122,60 @@ export default function DevicePage() {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      <Sidebar navItems={navItems} />
-      <div className="flex-1 flex flex-col">
-        <AppHeader onLogout={handleLogout} />
-        <main className="flex-1 p-8">
-          <div className="max-w-2xl mx-auto">
-            <div className="flex items-center justify-between mb-6">
-              <h1 className="text-2xl font-bold text-gray-900">
-                Daftar Device
-              </h1>
-              <button
-                onClick={() => setShowModal(true)}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-              >
-                + Tambah Device
-              </button>
-            </div>
-            <div className="bg-white rounded-lg shadow border border-gray-200 p-4">
-              {devices.length === 0 ? (
-                <div className="text-gray-500 text-center py-8">
-                  Belum ada device.
-                </div>
-              ) : (
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b">
-                      <th className="py-2 text-left">Nama</th>
-                      <th className="py-2 text-left">Lokasi</th>
-                      <th className="py-2 text-left">Sensor ID</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {devices.map((dev, idx) => (
-                      <tr key={idx} className="border-b last:border-b-0">
-                        <td className="py-2">{dev.name}</td>
-                        <td className="py-2">{dev.location}</td>
-                        <td className="py-2">{dev.sensorId}</td>
+    <ProtectedRoute>
+      <div className="flex min-h-screen bg-gray-50">
+        <Sidebar navItems={navItems} />
+        <div className="flex-1 flex flex-col">
+          <AppHeader onLogout={handleLogout} />
+          <main className="flex-1 p-8">
+            <div className="max-w-2xl mx-auto">
+              <div className="flex items-center justify-between mb-6">
+                <h1 className="text-2xl font-bold text-gray-900">
+                  Daftar Device
+                </h1>
+                <button
+                  onClick={() => setShowModal(true)}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                >
+                  + Tambah Device
+                </button>
+              </div>
+              <div className="bg-white rounded-lg shadow border border-gray-200 p-4">
+                {devices.length === 0 ? (
+                  <div className="text-gray-500 text-center py-8">
+                    Belum ada device.
+                  </div>
+                ) : (
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b">
+                        <th className="py-2 text-left">Nama</th>
+                        <th className="py-2 text-left">Lokasi</th>
+                        <th className="py-2 text-left">Sensor ID</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
+                    </thead>
+                    <tbody>
+                      {devices.map((dev, idx) => (
+                        <tr key={idx} className="border-b last:border-b-0">
+                          <td className="py-2">{dev.name}</td>
+                          <td className="py-2">{dev.location}</td>
+                          <td className="py-2">{dev.sensorId}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </div>
             </div>
-          </div>
-          {showModal && (
-            <DeviceModal
-              onClose={() => setShowModal(false)}
-              onSubmit={handleAddDevice}
-            />
-          )}
-        </main>
+            {showModal && (
+              <DeviceModal
+                onClose={() => setShowModal(false)}
+                onSubmit={handleAddDevice}
+              />
+            )}
+          </main>
+        </div>
       </div>
-    </div>
+    </ProtectedRoute>
   );
 }

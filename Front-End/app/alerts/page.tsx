@@ -11,6 +11,7 @@ import {
   NotificationIcon,
   BellIcon,
 } from "@/components/Icon";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
 export default function Alerts() {
   const [activeTab, setActiveTab] = useState("Active Alerts");
@@ -85,33 +86,34 @@ export default function Alerts() {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      {/* Sidebar Global */}
-      <Sidebar navItems={navItems} />
+    <ProtectedRoute>
+      <div className="flex min-h-screen bg-gray-50">
+        {/* Sidebar Global */}
+        <Sidebar navItems={navItems} />
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col">
-        <AppHeader onLogout={handleLogout} />
+        {/* Main Content */}
+        <div className="flex-1 flex flex-col">
+          <AppHeader onLogout={handleLogout} />
 
-        {/* Alerts Content */}
-        <main className="flex-1 p-6 space-y-6">
-          {/* Page Header */}
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">
-              Alarm dan Notifikasi
-            </h2>
-            <div className="flex space-x-2">
-              <button
-                onClick={() => setActiveTab("Active Alerts")}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  activeTab === "Active Alerts"
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                }`}
-              >
-                Active Alerts
-              </button>
-              {/*
+          {/* Alerts Content */}
+          <main className="flex-1 p-6 space-y-6">
+            {/* Page Header */}
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">
+                Alarm dan Notifikasi
+              </h2>
+              <div className="flex space-x-2">
+                <button
+                  onClick={() => setActiveTab("Active Alerts")}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    activeTab === "Active Alerts"
+                      ? "bg-blue-600 text-white"
+                      : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                  }`}
+                >
+                  Active Alerts
+                </button>
+                {/*
               <button
                 onClick={() => setActiveTab("Notification Settings")}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
@@ -123,44 +125,44 @@ export default function Alerts() {
                 Notification Settings
               </button>
               */}
-            </div>
-          </div>
-
-          {/* Active Alerts Tab */}
-          {activeTab === "Active Alerts" && (
-            <div>
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-semibold text-gray-900">
-                  Active Alerts
-                </h3>
-                <span className="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium">
-                  {activeAlerts.length} Active
-                </span>
               </div>
-              <div className="space-y-4">
-                {activeAlerts.map((alert) => (
-                  <div
-                    key={alert.id}
-                    className="bg-white rounded-lg border border-gray-200 p-4"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        {renderAlertIcon(alert.icon)}
-                        <span className="text-gray-900 font-medium">
-                          {alert.message}
+            </div>
+
+            {/* Active Alerts Tab */}
+            {activeTab === "Active Alerts" && (
+              <div>
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    Active Alerts
+                  </h3>
+                  <span className="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium">
+                    {activeAlerts.length} Active
+                  </span>
+                </div>
+                <div className="space-y-4">
+                  {activeAlerts.map((alert) => (
+                    <div
+                      key={alert.id}
+                      className="bg-white rounded-lg border border-gray-200 p-4"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3">
+                          {renderAlertIcon(alert.icon)}
+                          <span className="text-gray-900 font-medium">
+                            {alert.message}
+                          </span>
+                        </div>
+                        <span className="text-sm text-gray-500">
+                          {alert.time}
                         </span>
                       </div>
-                      <span className="text-sm text-gray-500">
-                        {alert.time}
-                      </span>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* 
+            {/* 
           // Notification Settings Tab
           {activeTab === "Notification Settings" && (
             <div>
@@ -210,8 +212,9 @@ export default function Alerts() {
             </div>
           )}
           */}
-        </main>
+          </main>
+        </div>
       </div>
-    </div>
+    </ProtectedRoute>
   );
 }
