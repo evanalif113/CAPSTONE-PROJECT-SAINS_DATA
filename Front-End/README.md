@@ -1,30 +1,70 @@
-# Recreate Figma UI
+# Kumbung Sense
 
-*Automatically synced with your [v0.dev](https://v0.dev) deployments*
-
-[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/aisyahhhhanannn192s-projects/v0-recreate-figma-ui)
-[![Built with v0](https://img.shields.io/badge/Built%20with-v0.dev-black?style=for-the-badge)](https://v0.dev/chat/projects/UIlkSQ4boRP)
+Aplikasi monitoring dan kontrol IoT untuk kumbung jamur berbasis React, TypeScript, dan Next.js.
 
 ## Overview
 
-This repository will stay in sync with your deployed chats on [v0.dev](https://v0.dev).
-Any changes you make to your deployed app will be automatically pushed to this repository from [v0.dev](https://v0.dev).
+Kumbung Sense adalah aplikasi web yang membantu petani jamur dalam memantau dan mengontrol kondisi lingkungan kumbung secara real-time. Dengan integrasi IoT, pengguna dapat melihat data sensor (suhu, kelembapan, intensitas cahaya, kelembapan media tanam) dan mengatur perangkat (kipas, humidifier, lampu) langsung dari dashboard.
+
+## Features
+
+- Autentikasi user (login/logout)
+- Dashboard monitoring sensor secara real-time
+- Kontrol perangkat (fan, humidifier, lampu)
+- Riwayat data sensor
+- Notifikasi dan alert
+- Manajemen device dan user (admin)
+- Responsive UI
+
+## Tech Stack
+
+- [React](https://reactjs.org/)
+- [Next.js](https://nextjs.org/)
+- [TypeScript](https://www.typescriptlang.org/)
+- [Firebase Auth](https://firebase.google.com/products/auth)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [Plotly.js](https://plotly.com/javascript/) (visualisasi data)
+
+## Getting Started
+
+1. **Clone repository:**
+   ```bash
+   git clone https://github.com/username/kumbung-sense.git
+   cd kumbung-sense
+   ```
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+3. **Jalankan aplikasi:**
+   ```bash
+   npm run dev
+   ```
+   Akses aplikasi di `http://localhost:3000`.
 
 ## Deployment
 
-Your project is live at:
+Untuk melakukan deployment aplikasi, ikuti langkah-langkah berikut:
 
-**[https://vercel.com/aisyahhhhanannn192s-projects/v0-recreate-figma-ui](https://vercel.com/aisyahhhhanannn192s-projects/v0-recreate-figma-ui)**
+1. **Build aplikasi untuk produksi:**
+   ```bash
+   npm run build
+   ```
+2. **Jalankan aplikasi yang sudah dibangun:**
+   ```bash
+   npm start
+   ```
 
 ## Build your app
 
-Continue building your app on:
-
-**[https://v0.dev/chat/projects/UIlkSQ4boRP](https://v0.dev/chat/projects/UIlkSQ4boRP)**
-
 ## How It Works
 
-1. Create and modify your project using [v0.dev](https://v0.dev)
-2. Deploy your chats from the v0 interface
-3. Changes are automatically pushed to this repository
-4. Vercel deploys the latest version from this repository
+Kumbung Sense memanfaatkan teknologi berikut untuk memberikan fungsionalitasnya:
+
+- **React** dan **Next.js** untuk antarmuka pengguna yang responsif dan dinamis.
+- **TypeScript** untuk pengembangan yang lebih aman dan terstruktur.
+- **Firebase Auth** untuk autentikasi pengguna yang aman.
+- **Tailwind CSS** untuk desain antarmuka yang modern dan responsif.
+- **Plotly.js** untuk visualisasi data sensor yang interaktif.
+
+Aplikasi ini terintegrasi dengan perangkat IoT melalui protokol yang sesuai, memungkinkan komunikasi dua arah antara aplikasi dan perangkat keras. Data sensor dikumpulkan dan dikirim ke aplikasi secara real-time, memberikan wawasan langsung kepada pengguna tentang kondisi kumbung mereka. Pengguna juga dapat mengontrol perangkat seperti kipas, humidifier, dan lampu langsung dari aplikasi, memungkinkan penyesuaian cepat terhadap perubahan kondisi lingkungan.
