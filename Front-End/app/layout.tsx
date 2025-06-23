@@ -8,8 +8,26 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Kumbung Sense",
-  description: "Aplikasi Monitoring Kumbung Jamur",
-};
+  description: "Penelitian dan Pengembangan",
+  icons: {
+    icon: [
+      {
+        url: "/img/icon.png",
+        sizes: "180x180",
+        type: "image/png",
+        href: "/img/icon.png",
+      },
+    ],
+    apple: [
+      {
+        url: "/img/icon.png",
+        sizes: "180x180",
+        type: "image/png",
+      },
+    ],
+  }
+}
+
 
 export default function RootLayout({
   children,

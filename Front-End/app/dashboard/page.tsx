@@ -10,13 +10,6 @@ import AppHeader from "@/components/AppHeader";
 import Sidebar from "@/components/Sidebar";
 import { getNavItems } from "@/components/navItems";
 import {
-  HomeIcon,
-  GridIcon,
-  BellIcon,
-  SettingsIcon,
-  UserIcon,
-  ArrowUpIcon,
-  ArrowDownIcon,
   RefreshIcon,
   TemperatureIcon,
   HumidityIcon,
