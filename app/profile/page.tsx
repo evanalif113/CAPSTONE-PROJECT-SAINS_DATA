@@ -4,6 +4,9 @@ import { useState } from "react";
 import AppHeader from "@/components/AppHeader";
 import Sidebar from "@/components/Sidebar";
 import { getNavItems } from "@/components/navItems";
+import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
+import { UserIcon, EditIcon, SaveIcon, X } from "lucide-react"; // Import ikon yang diperlukan
 import ProtectedRoute from "@/components/ProtectedRoute";
 import {
   EditIcon,
@@ -17,6 +20,7 @@ import {
 export default function Profile() {
   const [activeTab, setActiveTab] = useState("Personal Information");
   const [isEditing, setIsEditing] = useState(false);
+  const { logout, user, loading } = useAuth();
 
   // Handler untuk logout
   const handleLogout = () => {
@@ -42,6 +46,58 @@ export default function Profile() {
     new: "",
     confirm: "",
   });
+
+  // Ikon-ikon yang dipakai di konten
+  const EditIcon = () => (
+    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+      <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+    </svg>
+  );
+  const SaveIcon = () => (
+    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+      <path
+        fillRule="evenodd"
+        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+        clipRule="evenodd"
+      />
+    </svg>
+  );
+  const CancelIcon = () => (
+    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+      <path
+        fillRule="evenodd"
+        d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+        clipRule="evenodd"
+      />
+    </svg>
+  );
+  const KeyIcon = () => (
+    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+      <path
+        fillRule="evenodd"
+        d="M18 8a6 6 0 01-7.743 5.743L10 14l-1 1-1 1H6v2H2v-4l4.257-4.257A6 6 0 1118 8zm-6-4a1 1 0 100 2 2 2 0 012 2 1 1 0 102 0 4 4 0 00-4-4z"
+        clipRule="evenodd"
+      />
+    </svg>
+  );
+  const NotificationIcon = () => (
+    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+      <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
+    </svg>
+  );
+  const UserIcon = () => (
+    <svg
+      className="w-16 h-16 text-gray-400"
+      fill="currentColor"
+      viewBox="0 0 20 20"
+    >
+      <path
+        fillRule="evenodd"
+        d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+        clipRule="evenodd"
+      />
+    </svg>
+  );
 
   // Sample login history data
   const loginHistory = [
@@ -185,9 +241,9 @@ export default function Profile() {
                       </button>
                       <button
                         onClick={handleCancelEdit}
-                        className="flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                        className="flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
                       >
-                        <CancelIcon />
+                        <X />
                         <span className="ml-2">Batal</span>
                       </button>
                     </div>
@@ -227,7 +283,7 @@ export default function Profile() {
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                           />
                         ) : (
-                          <p className="text-gray-900">{profileData.name}</p>
+                          <p className="text-gray-900">{user?.displayName}</p>
                         )}
                       </div>
 
@@ -248,7 +304,7 @@ export default function Profile() {
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                           />
                         ) : (
-                          <p className="text-gray-900">{profileData.email}</p>
+                          <p className="text-gray-900">{user?.email}</p>
                         )}
                       </div>
 
@@ -281,7 +337,9 @@ export default function Profile() {
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                           Tanggal Bergabung
                         </label>
-                        <p className="text-gray-900">{profileData.joinDate}</p>
+                        <p className="text-gray-900">
+                          {user?.metadata.creationTime}
+                        </p>
                       </div>
                     </div>
                   </div>

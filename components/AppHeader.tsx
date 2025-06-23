@@ -1,5 +1,7 @@
 import React from "react";
-import { LogOut } from "lucide-react";
+import { 
+  LogOut 
+} from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 
