@@ -15,7 +15,7 @@ export default function Logout() {
       setCountdown((prev) => {
         if (prev <= 1) {
           clearInterval(timer);
-          window.location.href = "/login";
+          window.location.href = "/authentication"; // Redirect ke halaman login
           return 0;
         }
         return prev - 1;

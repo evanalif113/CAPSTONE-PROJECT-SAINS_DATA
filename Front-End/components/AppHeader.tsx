@@ -4,12 +4,18 @@ import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 
 const AppHeader: React.FC = () => {
-  const { logout } = useAuth();
-  const router = useRouter();
+  const { 
+    logout,
+    user,
+    loading 
+  } = useAuth();
+const router = useRouter();
 
   const handleLogout = async () => {
+    console.log("Mencoba untuk logout...");
     await logout();
-    router.replace("/authentication"); // Ganti dengan rute yang sesuai
+    console.log("Proses logout selesai.");
+    router.push("/authentication"); // Arahkan ke halaman login setelah logout
   };
 
   return (
@@ -28,8 +34,10 @@ const AppHeader: React.FC = () => {
               <div className="w-2 h-2 bg-green-500 rounded-full"></div>
               <span>Online</span>
             </div>
-            <span>Ais</span>
-            <span>Kumbung Pengempon</span>
+            <div className="flex flex-col">
+              <span>{user?.email}</span>
+              <span>{user?.uid}</span>
+            </div>
           </div>
         </div>
       </div>

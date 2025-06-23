@@ -1,16 +1,16 @@
 // context/AuthContext.tsx
 'use client';
 
-import { signOut } from 'firebase/auth';
-import { useRouter } from 'next/navigation';
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { onAuthStateChanged, User } from 'firebase/auth';
+import { onAuthStateChanged, User, signOut } from 'firebase/auth'; // 1. Import signOut
 import { auth } from '@/lib/firebaseConfig';
+import { useRouter } from 'next/navigation'; // 2. Import useRouter
 
+// 3. Tambahkan 'logout' ke dalam tipe interface
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  logout: () => Promise<void>;
+  logout: () => Promise<void>; // Fungsi logout yang akan kita buat
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -18,7 +18,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const router = useRouter();
+  const router = useRouter(); // 4. Inisialisasi router
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -28,16 +28,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => unsubscribe();
   }, []);
 
+  // 5. Implementasikan fungsi logout di sini
   const logout = async () => {
     try {
       await signOut(auth);
+      // Setelah berhasil logout, onAuthStateChanged di atas akan otomatis
+      // mengupdate state 'user' menjadi null.
+      
+      // Arahkan pengguna ke halaman login setelah logout
       router.push('/authentication'); // Ganti dengan rute yang sesuai
     } catch (error) {
-      console.error('Gagal logout:', error);
+      console.error("Gagal melakukan logout:", error);
+      // Anda bisa menambahkan notifikasi error untuk pengguna di sini
     }
   };
 
   return (
+    // 6. Sediakan fungsi 'logout' ke semua komponen anak melalui 'value'
     <AuthContext.Provider value={{ user, loading, logout }}>
       {children}
     </AuthContext.Provider>
