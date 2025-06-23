@@ -25,6 +25,10 @@ import {
   Check,
   Mail,
   Bell as LucideBell,
+  Pencil,
+  CheckSquare,
+  X,
+  Key,
 } from "lucide-react";
 
 const HomeIcon = (props: React.ComponentProps<typeof Home>) => (
@@ -55,7 +59,7 @@ const SettingsIcon = (props: React.ComponentProps<typeof Settings>) => (
   <Settings size={20} {...props} />
 );
 const UserIcon = (props: React.ComponentProps<typeof User>) => (
-  <User size={20} {...props} />
+  <User size={64} {...props} /> // 64px agar mirip w-16 h-16
 );
 const ArrowUpIcon = (props: React.ComponentProps<typeof ArrowUp>) => (
   <ArrowUp size={18} {...props} />
@@ -103,6 +107,21 @@ const EmailIcon = (props: React.ComponentProps<typeof Mail>) => (
 const NotificationIcon = (props: React.ComponentProps<typeof LucideBell>) => (
   <LucideBell size={18} {...props} />
 );
+const EditIcon = (props: React.ComponentProps<typeof Pencil>) => (
+  <Pencil size={18} {...props} />
+);
+const SaveIcon = (props: React.ComponentProps<typeof CheckSquare>) => (
+  <CheckSquare size={18} {...props} />
+);
+const CancelIcon = (props: React.ComponentProps<typeof X>) => (
+  <X size={18} {...props} />
+);
+const KeyIcon = (props: React.ComponentProps<typeof Key>) => (
+  <Key size={18} {...props} />
+);
+const NotificationIcon2 = (props: React.ComponentProps<typeof Bell>) => (
+  <Bell size={18} {...props} />
+);
 
 export {
   HomeIcon,
@@ -129,4 +148,9 @@ export {
   CheckIcon,
   EmailIcon,
   NotificationIcon,
+  EditIcon,
+  SaveIcon,
+  CancelIcon,
+  KeyIcon,
+  NotificationIcon2,
 };
