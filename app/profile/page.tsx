@@ -156,7 +156,7 @@ export default function Profile() {
                         onClick={handleCancelEdit}
                         className="flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
                       >
-                        <X />
+                        <CancelIcon size={18} />
                         <span className="ml-2">Batal</span>
                       </button>
                     </div>
