@@ -2,6 +2,7 @@
 
 import type React from "react"
 import { useState } from "react"
+import { useRouter } from "next/navigation";
 // Tambahkan import firebase auth
 import { auth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "@/lib/firebaseConfig"
 
@@ -42,9 +43,7 @@ export default function Authentication() {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       setSuccess("Login berhasil! Mengalihkan...");
-      setTimeout(() => {
-        window.location.href = "/dashboard"; // redirect ke dashboard
-      }, 1200);
+      window.location.href = "/dashboard"; // redirect ke dashboard
     } catch (err: any) {
       setError(err.message || "Login gagal.");
     }
@@ -66,10 +65,10 @@ export default function Authentication() {
         <h1 className="text-2xl font-bold text-center text-gray-900 mb-2">Kumbung Sense</h1>
 
         {/* Subtitle */}
-        <p className="text-center text-gray-600 mb-6">Teknologi IoT untuk Kumbung yang Lebih Cerdas dan Terjaga</p>
+        <p className="text-center text-gray-600 mb-6">Teknologi AIoT untuk Budidaya Jamur yang Lebih Cerdas dan Presisi</p>
 
         {/* Signup instruction */}
-        <p className="text-center text-gray-500 text-sm mb-8">Daftar untuk mengakses dashboard monitoring kumbungmu</p>
+        <p className="text-center text-gray-500 text-sm mb-8">Masukan Akun untuk mengakses dashboard</p>
 
         {/* Error/Success Message */}
         {error && <div className="mb-4 text-red-600 text-sm text-center">{error}</div>}
