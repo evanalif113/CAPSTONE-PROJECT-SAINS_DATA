@@ -36,7 +36,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // mengupdate state 'user' menjadi null.
       
       // Arahkan pengguna ke halaman login setelah logout
-      router.push('/authentication'); // Ganti dengan rute yang sesuai
+      router.replace('/authentication'); // Ganti dengan rute yang sesuai
     } catch (error) {
       console.error("Gagal melakukan logout:", error);
       // Anda bisa menambahkan notifikasi error untuk pengguna di sini
