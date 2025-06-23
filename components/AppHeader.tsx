@@ -38,7 +38,7 @@ const router = useRouter();
             </div>
             <div className="flex flex-col">
               <span>{user?.email}</span>
-              <span>{user?.uid}</span>
+              <span>{user?.metadata.lastSignInTime}</span>
             </div>
           </div>
         </div>

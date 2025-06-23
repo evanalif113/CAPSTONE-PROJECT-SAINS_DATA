@@ -12,8 +12,8 @@ const LoadingSpinner = () => (
       border: "6px solid #f3f3f3",
       borderTop: "6px solid #3498db",
       borderRadius: "50%",
-      width: 48,
-      height: 48,
+      width: 50,
+      height: 50,
       animation: "spin 1s linear infinite"
     }} />
     <p style={{ marginTop: 16, fontSize: 18, color: "#555" }}>Memuat data...</p>

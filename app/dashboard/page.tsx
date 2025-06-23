@@ -3,9 +3,8 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
-import { signOut } from "firebase/auth";
 import { useAuth } from "@/context/AuthContext";
-import { auth } from "@/lib/firebaseConfig"; // Menggunakan path yang benar
+import { database } from "@/lib/firebaseConfig"; // Menggunakan path yang benar
 import AppHeader from "@/components/AppHeader";
 import Sidebar from "@/components/Sidebar";
 import { getNavItems } from "@/components/navItems";
