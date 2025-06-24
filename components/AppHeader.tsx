@@ -4,13 +4,17 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
+type AppHeaderProps = {
+  onLogout: () => void;
+};
+const AppHeader: React.FC<AppHeaderProps> = ({onLogout}) => {
 
-const AppHeader: React.FC = () => {
 const { 
   logout,
   user,
   loading 
 } = useAuth();
+
 const router = useRouter();
 
   const handleLogout = async () => {
@@ -33,7 +37,7 @@ const router = useRouter();
           <h1 className="text-lg font-semibold text-gray-900">Kumbung Sense</h1>
           <div className="flex items-center space-x-4 text-sm text-gray-500">
             <div className="flex items-center space-x-1">
-              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
               <span>Online</span>
             </div>
             <div className="flex flex-col">
@@ -48,9 +52,8 @@ const router = useRouter();
           onClick={handleLogout}
           className="p-2 bg-red-600 hover:bg-red-700 text-white rounded-full transition-colors"
           title="Logout"
-          aria-label="Logout"
-        >
-          <LogOut />
+          aria-label="Logout">
+          <LogOut/>
         </button>
       </div>
     </header>

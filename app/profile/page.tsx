@@ -1,287 +1,220 @@
+// app/profile/page.tsx (atau di mana pun file ini berada)
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, FormEvent } from "react";
 import AppHeader from "@/components/AppHeader";
 import Sidebar from "@/components/Sidebar";
 import { getNavItems } from "@/components/navItems";
 import { useAuth } from "@/context/AuthContext";
-import { useRouter } from "next/navigation";
 import ProtectedRoute from "@/components/ProtectedRoute";
-import {
-  EditIcon,
-  SaveIcon,
-  CancelIcon,
-  KeyIcon,
-  NotificationIcon,
-  UserIcon,
-} from "@/components/Icon";
+import { 
+  updateProfile, 
+  updatePassword,
+  reauthenticateWithCredential,
+  EmailAuthProvider 
+} from "firebase/auth";
+import { EditIcon, SaveIcon, CancelIcon } from "@/components/Icon"; // Asumsi Icon ada
 
-export default function Profile() {
-  const [activeTab, setActiveTab] = useState("Personal Information");
-  const [isEditing, setIsEditing] = useState(false);
-  const { logout, user, loading } = useAuth();
+// Komponen Loading untuk UX yang lebih baik
+const FullScreenLoader = () => (
+    <div className="flex h-screen w-screen items-center justify-center bg-gray-50">
+        <div className="w-8 h-8 border-4 border-teal-500 border-t-transparent rounded-full animate-spin"></div>
+        <p className="ml-4 text-gray-700">Memuat Profil...</p>
+    </div>
+);
 
-  // Handler untuk logout
-  const handleLogout = () => {
-    window.location.href = "/logout";
-  };
 
-  // Ambil navItems dengan menu aktif
+export default function ProfilePage() {
+  // 1. PERBAIKAN: Gunakan hooks dan state yang relevan
+  const { user, loading, logout } = useAuth();
   const navItems = getNavItems("/profile");
 
-  const [profileData, setProfileData] = useState({
-    name: "Admin User",
-    email: "admin@example.com",
-    role: "Administrator",
-    joinDate: "2023-01-15",
-    notificationPreferences: {
-      email: true,
-      push: true,
-    },
-  });
+  const [activeTab, setActiveTab] = useState("Personal Information");
+  const [isEditing, setIsEditing] = useState(false);
+  
+  // State untuk form edit profil
+  const [displayName, setDisplayName] = useState('');
+  const [photoURL, setPhotoURL] = useState(''); // Meskipun tidak ada di UI, ini polanya
 
-  const [password, setPassword] = useState({
-    current: "",
-    new: "",
-    confirm: "",
-  });
+  // State untuk form ubah password
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
-  const handleSaveProfile = () => {
-    // In a real app, you would save the profile data to the server here
-    setIsEditing(false);
+  // State untuk feedback (loading, error, success)
+  const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+
+  // 2. PERBAIKAN: Isi form dengan data dari Firebase saat komponen dimuat
+  useEffect(() => {
+    if (user) {
+      setDisplayName(user.displayName || '');
+      setPhotoURL(user.photoURL || '');
+    }
+  }, [user]);
+
+  // 3. PERBAIKAN: Implementasi fungsi simpan profil
+  const handleSaveProfile = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!user) return;
+
+    setIsSaving(true);
+    setError(null);
+    setSuccess(null);
+
+    try {
+      await updateProfile(user, { displayName });
+      setSuccess("Profil berhasil diperbarui!");
+      setIsEditing(false);
+    } catch (err: any) {
+      setError(err.message || "Gagal menyimpan profil.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleCancelEdit = () => {
-    // Reset any changes and exit edit mode
+    // Kembalikan data form ke data asli dari user
+    if (user) {
+      setDisplayName(user.displayName || '');
+    }
     setIsEditing(false);
   };
 
-  const handleChangePassword = (e) => {
+  // 4. PERBAIKAN: Implementasi fungsi ubah password dengan re-autentikasi
+  const handleChangePassword = async (e: FormEvent) => {
     e.preventDefault();
-    // In a real app, you would validate and change the password here
-    alert("Password changed successfully!");
-    setPassword({ current: "", new: "", confirm: "" });
+    if (!user || !user.email) return;
+    if (newPassword !== confirmPassword) {
+      setError("Password baru dan konfirmasi tidak cocok.");
+      return;
+    }
+
+    setIsSaving(true);
+    setError(null);
+    setSuccess(null);
+
+    const credential = EmailAuthProvider.credential(user.email, currentPassword);
+
+    try {
+      await reauthenticateWithCredential(user, credential);
+      await updatePassword(user, newPassword);
+      setSuccess("Password berhasil diubah!");
+      // Kosongkan form password
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+    } catch (err: any) {
+      if (err.code === 'auth/wrong-password') {
+        setError("Password saat ini yang Anda masukkan salah.");
+      } else if (err.code === 'auth/weak-password') {
+        setError("Password baru terlalu lemah (minimal 6 karakter).");
+      } else {
+        setError(err.message || "Gagal mengubah password.");
+      }
+    } finally {
+      setIsSaving(false);
+    }
   };
+
+  // Tampilkan loader jika data pengguna belum siap
+  if (loading) {
+    return <FullScreenLoader />;
+  }
 
   return (
     <ProtectedRoute>
       <div className="flex min-h-screen bg-gray-50">
-        {/* Sidebar Global */}
         <Sidebar navItems={navItems} />
 
-        {/* Main Content */}
         <div className="flex-1 flex flex-col">
-          <AppHeader onLogout={handleLogout} />
+          {/* 5. PERBAIKAN: Gunakan fungsi `logout` langsung dari context */}
+          <AppHeader user={user} onLogout={logout} />
 
-          {/* Profile Content */}
           <main className="flex-1 p-6">
-            {/* Page Header */}
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">
-                Profil Pengguna
-              </h2>
-              <div className="flex space-x-2">
-                {/*
-              <button
-                onClick={() => setActiveTab("Personal Information")}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  activeTab === "Personal Information"
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                }`}
-              >
-                Informasi Pribadi
-              </button>
-              */}
-                {/* 
-              <button
-                onClick={() => setActiveTab("Security")}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  activeTab === "Security"
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                }`}
-              >
-                Keamanan
-              </button>
-              <button
-                onClick={() => setActiveTab("Notifications")}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  activeTab === "Notifications"
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                }`}
-              >
-                Notifikasi
-              </button>
-              <button
-                onClick={() => setActiveTab("Activity")}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  activeTab === "Activity"
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                }`}
-              >
-                Aktivitas
-              </button>
-              */}
-              </div>
+              <h2 className="text-2xl font-bold text-gray-900">Profil & Pengaturan</h2>
             </div>
 
-            {/* Personal Information Tab */}
+            {/* Tab Navigation */}
+            <div className="flex space-x-2 border-b mb-6">
+              <button onClick={() => setActiveTab("Personal Information")} className={`px-4 py-2 text-sm font-medium ${activeTab === 'Personal Information' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500'}`}>Informasi Pribadi</button>
+              <button onClick={() => setActiveTab("Security")} className={`px-4 py-2 text-sm font-medium ${activeTab === 'Security' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500'}`}>Keamanan</button>
+            </div>
+
+            {/* Konten Tab Informasi Pribadi */}
             {activeTab === "Personal Information" && (
               <div>
                 <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    Informasi Pribadi
-                  </h3>
+                  <h3 className="text-lg font-semibold text-gray-900">Detail Profil</h3>
                   {!isEditing ? (
-                    <button
-                      onClick={() => setIsEditing(true)}
-                      className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                    >
-                      <EditIcon />
-                      <span className="ml-2">Edit Profil</span>
+                    <button onClick={() => setIsEditing(true)} className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                      <EditIcon /> <span className="ml-2">Edit</span>
                     </button>
                   ) : (
                     <div className="flex space-x-2">
-                      <button
-                        onClick={handleSaveProfile}
-                        className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-                      >
-                        <SaveIcon />
-                        <span className="ml-2">Simpan</span>
+                      <button onClick={handleSaveProfile} disabled={isSaving} className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50">
+                        <SaveIcon /> <span className="ml-2">{isSaving ? 'Menyimpan...':'Simpan'}</span>
                       </button>
-                      <button
-                        onClick={handleCancelEdit}
-                        className="flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-                      >
-                        <CancelIcon size={18} />
-                        <span className="ml-2">Batal</span>
+                      <button onClick={handleCancelEdit} className="flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
+                        <CancelIcon size={18} /> <span className="ml-2">Batal</span>
                       </button>
                     </div>
                   )}
                 </div>
-
-                <div className="bg-white rounded-lg border border-gray-200 p-6">
-                  <div className="flex flex-col md:flex-row gap-8">
-                    {/* Profile Picture */}
-                    <div className="flex flex-col items-center space-y-4">
-                      <div className="w-32 h-32 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden">
-                        <UserIcon className="text-gray-400" />
-                      </div>
-                      {isEditing && (
-                        <button className="text-sm text-blue-600 hover:text-blue-800">
-                          Ubah Foto Profil
-                        </button>
+                <div className="bg-white rounded-lg border p-6">
+                  <form onSubmit={handleSaveProfile} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Nama Tampilan</label>
+                      {isEditing ? (
+                        <input type="text" value={displayName} onChange={(e) => setDisplayName(e.target.value)} className="w-full input-style" />
+                      ) : (
+                        <p className="text-gray-900">{user?.displayName || '(Belum diatur)'}</p>
                       )}
                     </div>
-
-                    {/* Profile Information */}
-                    <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Nama Lengkap
-                        </label>
-                        {isEditing ? (
-                          <input
-                            type="text"
-                            value={profileData.name}
-                            onChange={(e) =>
-                              setProfileData({
-                                ...profileData,
-                                name: e.target.value,
-                              })
-                            }
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                          />
-                        ) : (
-                          <p className="text-gray-900">{user?.displayName}</p>
-                        )}
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Email
-                        </label>
-                        {isEditing ? (
-                          <input
-                            type="email"
-                            value={profileData.email}
-                            onChange={(e) =>
-                              setProfileData({
-                                ...profileData,
-                                email: e.target.value,
-                              })
-                            }
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                          />
-                        ) : (
-                          <p className="text-gray-900">{user?.email}</p>
-                        )}
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Peran
-                        </label>
-                        {isEditing ? (
-                          <select
-                            value={profileData.role}
-                            onChange={(e) =>
-                              setProfileData({
-                                ...profileData,
-                                role: e.target.value,
-                              })
-                            }
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                            disabled
-                          >
-                            <option>Administrator</option>
-                            <option>Operator</option>
-                            <option>Viewer</option>
-                          </select>
-                        ) : (
-                          <p className="text-gray-900">{profileData.role}</p>
-                        )}
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Tanggal Bergabung
-                        </label>
-                        <p className="text-gray-900">
-                          {user?.metadata.creationTime}
-                        </p>
-                      </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                      <p className="text-gray-900">{user?.email}</p>
                     </div>
-                  </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Tanggal Bergabung</label>
+                      <p className="text-gray-900">{user?.metadata.creationTime ? new Date(user.metadata.creationTime).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric'}) : ''}</p>
+                    </div>
+                  </form>
+                  {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
+                  {success && isEditing === false && <p className="mt-4 text-sm text-green-600">{success}</p>}
                 </div>
               </div>
             )}
 
-            {/* 
-          // Security Tab
-          {activeTab === "Security" && (
-            <div>
-              ...Keamanan Akun...
-            </div>
-          )}
-
-          // Notifications Tab
-          {activeTab === "Notifications" && (
-            <div>
-              ...Preferensi Notifikasi...
-            </div>
-          )}
-
-          // Activity Tab
-          {activeTab === "Activity" && (
-            <div>
-              ...Riwayat Aktivitas...
-            </div>
-          )}
-          */}
+            {/* Konten Tab Keamanan */}
+            {activeTab === "Security" && (
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-6">Ubah Password</h3>
+                <div className="bg-white rounded-lg border p-6">
+                  <form onSubmit={handleChangePassword} className="space-y-4 max-w-md">
+                     <div>
+                      <label className="block text-sm font-medium">Password Saat Ini</label>
+                      <input type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} required className="mt-1 block w-full input-style" />
+                    </div>
+                     <div>
+                      <label className="block text-sm font-medium">Password Baru</label>
+                      <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required className="mt-1 block w-full input-style" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium">Konfirmasi Password Baru</label>
+                      <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required className="mt-1 block w-full input-style" />
+                    </div>
+                    {error && <p className="text-sm text-red-600">{error}</p>}
+                    {success && <p className="text-sm text-green-600">{success}</p>}
+                    <button type="submit" disabled={isSaving} className="w-full btn-primary">
+                      {isSaving ? 'Memproses...' : 'Ubah Password'}
+                    </button>
+                  </form>
+                </div>
+              </div>
+            )}
           </main>
         </div>
       </div>
