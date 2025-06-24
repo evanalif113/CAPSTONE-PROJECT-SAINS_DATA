@@ -34,7 +34,7 @@ export default function DataHistory() {
   };
 
   // Ambil navItems dengan menu aktif
-  const navItems = getNavItems("/data-history");
+  const navItems = getNavItems("/data");
 
   // Data untuk chart (dummy, bisa diganti dengan data asli)
   const chartData = [

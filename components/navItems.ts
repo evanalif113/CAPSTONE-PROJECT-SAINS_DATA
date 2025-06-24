@@ -10,7 +10,7 @@ import {
 
 export const baseNavItems = [
   { name: "Beranda", href: "/dashboard", icon: House },
-  { name: "Data", href: "/data-history", icon: ChartBarIcon },
+  { name: "Data", href: "/data", icon: ChartBarIcon },
   { name: "Intelijen", href: "/intelligence", icon: Lightbulb },
   { name: "Perangkat", href: "/device", icon: Cpu },
   { name: "Notifikasi", href: "/alerts", icon: Bell },
