@@ -196,7 +196,7 @@ export default function ProfilePage() {
                   >
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Nama Tampilan
+                        Nama Pengguna
                       </label>
                       {isEditing ? (
                         <input
@@ -232,6 +232,12 @@ export default function ProfilePage() {
                             })
                           : ""}
                       </p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        UID
+                      </label>
+                      <p className="text-gray-900">{user?.uid}</p>
                     </div>
                   </form>
                   {error && (
