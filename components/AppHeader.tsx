@@ -4,10 +4,8 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
-type AppHeaderProps = {
-  onLogout: () => void;
-};
-const AppHeader: React.FC<AppHeaderProps> = ({onLogout}) => {
+
+const AppHeader: React.FC = () => {
 
 const { 
   logout,

@@ -260,21 +260,21 @@ export default function DashboardPage() {
         setSensorData([
           {
             title: "Temperature",
-            value: newPoint.temperature.toFixed(1),
+            value: newPoint.temperature.toFixed(2),
             unit: "°C",
             status: "Normal",
             trend: tempDelta >= 0 ? "Naik" : "Turun",
           },
           {
             title: "Air Humidity",
-            value: newPoint.humidity.toFixed(0),
+            value: newPoint.humidity.toFixed(2),
             unit: "%",
             status: "Normal",
             trend: humDelta >= 0 ? "Naik" : "Turun",
           },
           {
             title: "Light Intensity",
-            value: newPoint.light.toFixed(0),
+            value: newPoint.light.toFixed(2),
             unit: "lux",
             status: "Normal",
             trend: lightDelta >= 0 ? "Naik" : "Turun",
@@ -300,7 +300,7 @@ export default function DashboardPage() {
         <Sidebar navItems={navItems} />
 
         <div className="flex-1 flex flex-col">
-          <AppHeader />
+          <AppHeader/>
 
           {/* Dashboard Content */}
           <main className="flex-1 p-6 space-y-6">

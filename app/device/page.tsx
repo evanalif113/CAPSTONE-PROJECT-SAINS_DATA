@@ -126,7 +126,7 @@ export default function DevicePage() {
     <div className="flex min-h-screen bg-gray-50">
       <Sidebar navItems={navItems} />
       <div className="flex-1 flex flex-col">
-        <AppHeader onLogout={handleLogout} />
+        <AppHeader/>
         <main className="flex-1 p-8">
           <div className="max-w-2xl mx-auto">
             <div className="flex items-center justify-between mb-6">

@@ -132,7 +132,7 @@ export default function ProfilePage() {
 
         <div className="flex-1 flex flex-col">
           {/* 5. PERBAIKAN: Gunakan fungsi `logout` langsung dari context */}
-          <AppHeader user={user} onLogout={logout} />
+          <AppHeader/>
 
           <main className="flex-1 p-6">
             <div className="flex items-center justify-between mb-6">

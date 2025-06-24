@@ -99,7 +99,7 @@ export default function DataHistory() {
 
         {/* Main Content */}
         <div className="flex-1 flex flex-col">
-          <AppHeader onLogout={handleLogout} />
+          <AppHeader/>
 
           {/* Data History Content */}
           <main className="flex-1 p-6">
