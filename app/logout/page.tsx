@@ -26,7 +26,7 @@ export default function Logout() {
   }, [logout]);
 
   const handleLoginRedirect = () => {
-    window.location.href = "/login";
+    window.location.href = "/authentication"; // Redirect ke halaman Autentikasi
   };
 
   return (
@@ -65,7 +65,7 @@ export default function Logout() {
         {/* Message */}
         <p className="text-gray-600 mb-6">
           Anda telah berhasil keluar dari sistem Kumbung Sense. Terima kasih
-          telah menggunakan layanan kami.
+          telah menggunakan sistem kami.
         </p>
 
         {/* Countdown */}
@@ -92,9 +92,9 @@ export default function Logout() {
 
         {/* Footer */}
         <div className="mt-8 pt-6 border-t border-gray-200">
-          <p className="text-xs text-gray-500">
-            © 2024 Kumbung Sense. Semua hak dilindungi.
-          </p>
+            <p className="text-xs text-gray-500">
+            © {new Date().getFullYear()} Kumbung Sense. Hak dilindungi Undang-undang.
+            </p>
         </div>
       </div>
     </div>
