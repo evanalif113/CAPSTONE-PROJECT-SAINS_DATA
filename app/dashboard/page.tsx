@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { useAuth } from "@/context/AuthContext";
 import { database } from "@/lib/firebaseConfig"; // Menggunakan path yang benar
+import { fetchUserSensorData } from "@/lib/fetchSensorData";
 import AppHeader from "@/components/AppHeader";
 import Sidebar from "@/components/Sidebar";
 import { getNavItems } from "@/components/navItems";
@@ -24,7 +25,7 @@ const Plot = dynamic(() => import("react-plotly.js"), { ssr: false });
 // Tipe union untuk key sensor
 type SensorKey = "temperature" | "humidity" | "light" | "moisture";
 
-// Helper untuk membuat data 24 hari terakhir (interval harian)
+/* Helper untuk membuat data 24 hari terakhir (interval harian)
 function generateInitialChartData() {
   const now = new Date();
   const arr = [];
@@ -52,6 +53,14 @@ function generateInitialChartData() {
     moist += (Math.random() - 0.5) * 0.5;
   }
   return arr;
+} **/
+interface SensorDatum {
+  timestamp: number;
+  temperature: number;
+  humidity: number;
+  light: number;
+  moisture: number;
+  timeFormatted?: string;
 }
 
 export default function DashboardPage() {
@@ -61,8 +70,36 @@ export default function DashboardPage() {
   const [fanEnabled, setFanEnabled] = useState(false);
   const [humidifierEnabled, setHumidifierEnabled] = useState(true);
   const [lightEnabled, setLightEnabled] = useState(false);
-  const [selectedPeriod, setSelectedPeriod] = useState("1 Month");
-  const [chartData, setChartData] = useState(generateInitialChartData());
+
+  //State untuk data asli dari backend
+  const [data, setData] = useState<SensorDatum[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedPeriod, setSelectedPeriod] = useState("1");
+
+  //Fetch data sensor dari backend
+  const loadData = async () => {
+    if (!user) return;
+    setLoading(true);
+    try {
+      const result = await fetchUserSensorData(
+        user.uid,
+        parseInt(selectedPeriod)
+      );
+      setData(result);
+      setError(null);
+    } catch (err) {
+      setError("Gagal memuat data sensor");
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    loadData();
+    const interval = setInterval(loadData, 3000);
+    return () => clearInterval(interval);
+  }, [user, selectedPeriod]);
+  // baru sampai sini
   const [sensorData, setSensorData] = useState([
     {
       title: "Temperature",
@@ -300,7 +337,7 @@ export default function DashboardPage() {
         <Sidebar navItems={navItems} />
 
         <div className="flex-1 flex flex-col">
-          <AppHeader/>
+          <AppHeader />
 
           {/* Dashboard Content */}
           <main className="flex-1 p-6 space-y-6">
