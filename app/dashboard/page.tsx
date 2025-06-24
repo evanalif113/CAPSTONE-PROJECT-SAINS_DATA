@@ -75,17 +75,13 @@ export default function DashboardPage() {
   const [data, setData] = useState<SensorDatum[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedPeriod, setSelectedPeriod] = useState("1");
 
   //Fetch data sensor dari backend
   const loadData = async () => {
     if (!user) return;
     setLoading(true);
     try {
-      const result = await fetchUserSensorData(
-        user.uid,
-        parseInt(selectedPeriod)
-      );
+      const result = await fetchUserSensorData(user.uid);
       setData(result);
       setError(null);
     } catch (err) {
@@ -98,98 +94,85 @@ export default function DashboardPage() {
     loadData();
     const interval = setInterval(loadData, 3000);
     return () => clearInterval(interval);
-  }, [user, selectedPeriod]);
-  // baru sampai sini
-  const [sensorData, setSensorData] = useState([
-    {
-      title: "Temperature",
-      value: chartData[chartData.length - 1].temperature.toFixed(1),
-      unit: "°C",
-      status: "Normal",
-      trend: "Naik",
-    },
-    {
-      title: "Air Humidity",
-      value: chartData[chartData.length - 1].humidity.toFixed(0),
-      unit: "%",
-      status: "Normal",
-      trend: "Naik",
-    },
-    {
-      title: "Light Intensity",
-      value: chartData[chartData.length - 1].light.toFixed(0),
-      unit: "lux",
-      status: "Normal",
-      trend: "Naik",
-    },
-    {
-      title: "Medium Moisture",
-      value: chartData[chartData.length - 1].moisture.toFixed(0),
-      unit: "%",
-      status: "Normal",
-      trend: "Naik",
-    },
-  ]);
-
-  const periods = [
-    "Latest",
-    "Last Hour",
-    "6 Hours",
-    "1 Day",
-    "1 Week",
-    "1 Month",
-    "3 Months",
-    "6 Months",
-    "1 Year",
-    "Custom",
-  ];
-
-  const ToggleSwitch = ({
-    checked,
-    onChange,
-    disabled = false,
-  }: {
-    checked: boolean;
-    onChange: (val: boolean) => void;
-    disabled?: boolean;
-  }) => (
-    <button
-      type="button"
-      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-        checked ? "bg-blue-600" : "bg-gray-200"
-      } ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
-      onClick={() => !disabled && onChange(!checked)}
-      disabled={disabled}
-    >
-      <span
-        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-          checked ? "translate-x-6" : "translate-x-1"
-        }`}
-      />
-    </button>
-  );
-
-  // Helper untuk min/max domain YAxis (berdasarkan data dummy, tanpa padding)
-  function getYAxisDomain(data: any[], key: SensorKey) {
+  }, [user]);
+  // SensorData untuk Card (ambil data terbaru)
+  const latest = data.length > 0 ? data[data.length - 1] : null;
+  const prev = data.length > 1 ? data[data.length - 2] : null;
+  const sensorData = latest
+    ? [
+        {
+          title: "Temperature",
+          value: latest.temperature.toFixed(1),
+          unit: "°C",
+          status: "Normal",
+          trend:
+            prev && latest.temperature > prev.temperature
+              ? "Naik"
+              : prev && latest.temperature < prev.temperature
+              ? "Turun"
+              : "-",
+        },
+        {
+          title: "Air Humidity",
+          value: latest.humidity.toFixed(0),
+          unit: "%",
+          status: "Normal",
+          trend:
+            prev && latest.humidity > prev.humidity
+              ? "Naik"
+              : prev && latest.humidity < prev.humidity
+              ? "Turun"
+              : "-",
+        },
+        {
+          title: "Light Intensity",
+          value: latest.light.toFixed(0),
+          unit: "lux",
+          status: "Normal",
+          trend:
+            prev && latest.light > prev.light
+              ? "Naik"
+              : prev && latest.light < prev.light
+              ? "Turun"
+              : "-",
+        },
+        {
+          title: "Medium Moisture",
+          value: latest.moisture.toFixed(0),
+          unit: "%",
+          status: "Normal",
+          trend:
+            prev && latest.moisture > prev.moisture
+              ? "Naik"
+              : prev && latest.moisture < prev.moisture
+              ? "Turun"
+              : "-",
+        },
+      ]
+    : [];
+  // Helper untuk min/max domain YAxis
+  function getYAxisDomain(data: SensorDatum[], key: SensorKey) {
+    if (!data.length) return [0, 100];
     const vals = data.map((d) => d[key]);
     const min = Math.min(...vals);
     const max = Math.max(...vals);
     return [min, max];
   }
-
-  // Chart Card Component with Icon, menggunakan Plotly
+  // Chart Card Component
   const ChartCard = ({
     title,
     dataKey,
     color,
     Icon,
     unit,
+    chartData,
   }: {
     title: string;
     dataKey: SensorKey;
     color: string;
     Icon: React.FC;
     unit: string;
+    chartData: SensorDatum[];
   }) => {
     const yDomain = getYAxisDomain(chartData, dataKey);
     return (
@@ -197,14 +180,18 @@ export default function DashboardPage() {
         <div className="p-4 border-b border-gray-200 flex items-center">
           <Icon />
           <h3 className={`text-sm font-medium ml-2`} style={{ color }}>
-            {title} Trend (24h)
+            {title} Trend
           </h3>
         </div>
         <div className="p-4">
           <Plot
             data={[
               {
-                x: chartData.map((d) => d.name),
+                x: chartData.map((d) =>
+                  d.timeFormatted
+                    ? d.timeFormatted
+                    : new Date(d.timestamp).toLocaleString()
+                ),
                 y: chartData.map((d) => d[dataKey]),
                 type: "scatter",
                 mode: "lines+markers",
@@ -242,94 +229,231 @@ export default function DashboardPage() {
       </div>
     );
   };
+  // ToggleSwitch tetap
+  const ToggleSwitch = ({
+    checked,
+    onChange,
+    disabled = false,
+  }: {
+    checked: boolean;
+    onChange: (val: boolean) => void;
+    disabled?: boolean;
+  }) => (
+    <button
+      type="button"
+      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+        checked ? "bg-blue-600" : "bg-gray-200"
+      } ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
+      onClick={() => !disabled && onChange(!checked)}
+      disabled={disabled}
+    >
+      <span
+        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+          checked ? "translate-x-6" : "translate-x-1"
+        }`}
+      />
+    </button>
+  );
 
-  // Simulasi update data realtime setiap 2 detik (interval harian)
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setChartData((prev) => {
-        // Ambil tanggal terakhir dari data sebelumnya
-        const lastDate = prev.length
-          ? (() => {
-              const lastLabel = prev[prev.length - 1].name;
-              const d = new Date();
-              // Parse label "May 01"
-              const [monthStr, dayStr] = lastLabel.split(" ");
-              d.setMonth(
-                [
-                  "Jan",
-                  "Feb",
-                  "Mar",
-                  "Apr",
-                  "May",
-                  "Jun",
-                  "Jul",
-                  "Aug",
-                  "Sep",
-                  "Oct",
-                  "Nov",
-                  "Dec",
-                ].indexOf(monthStr)
-              );
-              d.setDate(Number(dayStr));
-              return d;
-            })()
-          : new Date();
-        // Tambah 1 hari dari tanggal terakhir
-        const nextDate = new Date(lastDate.getTime() + 24 * 60 * 60 * 1000);
-        const name = nextDate.toLocaleDateString("en-US", {
-          month: "short",
-          day: "2-digit",
-        });
-        const last = prev[prev.length - 1];
-        // Simulasikan perubahan naik/turun
-        const tempDelta = (Math.random() - 0.5) * 2;
-        const humDelta = (Math.random() - 0.5) * 2;
-        const lightDelta = (Math.random() - 0.5) * 10;
-        const moistDelta = (Math.random() - 0.5) * 2;
-        const newPoint = {
-          name,
-          temperature: Math.max(20, Math.min(30, last.temperature + tempDelta)),
-          humidity: Math.max(70, Math.min(90, last.humidity + humDelta)),
-          light: Math.max(400, Math.min(600, last.light + lightDelta)),
-          moisture: Math.max(60, Math.min(80, last.moisture + moistDelta)),
-        };
-        // Update sensorData tren naik/turun
-        setSensorData([
-          {
-            title: "Temperature",
-            value: newPoint.temperature.toFixed(2),
-            unit: "°C",
-            status: "Normal",
-            trend: tempDelta >= 0 ? "Naik" : "Turun",
-          },
-          {
-            title: "Air Humidity",
-            value: newPoint.humidity.toFixed(2),
-            unit: "%",
-            status: "Normal",
-            trend: humDelta >= 0 ? "Naik" : "Turun",
-          },
-          {
-            title: "Light Intensity",
-            value: newPoint.light.toFixed(2),
-            unit: "lux",
-            status: "Normal",
-            trend: lightDelta >= 0 ? "Naik" : "Turun",
-          },
-          {
-            title: "Medium Moisture",
-            value: newPoint.moisture.toFixed(0),
-            unit: "%",
-            status: "Normal",
-            trend: moistDelta >= 0 ? "Naik" : "Turun",
-          },
-        ]);
-        // Pastikan hanya 24 data (24 hari)
-        return [...prev.slice(1), newPoint];
-      });
-    }, 2000);
-    return () => clearInterval(interval);
-  }, []);
+  // const periods = [
+  //   "Latest",
+  //   "Last Hour",
+  //   "6 Hours",
+  //   "1 Day",
+  //   "1 Week",
+  //   "1 Month",
+  //   "3 Months",
+  //   "6 Months",
+  //   "1 Year",
+  //   "Custom",
+  // ];
+
+  // const ToggleSwitch = ({
+  //   checked,
+  //   onChange,
+  //   disabled = false,
+  // }: {
+  //   checked: boolean;
+  //   onChange: (val: boolean) => void;
+  //   disabled?: boolean;
+  // }) => (
+  //   <button
+  //     type="button"
+  //     className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+  //       checked ? "bg-blue-600" : "bg-gray-200"
+  //     } ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
+  //     onClick={() => !disabled && onChange(!checked)}
+  //     disabled={disabled}
+  //   >
+  //     <span
+  //       className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+  //         checked ? "translate-x-6" : "translate-x-1"
+  //       }`}
+  //     />
+  //   </button>
+  // );
+
+  // // Helper untuk min/max domain YAxis (berdasarkan data dummy, tanpa padding)
+  // function getYAxisDomain(data: any[], key: SensorKey) {
+  //   const vals = data.map((d) => d[key]);
+  //   const min = Math.min(...vals);
+  //   const max = Math.max(...vals);
+  //   return [min, max];
+  // }
+
+  // // Chart Card Component with Icon, menggunakan Plotly
+  // const ChartCard = ({
+  //   title,
+  //   dataKey,
+  //   color,
+  //   Icon,
+  //   unit,
+  // }: {
+  //   title: string;
+  //   dataKey: SensorKey;
+  //   color: string;
+  //   Icon: React.FC;
+  //   unit: string;
+  // }) => {
+  //   const yDomain = getYAxisDomain(chartData, dataKey);
+  //   return (
+  //     <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+  //       <div className="p-4 border-b border-gray-200 flex items-center">
+  //         <Icon />
+  //         <h3 className={`text-sm font-medium ml-2`} style={{ color }}>
+  //           {title} Trend (24h)
+  //         </h3>
+  //       </div>
+  //       <div className="p-4">
+  //         <Plot
+  //           data={[
+  //             {
+  //               x: chartData.map((d) => d.name),
+  //               y: chartData.map((d) => d[dataKey]),
+  //               type: "scatter",
+  //               mode: "lines+markers",
+  //               marker: { color },
+  //               line: { color, width: 3 },
+  //               name: title,
+  //             },
+  //           ]}
+  //           layout={{
+  //             autosize: true,
+  //             height: 200,
+  //             margin: { l: 40, r: 10, t: 10, b: 40 },
+  //             xaxis: {
+  //               title: "Time",
+  //               tickmode: "auto",
+  //               nticks: 8,
+  //               showgrid: true,
+  //               zeroline: false,
+  //             },
+  //             yaxis: {
+  //               title: unit,
+  //               range: yDomain,
+  //               showgrid: true,
+  //               zeroline: false,
+  //             },
+  //             plot_bgcolor: "#fff",
+  //             paper_bgcolor: "#fff",
+  //             font: { size: 12 },
+  //           }}
+  //           config={{ displayModeBar: false, responsive: true }}
+  //           style={{ width: "100%", height: "200px" }}
+  //           useResizeHandler
+  //         />
+  //       </div>
+  //     </div>
+  //   );
+  // };
+
+  // // Simulasi update data realtime setiap 2 detik (interval harian)
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     setChartData((prev) => {
+  //       // Ambil tanggal terakhir dari data sebelumnya
+  //       const lastDate = prev.length
+  //         ? (() => {
+  //             const lastLabel = prev[prev.length - 1].name;
+  //             const d = new Date();
+  //             // Parse label "May 01"
+  //             const [monthStr, dayStr] = lastLabel.split(" ");
+  //             d.setMonth(
+  //               [
+  //                 "Jan",
+  //                 "Feb",
+  //                 "Mar",
+  //                 "Apr",
+  //                 "May",
+  //                 "Jun",
+  //                 "Jul",
+  //                 "Aug",
+  //                 "Sep",
+  //                 "Oct",
+  //                 "Nov",
+  //                 "Dec",
+  //               ].indexOf(monthStr)
+  //             );
+  //             d.setDate(Number(dayStr));
+  //             return d;
+  //           })()
+  //         : new Date();
+  //       // Tambah 1 hari dari tanggal terakhir
+  //       const nextDate = new Date(lastDate.getTime() + 24 * 60 * 60 * 1000);
+  //       const name = nextDate.toLocaleDateString("en-US", {
+  //         month: "short",
+  //         day: "2-digit",
+  //       });
+  //       const last = prev[prev.length - 1];
+  //       // Simulasikan perubahan naik/turun
+  //       const tempDelta = (Math.random() - 0.5) * 2;
+  //       const humDelta = (Math.random() - 0.5) * 2;
+  //       const lightDelta = (Math.random() - 0.5) * 10;
+  //       const moistDelta = (Math.random() - 0.5) * 2;
+  //       const newPoint = {
+  //         name,
+  //         temperature: Math.max(20, Math.min(30, last.temperature + tempDelta)),
+  //         humidity: Math.max(70, Math.min(90, last.humidity + humDelta)),
+  //         light: Math.max(400, Math.min(600, last.light + lightDelta)),
+  //         moisture: Math.max(60, Math.min(80, last.moisture + moistDelta)),
+  //       };
+  //       // Update sensorData tren naik/turun
+  //       setSensorData([
+  //         {
+  //           title: "Temperature",
+  //           value: newPoint.temperature.toFixed(2),
+  //           unit: "°C",
+  //           status: "Normal",
+  //           trend: tempDelta >= 0 ? "Naik" : "Turun",
+  //         },
+  //         {
+  //           title: "Air Humidity",
+  //           value: newPoint.humidity.toFixed(2),
+  //           unit: "%",
+  //           status: "Normal",
+  //           trend: humDelta >= 0 ? "Naik" : "Turun",
+  //         },
+  //         {
+  //           title: "Light Intensity",
+  //           value: newPoint.light.toFixed(2),
+  //           unit: "lux",
+  //           status: "Normal",
+  //           trend: lightDelta >= 0 ? "Naik" : "Turun",
+  //         },
+  //         {
+  //           title: "Medium Moisture",
+  //           value: newPoint.moisture.toFixed(0),
+  //           unit: "%",
+  //           status: "Normal",
+  //           trend: moistDelta >= 0 ? "Naik" : "Turun",
+  //         },
+  //       ]);
+  //       // Pastikan hanya 24 data (24 hari)
+  //       return [...prev.slice(1), newPoint];
+  //     });
+  //   }, 2000);
+  //   return () => clearInterval(interval);
+  // }, []);
 
   return (
     <ProtectedRoute>
@@ -346,7 +470,10 @@ export default function DashboardPage() {
               <div>
                 <h2 className="text-2xl font-bold text-gray-900">Dashboard</h2>
                 <p className="text-sm text-gray-500 mt-1">
-                  Last updated at 10:10:10
+                  Last updated at{" "}
+                  {latest
+                    ? new Date(latest.timestamp).toLocaleTimeString()
+                    : "-"}
                 </p>
               </div>
               <div className="flex items-center space-x-4">
@@ -354,12 +481,18 @@ export default function DashboardPage() {
                   <span className="text-sm text-gray-600">Mode Auto</span>
                   <ToggleSwitch checked={modeAuto} onChange={setModeAuto} />
                 </div>
-                <button className="flex items-center px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                <button
+                  className="flex items-center px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                  onClick={loadData}
+                >
                   <RefreshIcon />
                   <span className="ml-2">Refresh</span>
                 </button>
               </div>
             </div>
+
+            {loading && <div className="text-gray-500">Loading data...</div>}
+            {error && <div className="text-red-500">{error}</div>}
 
             {/* Manual Override Indicator */}
             {modeAuto === false && (
@@ -420,7 +553,7 @@ export default function DashboardPage() {
             </div>
 
             {/* Time Period Selector */}
-            <div className="flex flex-wrap gap-2">
+            {/* <div className="flex flex-wrap gap-2">
               {periods.map((period) => (
                 <button
                   key={period}
@@ -434,7 +567,7 @@ export default function DashboardPage() {
                   {period}
                 </button>
               ))}
-            </div>
+            </div> */}
 
             {/* Charts */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -444,6 +577,7 @@ export default function DashboardPage() {
                 color="#ef4444"
                 Icon={TemperatureIcon}
                 unit="°C"
+                chartData={data}
               />
               <ChartCard
                 title="Humidity"
@@ -451,6 +585,7 @@ export default function DashboardPage() {
                 color="#3b82f6"
                 Icon={HumidityIcon}
                 unit="%"
+                chartData={data}
               />
               <ChartCard
                 title="Light Intensity"
@@ -458,6 +593,7 @@ export default function DashboardPage() {
                 color="#f59e0b"
                 Icon={LightIntensityIcon}
                 unit="lux"
+                chartData={data}
               />
               <ChartCard
                 title="Moisture"
@@ -465,6 +601,7 @@ export default function DashboardPage() {
                 color="#10b981"
                 Icon={MoistureIcon}
                 unit="%"
+                chartData={data}
               />
             </div>
 
@@ -487,7 +624,11 @@ export default function DashboardPage() {
                     <span className="text-gray-600">
                       Terakhir data diterima
                     </span>
-                    <span className="text-gray-900">2 menit yang lalu</span>
+                    <span className="text-gray-900">
+                      {latest
+                        ? new Date(latest.timestamp).toLocaleString()
+                        : "-"}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Level Sinyal</span>
