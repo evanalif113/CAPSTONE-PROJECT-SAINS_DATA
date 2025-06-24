@@ -125,7 +125,7 @@ export default function ProfilePage() {
           <main className="flex-1 p-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-gray-900">
-                Profil & Pengaturan
+                Profil Pengguna
               </h2>
             </div>
 
@@ -165,7 +165,7 @@ export default function ProfilePage() {
                       onClick={() => setIsEditing(true)}
                       className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                     >
-                      <EditIcon /> <span className="ml-2">Edit</span>
+                      <EditIcon/> <span className="ml-2">Edit</span>
                     </button>
                   ) : (
                     <div className="flex space-x-2">
@@ -181,7 +181,7 @@ export default function ProfilePage() {
                       </button>
                       <button
                         onClick={handleCancelEdit}
-                        className="flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
+                        className="flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
                       >
                         <CancelIcon size={18} />{" "}
                         <span className="ml-2">Batal</span>
