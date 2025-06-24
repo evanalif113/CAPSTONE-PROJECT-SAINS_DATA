@@ -15,13 +15,6 @@ import {
 } from "firebase/auth";
 import { EditIcon, SaveIcon, CancelIcon } from "@/components/Icon"; // Asumsi Icon ada
 
-// Komponen Loading untuk UX yang lebih baik
-const FullScreenLoader = () => (
-  <div className="flex h-screen w-screen items-center justify-center bg-gray-50">
-    <div className="w-8 h-8 border-4 border-teal-500 border-t-transparent rounded-full animate-spin"></div>
-    <p className="ml-4 text-gray-700">Memuat Profil...</p>
-  </div>
-);
 
 export default function ProfilePage() {
   // 1. PERBAIKAN: Gunakan hooks dan state yang relevan
@@ -119,11 +112,6 @@ export default function ProfilePage() {
       setIsSaving(false);
     }
   };
-
-  // Tampilkan loader jika data pengguna belum siap
-  if (loading) {
-    return <FullScreenLoader />;
-  }
 
   return (
     <ProtectedRoute>

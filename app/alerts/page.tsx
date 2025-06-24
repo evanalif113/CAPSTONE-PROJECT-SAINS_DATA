@@ -91,7 +91,7 @@ export default function Alerts() {
 
         {/* Main Content */}
         <div className="flex-1 flex flex-col">
-          <AppHeader onLogout={handleLogout} />
+          <AppHeader/>
 
           {/* Alerts Content */}
           <main className="flex-1 p-6 space-y-6">
