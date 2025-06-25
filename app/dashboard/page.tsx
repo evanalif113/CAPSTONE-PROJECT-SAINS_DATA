@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { useAuth } from "@/context/AuthContext";
-import { database } from "@/lib/firebaseConfig"; // Menggunakan path yang benar
 import { fetchUserSensorData } from "@/lib/fetchSensorData";
 import AppHeader from "@/components/AppHeader";
 import Sidebar from "@/components/Sidebar";
@@ -20,40 +19,11 @@ import { ArrowUp, ArrowDown } from "lucide-react";
 import ProtectedRoute from "@/components/ProtectedRoute";
 
 const navItems = getNavItems("/");
-const Plot = dynamic(() => import("react-plotly.js"), { ssr: false });
+const Plot = dynamic(() => import("react-plotly.js"), { ssr: true });
 
 // Tipe union untuk key sensor
 type SensorKey = "temperature" | "humidity" | "light" | "moisture";
 
-/* Helper untuk membuat data 24 hari terakhir (interval harian)
-function generateInitialChartData() {
-  const now = new Date();
-  const arr = [];
-  let temp = 24,
-    hum = 85,
-    light = 450,
-    moist = 75;
-  for (let i = 23; i >= 0; i--) {
-    const d = new Date(now);
-    d.setDate(now.getDate() - i);
-    arr.push({
-      name: d.toLocaleDateString("en-US", {
-        month: "short",
-        day: "2-digit",
-      }),
-      temperature: temp,
-      humidity: hum,
-      light: light,
-      moisture: moist,
-    });
-    // Simulasikan perubahan awal
-    temp += (Math.random() - 0.5) * 0.5;
-    hum += (Math.random() - 0.5) * 0.5;
-    light += (Math.random() - 0.5) * 2;
-    moist += (Math.random() - 0.5) * 0.5;
-  }
-  return arr;
-} **/
 interface SensorDatum {
   timestamp: number;
   temperature: number;
@@ -68,7 +38,7 @@ export default function DashboardPage() {
   const router = useRouter();
   const [modeAuto, setModeAuto] = useState(true);
   const [fanEnabled, setFanEnabled] = useState(false);
-  const [humidifierEnabled, setHumidifierEnabled] = useState(true);
+  const [humidifierEnabled, setHumidifierEnabled] = useState(false);
   const [lightEnabled, setLightEnabled] = useState(false);
 
   //State untuk data asli dari backend
@@ -90,9 +60,10 @@ export default function DashboardPage() {
       setLoading(false);
     }
   };
+
   useEffect(() => {
     loadData();
-    const interval = setInterval(loadData, 3000);
+    const interval = setInterval(loadData, 10000);
     return () => clearInterval(interval);
   }, [user]);
   // SensorData untuk Card (ambil data terbaru)
@@ -126,7 +97,7 @@ export default function DashboardPage() {
         },
         {
           title: "Light Intensity",
-          value: latest.light.toFixed(0),
+          value: latest.light.toFixed(2),
           unit: "lux",
           status: "Normal",
           trend:
