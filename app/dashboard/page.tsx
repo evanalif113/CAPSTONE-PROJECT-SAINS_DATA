@@ -102,7 +102,7 @@ export default function DashboardPage() {
     ? [
         {
           title: "Temperature",
-          value: latest.temperature.toFixed(1),
+          value: latest.temperature.toFixed(2),
           unit: "°C",
           status: "Normal",
           trend:
@@ -114,7 +114,7 @@ export default function DashboardPage() {
         },
         {
           title: "Air Humidity",
-          value: latest.humidity.toFixed(0),
+          value: latest.humidity.toFixed(2),
           unit: "%",
           status: "Normal",
           trend:
@@ -471,9 +471,7 @@ export default function DashboardPage() {
                 <h2 className="text-2xl font-bold text-gray-900">Dashboard</h2>
                 <p className="text-sm text-gray-500 mt-1">
                   Last updated at{" "}
-                  {latest
-                    ? new Date(latest.timestamp).toLocaleTimeString()
-                    : "-"}
+                  {latest? new Date(latest.timestamp).toLocaleTimeString(): "-"}
                 </p>
               </div>
               <div className="flex items-center space-x-4">
@@ -491,7 +489,6 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {loading && <div className="text-gray-500">Loading data...</div>}
             {error && <div className="text-red-500">{error}</div>}
 
             {/* Manual Override Indicator */}
