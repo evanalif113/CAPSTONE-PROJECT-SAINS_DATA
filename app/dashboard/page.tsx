@@ -152,7 +152,6 @@ export default function DashboardPage() {
     : [];
   // Helper untuk min/max domain YAxis
   function getYAxisDomain(data: SensorDatum[], key: SensorKey) {
-    if (!data.length) return [0, 100];
     const vals = data.map((d) => d[key]);
     const min = Math.min(...vals);
     const max = Math.max(...vals);
@@ -221,8 +220,16 @@ export default function DashboardPage() {
               paper_bgcolor: "#fff",
               font: { size: 12 },
             }}
-            config={{ displayModeBar: false, responsive: true }}
-            style={{ width: "100%", height: "200px" }}
+            config={
+              {  
+                responsive: true 
+              }
+            }
+            style={
+              { width: "100%", 
+                height: "200px" 
+              }
+            }
             useResizeHandler
           />
         </div>
