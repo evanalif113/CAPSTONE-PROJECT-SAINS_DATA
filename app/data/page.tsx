@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useAuth } from "@/context/AuthContext";
+import { fetchSensorData } from "@/lib/fetchSensorData";
 import AppHeader from "@/components/AppHeader";
 import Sidebar from "@/components/Sidebar";
 import { getNavItems } from "@/components/navItems";
@@ -14,7 +16,6 @@ import {
   CartesianGrid,
 } from "recharts";
 import {
-  CalendarIcon,
   DownloadIcon,
   TemperatureIcon,
   HumidityIcon,
@@ -23,34 +24,74 @@ import {
 } from "@/components/Icon";
 import ProtectedRoute from "@/components/ProtectedRoute";
 
+interface SensorDatum {
+  timestamp: number;
+  temperature: number;
+  humidity: number;
+  light: number;
+  moisture: number;
+  timeFormatted?: string;
+}
+
 export default function DataHistory() {
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("Environmental Trends");
-  const [startDate, setStartDate] = useState("2023-05-01");
-  const [endDate, setEndDate] = useState("2023-05-31");
   const [selectedPeriod, setSelectedPeriod] = useState("Latest");
-  // Ambil navItems dengan menu aktif
   const navItems = getNavItems("/data");
 
-  // Data untuk chart (dummy, bisa diganti dengan data asli)
-  const chartData = [
-    { name: "0", temperature: 24, humidity: 85, light: 450, moisture: 75 },
-    { name: "1", temperature: 25, humidity: 80, light: 500, moisture: 70 },
-    { name: "2", temperature: 23, humidity: 82, light: 480, moisture: 72 },
-    { name: "3", temperature: 22, humidity: 78, light: 470, moisture: 68 },
-    { name: "4", temperature: 24, humidity: 81, light: 490, moisture: 74 },
-    { name: "5", temperature: 26, humidity: 79, light: 510, moisture: 76 },
-    { name: "6", temperature: 25, humidity: 77, light: 520, moisture: 73 },
-    { name: "7", temperature: 24, humidity: 80, light: 530, moisture: 75 },
-  ];
+  // State untuk data asli dari backend
+  const [data, setData] = useState<SensorDatum[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Komponen Chart Reusable
+  // Fetch data sensor dari backend
+  const loadData = async () => {
+    if (!user) return;
+    setLoading(true);
+    try {
+      const result = await fetchSensorData(user.uid);
+      setData(result);
+      setError(null);
+    } catch (err) {
+      setError("Gagal memuat data sensor");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Panggil fetchdata di useEffect
+  useEffect(() => {
+    loadData();
+    // (opsional) polling setiap 10 detik:
+    const interval = setInterval(loadData, 10000);
+    return () => clearInterval(interval);
+  }, [user]);
+
+  // Chart reusable
   type ChartProps = {
     title: string;
-    dataKey: string;
+    dataKey: keyof SensorDatum;
     color: string;
     colorClass: string;
     unit: string;
+    Icon: React.FC;
   };
+
+  // Padding Y-Axis agar grafik tidak terlalu ketat
+  function getYAxisDomain(data: SensorDatum[], key: keyof SensorDatum) {
+    const vals = data.map((d) => d[key] as number);
+    let min = Math.min(...vals);
+    let max = Math.max(...vals);
+    if (min === max) {
+      min = min - 1;
+      max = max + 1;
+    } else {
+      const padding = (max - min) * 0.05;
+      min = min - padding;
+      max = max + padding;
+    }
+    return [min, max];
+  }
 
   const Chart = ({
     title,
@@ -59,18 +100,26 @@ export default function DataHistory() {
     colorClass,
     unit,
     Icon,
-  }: ChartProps & { Icon: React.FC }) => (
+  }: ChartProps) => (
     <div className="mb-8">
       <div className="flex items-center mb-4">
         <Icon />
         <h3 className="text-lg font-medium text-gray-900 ml-3">{title}</h3>
       </div>
       <div className="bg-white p-4 rounded-lg border border-gray-200">
-        <ResponsiveContainer width="100%" height={220}>
-          <ReLineChart data={chartData}>
+        <ResponsiveContainer width="100%" height={260}>
+          <ReLineChart data={data}>
             <CartesianGrid stroke="#e5e7eb" strokeDasharray="3 3" />
-            <XAxis dataKey="name" />
-            <YAxis unit={unit} />
+            <XAxis
+              dataKey="timeFormatted"
+              tick={{ fontSize: 12 }}
+              minTickGap={10}
+            />
+            <YAxis
+              unit={unit}
+              domain={getYAxisDomain(data, dataKey)}
+              tick={{ fontSize: 12 }}
+            />
             <Tooltip />
             <Line
               type="monotone"
@@ -138,37 +187,27 @@ export default function DataHistory() {
               </div>
             </div>
 
-            {/* Date Range and Export Controls */}
-            <div className="flex items-center justify-between mb-8">
-              <div className="flex items-center space-x-4">
-                <span className="text-sm text-gray-600">Date Range:</span>
-                <div className="flex items-center space-x-2">
-                  <div className="relative">
-                    <input
-                      type="date"
-                      value={startDate}
-                      onChange={(e) => setStartDate(e.target.value)}
-                      className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    />
-                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-                      <CalendarIcon />
-                    </span>
-                  </div>
-                  <span className="text-gray-500">to</span>
-                  <div className="relative">
-                    <input
-                      type="date"
-                      value={endDate}
-                      onChange={(e) => setEndDate(e.target.value)}
-                      className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    />
-                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-                      <CalendarIcon />
-                    </span>
-                  </div>
+            {/* Export Controls & Period Selector dalam satu baris */}
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
+              <div>
+                <span className="text-sm text-gray-600">Select Period:</span>
+                <div className="flex flex-wrap gap-2 mt-2 md:mt-0">
+                  {periods.map((period) => (
+                    <button
+                      key={period}
+                      onClick={() => setSelectedPeriod(period)}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                        selectedPeriod === period
+                          ? "bg-blue-600 text-white"
+                          : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                      }`}
+                    >
+                      {period}
+                    </button>
+                  ))}
                 </div>
               </div>
-              <div className="flex space-x-2">
+              <div className="flex items-center gap-2">
                 <button className="flex items-center px-4 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
                   <DownloadIcon />
                   <span className="ml-2">Export CSV</span>
@@ -180,28 +219,15 @@ export default function DataHistory() {
               </div>
             </div>
 
-            {/* Period Selector */}
-            <div className="mb-8">
-              <span className="text-sm text-gray-600">Select Period:</span>
-              <div className="flex flex-wrap gap-2 mt-2">
-                {periods.map((period) => (
-                  <button
-                    key={period}
-                    onClick={() => setSelectedPeriod(period)}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      selectedPeriod === period
-                        ? "bg-blue-600 text-white"
-                        : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                    }`}
-                  >
-                    {period}
-                  </button>
-                ))}
-              </div>
-            </div>
+            {loading && (
+              <div className="text-center text-gray-500 py-8">Loading...</div>
+            )}
+            {error && (
+              <div className="text-center text-red-500 py-8">{error}</div>
+            )}
 
             {/* Charts */}
-            {activeTab === "Environmental Trends" && (
+            {activeTab === "Environmental Trends" && !loading && !error && (
               <div className="space-y-8">
                 <Chart
                   title="Temperature"
