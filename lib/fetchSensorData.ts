@@ -17,7 +17,7 @@ interface SensorData {
   timeFormatted: string;
 }
 
-export async function fetchUserSensorData(
+export async function fetchSensorData(
   userId: string,
   limit: number = 60,
 ): Promise<SensorData[]> {

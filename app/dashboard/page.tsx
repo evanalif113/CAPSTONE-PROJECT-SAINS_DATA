@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { useAuth } from "@/context/AuthContext";
-import { fetchUserSensorData } from "@/lib/fetchSensorData";
+import { fetchSensorData } from "@/lib/fetchSensorData";
 import AppHeader from "@/components/AppHeader";
 import Sidebar from "@/components/Sidebar";
 import { getNavItems } from "@/components/navItems";
@@ -51,7 +51,7 @@ export default function DashboardPage() {
     if (!user) return;
     setLoading(true);
     try {
-      const result = await fetchUserSensorData(user.uid);
+      const result = await fetchSensorData(user.uid);
       setData(result);
       setError(null);
     } catch (err) {
