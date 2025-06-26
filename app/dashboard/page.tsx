@@ -46,12 +46,14 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const intervalData = 60;
+
   //Fetch data sensor dari backend
   const loadData = async () => {
     if (!user) return;
     setLoading(true);
     try {
-      const result = await fetchSensorData(user.uid);
+      const result = await fetchSensorData(user.uid, intervalData);
       setData(result);
       setError(null);
     } catch (err) {

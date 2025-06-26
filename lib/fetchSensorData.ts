@@ -19,7 +19,7 @@ interface SensorData {
 
 export async function fetchSensorData(
   userId: string,
-  limit: number = 60,
+  limit: number,
 ): Promise<SensorData[]> {
   try {
     const dataRef = query(
