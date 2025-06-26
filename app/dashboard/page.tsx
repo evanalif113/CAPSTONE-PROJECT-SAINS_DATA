@@ -124,8 +124,18 @@ export default function DashboardPage() {
   // Helper untuk min/max domain YAxis
   function getYAxisDomain(data: SensorDatum[], key: SensorKey) {
     const vals = data.map((d) => d[key]);
-    const min = Math.min(...vals);
-    const max = Math.max(...vals);
+    let min = Math.min(...vals);
+    let max = Math.max(...vals);
+    if (min === max) {
+      // Jika data stagnan, beri padding default
+      min = min - 1;
+      max = max + 1;
+    } else {
+      // Tambahkan padding 10%
+      const padding = (max - min) * 0.1;
+      min = min - padding;
+      max = max + padding;
+    }
     return [min, max];
   }
   // Chart Card Component
@@ -191,16 +201,10 @@ export default function DashboardPage() {
               paper_bgcolor: "#fff",
               font: { size: 12 },
             }}
-            config={
-              {  
-                responsive: true 
-              }
-            }
-            style={
-              { width: "100%", 
-                height: "200px" 
-              }
-            }
+            config={{
+              responsive: true,
+            }}
+            style={{ width: "100%", height: "200px" }}
             useResizeHandler
           />
         </div>
@@ -449,7 +453,9 @@ export default function DashboardPage() {
                 <h2 className="text-2xl font-bold text-gray-900">Dashboard</h2>
                 <p className="text-sm text-gray-500 mt-1">
                   Last updated at{" "}
-                  {latest? new Date(latest.timestamp).toLocaleTimeString(): "-"}
+                  {latest
+                    ? new Date(latest.timestamp).toLocaleTimeString()
+                    : "-"}
                 </p>
               </div>
               <div className="flex items-center space-x-4">
