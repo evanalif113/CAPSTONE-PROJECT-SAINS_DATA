@@ -197,12 +197,13 @@ export default function DashboardPage() {
                 showgrid: true,
                 zeroline: false,
               },
-              plot_bgcolor: "#fff",
-              paper_bgcolor: "#fff",
+              plot_bgcolor: "transparent",
+              paper_bgcolor: "transparent",
               font: { size: 12 },
             }}
             config={{
               responsive: true,
+              displayModeBar: false,
             }}
             style={{ width: "100%", height: "200px" }}
             useResizeHandler
@@ -619,7 +620,6 @@ export default function DashboardPage() {
                     <span className="text-gray-600">Uptime</span>
                     <span className="text-gray-900">5 hari 32 menit</span>
                   </div>
-                  {/* Level Baterai dihapus */}
                 </div>
               </div>
             </div>

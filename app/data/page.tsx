@@ -27,12 +27,6 @@ export default function DataHistory() {
   const [activeTab, setActiveTab] = useState("Environmental Trends");
   const [startDate, setStartDate] = useState("2023-05-01");
   const [endDate, setEndDate] = useState("2023-05-31");
-
-  // Handler untuk logout
-  const handleLogout = () => {
-    window.location.href = "/logout";
-  };
-
   // Ambil navItems dengan menu aktif
   const navItems = getNavItems("/data");
 
