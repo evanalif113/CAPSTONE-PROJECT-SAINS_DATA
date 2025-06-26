@@ -27,6 +27,7 @@ export default function DataHistory() {
   const [activeTab, setActiveTab] = useState("Environmental Trends");
   const [startDate, setStartDate] = useState("2023-05-01");
   const [endDate, setEndDate] = useState("2023-05-31");
+  const [selectedPeriod, setSelectedPeriod] = useState("Latest");
   // Ambil navItems dengan menu aktif
   const navItems = getNavItems("/data");
 
@@ -85,6 +86,19 @@ export default function DataHistory() {
     </div>
   );
 
+  const periods = [
+    "Latest",
+    "Last Hour",
+    "6 Hours",
+    "1 Day",
+    "1 Week",
+    "1 Month",
+    "3 Months",
+    "6 Months",
+    "1 Year",
+    "Custom",
+  ];
+
   return (
     <ProtectedRoute>
       <div className="flex min-h-screen bg-gray-50">
@@ -93,7 +107,7 @@ export default function DataHistory() {
 
         {/* Main Content */}
         <div className="flex-1 flex flex-col">
-          <AppHeader/>
+          <AppHeader />
 
           {/* Data History Content */}
           <main className="flex-1 p-6">
@@ -163,6 +177,26 @@ export default function DataHistory() {
                   <DownloadIcon />
                   <span className="ml-2">Export PDF</span>
                 </button>
+              </div>
+            </div>
+
+            {/* Period Selector */}
+            <div className="mb-8">
+              <span className="text-sm text-gray-600">Select Period:</span>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {periods.map((period) => (
+                  <button
+                    key={period}
+                    onClick={() => setSelectedPeriod(period)}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      selectedPeriod === period
+                        ? "bg-blue-600 text-white"
+                        : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                    }`}
+                  >
+                    {period}
+                  </button>
+                ))}
               </div>
             </div>
 
