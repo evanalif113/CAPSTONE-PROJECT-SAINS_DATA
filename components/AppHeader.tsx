@@ -39,8 +39,8 @@ const router = useRouter();
               <span>Online</span>
             </div>
             <div className="flex flex-col">
+              <span>{user?.displayName}</span>
               <span>{user?.email}</span>
-              <span>{user?.metadata.lastSignInTime}</span>
             </div>
           </div>
         </div>
