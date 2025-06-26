@@ -72,7 +72,7 @@ export default function DashboardPage() {
   const sensorData = latest
     ? [
         {
-          title: "Temperature",
+          title: "Suhu Udara",
           value: latest.temperature.toFixed(2),
           unit: "°C",
           status: "Normal",
@@ -84,7 +84,7 @@ export default function DashboardPage() {
               : "-",
         },
         {
-          title: "Air Humidity",
+          title: "Kelembapan Udara",
           value: latest.humidity.toFixed(2),
           unit: "%",
           status: "Normal",
@@ -96,7 +96,7 @@ export default function DashboardPage() {
               : "-",
         },
         {
-          title: "Light Intensity",
+          title: "Intensitas Cahaya",
           value: latest.light.toFixed(2),
           unit: "lux",
           status: "Normal",
@@ -108,7 +108,7 @@ export default function DashboardPage() {
               : "-",
         },
         {
-          title: "Medium Moisture",
+          title: "Kelembapan Media",
           value: latest.moisture.toFixed(0),
           unit: "%",
           status: "Normal",
@@ -160,7 +160,7 @@ export default function DashboardPage() {
         <div className="p-4 border-b border-gray-200 flex items-center">
           <Icon />
           <h3 className={`text-sm font-medium ml-2`} style={{ color }}>
-            {title} Trend
+            {title}
           </h3>
         </div>
         <div className="p-4">
@@ -237,19 +237,6 @@ export default function DashboardPage() {
       />
     </button>
   );
-
-  // const periods = [
-  //   "Latest",
-  //   "Last Hour",
-  //   "6 Hours",
-  //   "1 Day",
-  //   "1 Week",
-  //   "1 Month",
-  //   "3 Months",
-  //   "6 Months",
-  //   "1 Year",
-  //   "Custom",
-  // ];
 
   return (
     <ProtectedRoute>
@@ -367,7 +354,7 @@ export default function DashboardPage() {
             {/* Charts */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <ChartCard
-                title="Temperature"
+                title="Suhu Udara"
                 dataKey="temperature"
                 color="#ef4444"
                 Icon={TemperatureIcon}
@@ -375,7 +362,7 @@ export default function DashboardPage() {
                 chartData={data}
               />
               <ChartCard
-                title="Humidity"
+                title="Kelembapan Udara"
                 dataKey="humidity"
                 color="#3b82f6"
                 Icon={HumidityIcon}
@@ -383,7 +370,7 @@ export default function DashboardPage() {
                 chartData={data}
               />
               <ChartCard
-                title="Light Intensity"
+                title="Intensitas Cahaya"
                 dataKey="light"
                 color="#f59e0b"
                 Icon={LightIntensityIcon}
@@ -391,7 +378,7 @@ export default function DashboardPage() {
                 chartData={data}
               />
               <ChartCard
-                title="Moisture"
+                title="Kelembapan Media"
                 dataKey="moisture"
                 color="#10b981"
                 Icon={MoistureIcon}
@@ -404,13 +391,13 @@ export default function DashboardPage() {
             <div className="bg-white rounded-lg shadow-sm border border-gray-200">
               <div className="p-4 border-b border-gray-200">
                 <h3 className="text-lg font-semibold text-gray-900">
-                  System status
+                  Status Sistem
                 </h3>
               </div>
               <div className="p-4 space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="flex justify-between">
-                    <span className="text-gray-600">System status</span>
+                    <span className="text-gray-600">Status Sistem</span>
                     <span className="bg-green-500 text-white px-2 py-1 rounded text-sm">
                       Online
                     </span>
@@ -441,7 +428,7 @@ export default function DashboardPage() {
             <div className="bg-white rounded-lg shadow-sm border border-gray-200">
               <div className="p-4 border-b border-gray-200">
                 <h3 className="text-lg font-semibold text-gray-900">
-                  Actuator Status
+                  Status Aktuator
                 </h3>
               </div>
               <div className="p-4">
