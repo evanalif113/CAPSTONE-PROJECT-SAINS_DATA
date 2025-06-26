@@ -247,7 +247,7 @@ export default function DataHistory() {
             {activeTab === "Environmental Trends" && !loading && !error && (
               <div className="space-y-8">
                 <ChartCard
-                  title="Temperature"
+                  title="Suhu Udara"
                   dataKey="temperature"
                   color="#ef4444"
                   Icon={TemperatureIcon}
@@ -255,7 +255,7 @@ export default function DataHistory() {
                   chartData={data}
                 />
                 <ChartCard
-                  title="Air Humidity"
+                  title="Kelembapan Udara"
                   dataKey="humidity"
                   color="#3b82f6"
                   Icon={HumidityIcon}
@@ -263,7 +263,7 @@ export default function DataHistory() {
                   chartData={data}
                 />
                 <ChartCard
-                  title="Light Intensity"
+                  title="Intensitas Cahaya"
                   dataKey="light"
                   color="#f59e0b"
                   Icon={LightIntensityIcon}
@@ -271,7 +271,7 @@ export default function DataHistory() {
                   chartData={data}
                 />
                 <ChartCard
-                  title="Moisture"
+                  title="Kelembapan Media"
                   dataKey="moisture"
                   color="#10b981"
                   Icon={MoistureIcon}
