@@ -153,16 +153,14 @@ export default function DataHistory() {
   };
 
   const periods = [
-    "Latest",
-    "Last Hour",
-    "6 Hours",
-    "1 Day",
-    "1 Week",
-    "1 Month",
-    "3 Months",
-    "6 Months",
-    "1 Year",
-    "Custom",
+    "30 Menit",
+    "1 Jam",
+    "3 Jam",
+    "6 Jam",
+    "12 Jam",
+    "24 Jam",
+    "3 Hari",
+    "7 Hari"
   ];
 
   return (
