@@ -1,20 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import { useAuth } from "@/context/AuthContext";
 import { fetchSensorData } from "@/lib/fetchSensorData";
 import AppHeader from "@/components/AppHeader";
 import Sidebar from "@/components/Sidebar";
 import { getNavItems } from "@/components/navItems";
-import {
-  LineChart as ReLineChart,
-  Line,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  CartesianGrid,
-} from "recharts";
 import {
   DownloadIcon,
   TemperatureIcon,
@@ -23,6 +15,8 @@ import {
   MoistureIcon,
 } from "@/components/Icon";
 import ProtectedRoute from "@/components/ProtectedRoute";
+
+const Plot = dynamic(() => import("react-plotly.js"), { ssr: true });
 
 interface SensorDatum {
   timestamp: number;
@@ -67,17 +61,7 @@ export default function DataHistory() {
     return () => clearInterval(interval);
   }, [user]);
 
-  // Chart reusable
-  type ChartProps = {
-    title: string;
-    dataKey: keyof SensorDatum;
-    color: string;
-    colorClass: string;
-    unit: string;
-    Icon: React.FC;
-  };
-
-  // Padding Y-Axis agar grafik tidak terlalu ketat
+  // Helper untuk min/max domain YAxis
   function getYAxisDomain(data: SensorDatum[], key: keyof SensorDatum) {
     const vals = data.map((d) => d[key] as number);
     let min = Math.min(...vals);
@@ -86,54 +70,87 @@ export default function DataHistory() {
       min = min - 1;
       max = max + 1;
     } else {
-      const padding = (max - min) * 0.05;
+      const padding = (max - min) * 0.1;
       min = min - padding;
       max = max + padding;
     }
     return [min, max];
   }
 
-  const Chart = ({
+  // ChartCard menggunakan Plotly
+  const ChartCard = ({
     title,
     dataKey,
     color,
-    colorClass,
-    unit,
     Icon,
-  }: ChartProps) => (
-    <div className="mb-8">
-      <div className="flex items-center mb-4">
-        <Icon />
-        <h3 className="text-lg font-medium text-gray-900 ml-3">{title}</h3>
+    unit,
+    chartData,
+  }: {
+    title: string;
+    dataKey: keyof SensorDatum;
+    color: string;
+    Icon: React.FC;
+    unit: string;
+    chartData: SensorDatum[];
+  }) => {
+    const yDomain = getYAxisDomain(chartData, dataKey);
+    return (
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="p-4 border-b border-gray-200 flex items-center">
+          <Icon />
+          <h3 className={`text-sm font-medium ml-2`} style={{ color }}>
+            {title}
+          </h3>
+        </div>
+        <div className="p-4">
+          <Plot
+            data={[
+              {
+                x: chartData.map((d) =>
+                  d.timeFormatted
+                    ? d.timeFormatted
+                    : new Date(d.timestamp).toLocaleString()
+                ),
+                y: chartData.map((d) => d[dataKey] as number),
+                type: "scatter",
+                mode: "lines+markers",
+                marker: { color },
+                line: { color, width: 3 },
+                name: title,
+              },
+            ]}
+            layout={{
+              autosize: true,
+              height: 220,
+              margin: { l: 40, r: 10, t: 10, b: 40 },
+              xaxis: {
+                title: "Time",
+                tickmode: "auto",
+                nticks: 8,
+                showgrid: true,
+                zeroline: false,
+              },
+              yaxis: {
+                title: unit,
+                range: yDomain,
+                showgrid: true,
+                zeroline: false,
+              },
+              plot_bgcolor: "transparent",
+              paper_bgcolor: "transparent",
+              font: { size: 12 },
+            }}
+            config={{
+              responsive: true,
+              displayModeBar: false,
+            }}
+            style={{ width: "100%", height: "220px" }}
+            useResizeHandler
+          />
+        </div>
       </div>
-      <div className="bg-white p-4 rounded-lg border border-gray-200">
-        <ResponsiveContainer width="100%" height={260}>
-          <ReLineChart data={data}>
-            <CartesianGrid stroke="#e5e7eb" strokeDasharray="3 3" />
-            <XAxis
-              dataKey="timeFormatted"
-              tick={{ fontSize: 12 }}
-              minTickGap={10}
-            />
-            <YAxis
-              unit={unit}
-              domain={getYAxisDomain(data, dataKey)}
-              tick={{ fontSize: 12 }}
-            />
-            <Tooltip />
-            <Line
-              type="monotone"
-              dataKey={dataKey}
-              stroke={color}
-              strokeWidth={2}
-              dot={{ r: 4 }}
-              activeDot={{ r: 6 }}
-            />
-          </ReLineChart>
-        </ResponsiveContainer>
-      </div>
-    </div>
-  );
+    );
+  };
 
   const periods = [
     "Latest",
@@ -229,37 +246,37 @@ export default function DataHistory() {
             {/* Charts */}
             {activeTab === "Environmental Trends" && !loading && !error && (
               <div className="space-y-8">
-                <Chart
+                <ChartCard
                   title="Temperature"
                   dataKey="temperature"
                   color="#ef4444"
-                  colorClass="bg-red-500"
-                  unit="°C"
                   Icon={TemperatureIcon}
+                  unit="°C"
+                  chartData={data}
                 />
-                <Chart
+                <ChartCard
                   title="Air Humidity"
                   dataKey="humidity"
                   color="#3b82f6"
-                  colorClass="bg-blue-500"
-                  unit="%"
                   Icon={HumidityIcon}
+                  unit="%"
+                  chartData={data}
                 />
-                <Chart
+                <ChartCard
                   title="Light Intensity"
                   dataKey="light"
                   color="#f59e0b"
-                  colorClass="bg-yellow-500"
-                  unit="lux"
                   Icon={LightIntensityIcon}
+                  unit="lux"
+                  chartData={data}
                 />
-                <Chart
+                <ChartCard
                   title="Moisture"
                   dataKey="moisture"
                   color="#10b981"
-                  colorClass="bg-green-500"
-                  unit="%"
                   Icon={MoistureIcon}
+                  unit="%"
+                  chartData={data}
                 />
               </div>
             )}
