@@ -71,8 +71,8 @@ export default function DashboardPage() {
   // SensorData untuk Card (ambil data terbaru)
   const latest = data.length > 0 ? data[data.length - 1] : null;
   const prev = data.length > 1 ? data[data.length - 2] : null;
-  const sensorData = latest
-    ? [
+  const sensorData = latest? 
+  [
         {
           title: "Suhu Udara",
           value: latest.temperature.toFixed(2),
@@ -335,23 +335,6 @@ export default function DashboardPage() {
                 </div>
               ))}
             </div>
-
-            {/* Time Period Selector */}
-            {/* <div className="flex flex-wrap gap-2">
-              {periods.map((period) => (
-                <button
-                  key={period}
-                  onClick={() => setSelectedPeriod(period)}
-                  className={`px-3 py-2 text-sm rounded-lg transition-colors ${
-                    selectedPeriod === period
-                      ? "bg-slate-800 text-white"
-                      : "border border-gray-300 text-gray-700 hover:bg-gray-50"
-                  }`}
-                >
-                  {period}
-                </button>
-              ))}
-            </div> */}
 
             {/* Charts */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
