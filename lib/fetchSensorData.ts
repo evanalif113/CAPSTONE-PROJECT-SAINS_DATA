@@ -20,6 +20,13 @@ export interface SensorData extends SensorValue {
   timeFormatted: string;
 }
 
+/**
+ * Memperbarui status dari satu aktuator spesifik.
+ * @param userId - ID pengguna yang datanya akan diupdate.
+ * @param limit - Berapa Poin data yang akan diambil.
+ * @returns Sebuah promise yang akan resolve ketika get data selesai.
+ */
+
 export async function fetchSensorData(
   userId: string,
   limit: number,

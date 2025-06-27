@@ -16,9 +16,8 @@ import {
 } from "@/components/Icon";
 import ProtectedRoute from "@/components/ProtectedRoute";
 
-const Plot = dynamic(() => import("react-plotly.js"), { ssr: false }); // Rekomendasi: ssr: false untuk Plotly
+const Plot = dynamic(() => import("react-plotly.js"), { ssr: false });
 
-// 1. Definisikan tipe untuk objek Period agar lebih aman
 interface Period {
   label: string;
   valueInMinutes: number;
@@ -33,7 +32,6 @@ interface SensorDatum {
   timeFormatted?: string;
 }
 
-// 2. Ubah struktur data `periods` menjadi array objek
 const periods: Period[] = [
   { label: "30 Menit", valueInMinutes: 30 },
   { label: "1 Jam", valueInMinutes: 60 },
@@ -48,19 +46,14 @@ const periods: Period[] = [
 export default function DataHistory() {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("Environmental Trends");
-  
-  // 3. Ubah state `selectedPeriod` untuk menyimpan objek Period, bukan string
-  //    dan set default value dari array `periods`
-  const [selectedPeriod, setSelectedPeriod] = useState<Period>(periods[0]); // Default "30 Menit"
+  const [selectedPeriod, setSelectedPeriod] = useState<Period>(periods[0]);
 
   const navItems = getNavItems("/data");
   const [data, setData] = useState<SensorDatum[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // 4. Refactor useEffect untuk fetching data berdasarkan `selectedPeriod`
   useEffect(() => {
-    // Fungsi untuk mengambil data berdasarkan periode yang dipilih
     const loadDataForPeriod = async () => {
       if (!user || !selectedPeriod) return;
 
@@ -78,30 +71,25 @@ export default function DataHistory() {
     };
 
     loadDataForPeriod();
-  }, [user, selectedPeriod]); // <-- Dependensi diubah ke user dan selectedPeriod
+  }, [user, selectedPeriod]);
 
-  // 5. (Opsional) Pisahkan useEffect untuk polling agar lebih terkontrol
   useEffect(() => {
     if (!user) return;
 
-    // Hanya lakukan polling jika periode yang dipilih adalah "30 Menit"
     if (selectedPeriod?.label === "30 Menit") {
       const interval = setInterval(async () => {
         try {
-          // Ambil data terbaru tanpa menampilkan loading spinner agar tidak berkedip
           const result = await fetchSensorData(user.uid, selectedPeriod.valueInMinutes);
           setData(result);
         } catch (err) {
           console.error("Gagal melakukan polling data:", err);
         }
-      }, 30000); // Polling setiap 30 detik
+      }, 30000);
 
-      // Cleanup interval saat komponen unmount atau dependensi berubah
       return () => clearInterval(interval);
     }
-  }, [user, selectedPeriod]); // <-- Dependensi sama
+  }, [user, selectedPeriod]);
 
-  // ... (sisa fungsi helper dan komponen ChartCard tetap sama)
   function getYAxisDomain(data: SensorDatum[], key: keyof SensorDatum) {
     const vals = data.map((d) => d[key] as number);
     if (vals.length === 0) return [-1, 1];
@@ -118,8 +106,13 @@ export default function DataHistory() {
     return [min, max];
   }
 
+  // --- PERBAIKAN ADA DI DALAM KOMPONEN INI ---
   const ChartCard = ({ title, dataKey, color, Icon, unit, chartData }: { title: string; dataKey: keyof SensorDatum; color: string; Icon: React.FC; unit: string; chartData: SensorDatum[] }) => {
     const yDomain = getYAxisDomain(chartData, dataKey);
+    
+    // Buat salinan array dengan urutan kronologis (terlama -> terbaru) untuk chart
+    const chronologicalData = [...chartData].reverse();
+
     return (
         <div className="bg-white rounded-lg shadow-sm border border-gray-200">
             <div className="p-4 border-b border-gray-200 flex items-center">
@@ -129,8 +122,9 @@ export default function DataHistory() {
             <div className="p-4">
                 <Plot
                     data={[{
-                        x: chartData.map((d) => d.timeFormatted ? d.timeFormatted : new Date(d.timestamp).toLocaleString("id-ID")),
-                        y: chartData.map((d) => d[dataKey] as number),
+                        // Gunakan data yang urutannya sudah benar
+                        x: chronologicalData.map((d) => d.timeFormatted ? d.timeFormatted : new Date(d.timestamp).toLocaleString("id-ID")),
+                        y: chronologicalData.map((d) => d[dataKey] as number),
                         type: "scatter",
                         mode: "lines+markers",
                         marker: { color },
@@ -166,15 +160,13 @@ export default function DataHistory() {
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-gray-900">Data History</h2>
               <div className="flex space-x-2">
-                 {/* ... (Tombol Tab tidak berubah) ... */}
+                 {/* ... */}
               </div>
             </div>
 
             <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
               <div>
                 <span className="text-sm text-gray-600">Pilih Periode:</span>
-                
-                {/* 6. Sesuaikan JSX untuk me-render tombol dari array objek */}
                 <div className="flex flex-wrap gap-2 mt-2">
                   {periods.map((period) => (
                     <button
@@ -192,7 +184,7 @@ export default function DataHistory() {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                 {/* ... (Tombol Export tidak berubah) ... */}
+                 {/* ... */}
               </div>
             </div>
 
@@ -207,7 +199,7 @@ export default function DataHistory() {
                 <ChartCard title="Kelembapan Media" dataKey="moisture" color="#10b981" Icon={MoistureIcon} unit="%" chartData={data} />
               </div>
             )}
-             {/* ... (sisa JSX tidak berubah) ... */}
+             {/* ... */}
           </main>
         </div>
       </div>
