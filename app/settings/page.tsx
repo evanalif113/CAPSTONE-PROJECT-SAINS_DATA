@@ -3,6 +3,7 @@
 import { useState } from "react";
 import AppHeader from "@/components/AppHeader";
 import Sidebar from "@/components/Sidebar";
+import { RangeSlider } from "@/components/RangeSlider";
 import { getNavItems } from "@/components/navItems";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { 
@@ -41,39 +42,6 @@ export default function Settings() {
     measurementUnit: "Metric (°C, meters)",
     autoUpdates: true,
   });
-
-  // Slider Component
-  const Slider = ({ label, value, min, max, unit, onChange }) => (
-    <div className="mb-6">
-      <label className="block text-sm font-medium text-gray-700 mb-2">
-        {label}
-      </label>
-      <div className="relative">
-        <input
-          type="range"
-          min={min}
-          max={max}
-          value={value}
-          onChange={(e) => onChange(Number.parseInt(e.target.value))}
-          className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
-        />
-        <div className="flex justify-between text-xs text-gray-500 mt-1">
-          <span>
-            {min}
-            {unit}
-          </span>
-          <span className="font-medium text-gray-900">
-            {value}
-            {unit}
-          </span>
-          <span>
-            {max}
-            {unit}
-          </span>
-        </div>
-      </div>
-    </div>
-  );
 
   // Sample users data
   const users = [
@@ -159,124 +127,68 @@ export default function Settings() {
                 </button>
               </div>
             </div>
-
           {/* Thresholds Tab */}
           {activeTab === "Thresholds" && (
             <div>
               <h3 className="text-lg font-semibold text-gray-900 mb-6">
                 Global Threshold Configuration
               </h3>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div>
-                  <h4 className="text-md font-medium text-gray-900 mb-4">
-                    Temperature Thresholds
-                  </h4>
-                  <Slider
-                    label="Minimum Temperature (°C)"
-                    value={thresholds.tempMin}
-                    min={0}
-                    max={30}
-                    unit="°C"
-                    onChange={(value) =>
-                      setThresholds({ ...thresholds, tempMin: value })
-                    }
-                  />
-                  <Slider
-                    label="Maximum Temperature (°C)"
-                    value={thresholds.tempMax}
-                    min={20}
-                    max={50}
-                    unit="°C"
-                    onChange={(value) =>
-                      setThresholds({ ...thresholds, tempMax: value })
-                    }
-                  />
-                </div>
-                <div>
-                  <h4 className="text-md font-medium text-gray-900 mb-4">
-                    Humidity Thresholds
-                  </h4>
-                  <Slider
-                    label="Minimum Humidity (%)"
-                    value={thresholds.humidityMin}
-                    min={0}
-                    max={100}
-                    unit="%"
-                    onChange={(value) =>
-                      setThresholds({ ...thresholds, humidityMin: value })
-                    }
-                  />
-                  <Slider
-                    label="Maximum Humidity (%)"
-                    value={thresholds.humidityMax}
-                    min={0}
-                    max={100}
-                    unit="%"
-                    onChange={(value) =>
-                      setThresholds({ ...thresholds, humidityMax: value })
-                    }
-                  />
-                </div>
-                <div>
-                  <h4 className="text-md font-medium text-gray-900 mb-4">
-                    Light Intensity Thresholds
-                  </h4>
-                  <Slider
-                    label="Minimum Light Intensity (lux)"
-                    value={thresholds.lightMin}
-                    min={0}
-                    max={1000}
-                    unit=" lux"
-                    onChange={(value) =>
-                      setThresholds({ ...thresholds, lightMin: value })
-                    }
-                  />
-                  <Slider
-                    label="Maximum Light Intensity (lux)"
-                    value={thresholds.lightMax}
-                    min={1000}
-                    max={5000}
-                    unit=" lux"
-                    onChange={(value) =>
-                      setThresholds({ ...thresholds, lightMax: value })
-                    }
-                  />
-                </div>
-                <div>
-                  <h4 className="text-md font-medium text-gray-900 mb-4">
-                    Medium Moisture Thresholds
-                  </h4>
-                  <Slider
-                    label="Minimum Moisture (%)"
-                    value={thresholds.moistureMin}
-                    min={0}
-                    max={100}
-                    unit="%"
-                    onChange={(value) =>
-                      setThresholds({ ...thresholds, moistureMin: value })
-                    }
-                  />
-                  <Slider
-                    label="Maximum Moisture (%)"
-                    value={thresholds.moistureMax}
-                    min={0}
-                    max={100}
-                    unit="%"
-                    onChange={(value) =>
-                      setThresholds({ ...thresholds, moistureMax: value })
-                    }
-                  />
-                </div>
+              {/* 2. Ganti seluruh grid dengan kode yang lebih sederhana ini */}
+              <div className="space-y-8">
+                <RangeSlider
+                  label="Temperature Thresholds"
+                  value={[thresholds.tempMin, thresholds.tempMax]}
+                  onChange={([newMin, newMax]) =>
+                    setThresholds({ ...thresholds, tempMin: newMin, tempMax: newMax })
+                  }
+                  min={0}
+                  max={50}
+                  unit="°C"
+                  colorClassName="bg-red-500" // Warna untuk suhu
+                />
+                <RangeSlider
+                  label="Humidity Thresholds"
+                  value={[thresholds.humidityMin, thresholds.humidityMax]}
+                  onChange={([newMin, newMax]) =>
+                    setThresholds({ ...thresholds, humidityMin: newMin, humidityMax: newMax })
+                  }
+                  min={0}
+                  max={100}
+                  unit="%"
+                  colorClassName="bg-blue-500" // Warna untuk kelembapan
+                />
+                <RangeSlider
+                  label="Light Intensity Thresholds"
+                  value={[thresholds.lightMin, thresholds.lightMax]}
+                  onChange={([newMin, newMax]) =>
+                    setThresholds({ ...thresholds, lightMin: newMin, lightMax: newMax })
+                  }
+                  min={0}
+                  max={5000}
+                  step={50} // Step bisa disesuaikan
+                  unit="lux"
+                  colorClassName="bg-yellow-500" // Warna untuk cahaya
+                />
+                <RangeSlider
+                  label="Medium Moisture Thresholds"
+                  value={[thresholds.moistureMin, thresholds.moistureMax]}
+                  onChange={([newMin, newMax]) =>
+                    setThresholds({ ...thresholds, moistureMin: newMin, moistureMax: newMax })
+                  }
+                  min={0}
+                  max={100}
+                  unit="%"
+                  colorClassName="bg-emerald-500" // Warna untuk kelembapan media
+                />
               </div>
               <div className="mt-8 flex justify-end">
                 <button className="flex items-center px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                  <Save />
+                  <Save size={18} />
                   <span className="ml-2">Save Thresholds</span>
                 </button>
               </div>
             </div>
           )}
-
           {/* Notification Channels Tab */}
           {activeTab === "Notification Channels" && (
             <div>
