@@ -189,11 +189,7 @@ export default function IntelligencePage() {
       <div className="flex min-h-screen bg-gray-50">
         <Sidebar navItems={navItems} />
         <div className="flex-1 flex flex-col">
-          <AppHeader
-            onLogout={() => {
-              window.location.href = "/logout";
-            }}
-          />
+          <AppHeader/>
           <main className="flex-1 p-6 space-y-8">
             {/* Header & Input Data Panen Button */}
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-2">

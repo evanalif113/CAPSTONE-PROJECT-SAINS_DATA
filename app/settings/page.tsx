@@ -109,7 +109,7 @@ export default function Settings() {
 
         {/* Main Content */}
         <div className="flex-1 flex flex-col">
-          <AppHeader onLogout={handleLogout} />
+          <AppHeader/>
 
           {/* Settings Content */}
           <main className="flex-1 p-6">
