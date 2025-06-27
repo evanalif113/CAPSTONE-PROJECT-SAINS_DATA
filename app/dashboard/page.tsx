@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react"; // KOREKSI: Tambahkan useMemo
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { useAuth } from "@/context/AuthContext";
-import { fetchSensorData } from "@/lib/fetchSensorData";
+// KOREKSI: Impor tipe data SensorData dari sumber aslinya
+import { fetchSensorData, SensorData } from "@/lib/fetchSensorData";
 import AppHeader from "@/components/AppHeader";
 import Sidebar from "@/components/Sidebar";
 import { getNavItems } from "@/components/navItems";
@@ -15,23 +16,15 @@ import {
   LightIntensityIcon,
   MoistureIcon,
 } from "@/components/Icon";
-import { ArrowUp, ArrowDown } from "lucide-react";
+import { ArrowUp, ArrowDown, Minus } from "lucide-react"; // KOREKSI: Tambahkan ikon Minus
 import ProtectedRoute from "@/components/ProtectedRoute";
 
 const navItems = getNavItems("/");
 const Plot = dynamic(() => import("react-plotly.js"), { ssr: false });
 
-// Tipe union untuk key sensor
 type SensorKey = "temperature" | "humidity" | "light" | "moisture";
 
-interface SensorDatum {
-  timestamp: number;
-  temperature: number;
-  humidity: number;
-  light: number;
-  moisture: number;
-  timeFormatted?: string;
-}
+// Hapus interface SensorDatum karena kita sudah impor SensorData
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -41,17 +34,17 @@ export default function DashboardPage() {
   const [humidifierEnabled, setHumidifierEnabled] = useState(false);
   const [lightEnabled, setLightEnabled] = useState(false);
 
-  //State untuk data asli dari backend
-  const [data, setData] = useState<SensorDatum[]>([]);
+  // KOREKSI: Gunakan tipe data SensorData yang diimpor
+  const [data, setData] = useState<SensorData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const intervalData = 60;
 
-  //Fetch data sensor dari backend
   const loadData = async () => {
     if (!user) return;
-    setLoading(true);
+    // Hindari setLoading(true) pada refresh interval agar UI tidak berkedip
+    // setLoading akan true hanya pada pemuatan awal
     try {
       const result = await fetchSensorData(user.uid, intervalData);
       setData(result);
@@ -59,87 +52,99 @@ export default function DashboardPage() {
     } catch (err) {
       setError("Gagal memuat data sensor");
     } finally {
-      setLoading(false);
+      // Pastikan loading menjadi false setelah pemuatan pertama selesai
+      if (loading) setLoading(false);
     }
   };
 
   useEffect(() => {
-    loadData();
-    const interval = setInterval(loadData, 10000);
-    return () => clearInterval(interval);
+    if (user) {
+      setLoading(true); // Set loading hanya sekali saat user pertama kali ada
+      loadData();
+      const interval = setInterval(loadData, 10000); // 10 detik polling
+      return () => clearInterval(interval);
+    }
   }, [user]);
-  // SensorData untuk Card (ambil data terbaru)
-  const latest = data.length > 0 ? data[data.length - 1] : null;
-  const prev = data.length > 1 ? data[data.length - 2] : null;
-  const sensorData = latest? 
-  [
-        {
-          title: "Suhu Udara",
-          value: latest.temperature.toFixed(2),
-          unit: "°C",
-          status: "Normal",
-          trend:
-            prev && latest.temperature > prev.temperature
-              ? "Naik"
-              : prev && latest.temperature < prev.temperature
-              ? "Turun"
-              : "-",
-        },
-        {
-          title: "Kelembapan Udara",
-          value: latest.humidity.toFixed(2),
-          unit: "%",
-          status: "Normal",
-          trend:
-            prev && latest.humidity > prev.humidity
-              ? "Naik"
-              : prev && latest.humidity < prev.humidity
-              ? "Turun"
-              : "-",
-        },
-        {
-          title: "Intensitas Cahaya",
-          value: latest.light.toFixed(2),
-          unit: "lux",
-          status: "Normal",
-          trend:
-            prev && latest.light > prev.light
-              ? "Naik"
-              : prev && latest.light < prev.light
-              ? "Turun"
-              : "-",
-        },
-        {
-          title: "Kelembapan Media",
-          value: latest.moisture.toFixed(0),
-          unit: "%",
-          status: "Normal",
-          trend:
-            prev && latest.moisture > prev.moisture
-              ? "Naik"
-              : prev && latest.moisture < prev.moisture
-              ? "Turun"
-              : "-",
-        },
-      ]
-    : [];
+
+  // KOREKSI: Ambil data terbaru dari AWAL array, bukan akhir
+  // Gunakan useMemo untuk mencegah kalkulasi ulang yang tidak perlu pada setiap render
+  const { latest, prev, chartData } = useMemo(() => {
+    if (data.length === 0) {
+      return { latest: null, prev: null, chartData: [] };
+    }
+    // Data sudah diurutkan dari terbaru -> terlama oleh fetchSensorData
+    const latest = data[0];
+    const prev = data.length > 1 ? data[1] : null;
+
+    // Untuk grafik, kita ingin urutan waktu dari kiri ke kanan (terlama -> terbaru)
+    // Jadi kita balik lagi array-nya khusus untuk chart.
+    const chartData = [...data].reverse();
+
+    return { latest, prev, chartData };
+  }, [data]);
+
+  const sensorCards = useMemo(() => {
+    if (!latest) return [];
+
+    const createTrend = (current: number, previous: number | null) => {
+      if (previous === null) return "-";
+      if (current > previous) return "Naik";
+      if (current < previous) return "Turun";
+      return "-";
+    };
+
+    return [
+      {
+        title: "Suhu Udara",
+        value: latest.temperature.toFixed(2),
+        unit: "°C",
+        status: "Normal", // Logika status bisa dikembangkan di sini
+        trend: createTrend(latest.temperature, prev?.temperature ?? null),
+      },
+      {
+        title: "Kelembapan Udara",
+        value: latest.humidity.toFixed(2),
+        unit: "%",
+        status: "Normal",
+        trend: createTrend(latest.humidity, prev?.humidity ?? null),
+      },
+      {
+        title: "Intensitas Cahaya",
+        value: latest.light.toFixed(2),
+        unit: "lux",
+        status: "Normal",
+        trend: createTrend(latest.light, prev?.light ?? null),
+      },
+      {
+        title: "Kelembapan Media",
+        value: latest.moisture.toFixed(1),
+        unit: "%",
+        status: "Normal",
+        trend: createTrend(latest.moisture, prev?.moisture ?? null),
+      },
+    ];
+  }, [latest, prev]);
+
+  // ... (Komponen ChartCard dan ToggleSwitch tetap sama) ...
   // Helper untuk min/max domain YAxis
-  function getYAxisDomain(data: SensorDatum[], key: SensorKey) {
+  function getYAxisDomain(data: SensorData[], key: SensorKey) {
     const vals = data.map((d) => d[key]);
+    if (vals.length === 0) return [0, 1]; // Default jika tidak ada data
+
     let min = Math.min(...vals);
     let max = Math.max(...vals);
+
     if (min === max) {
-      // Jika data stagnan, beri padding default
-      min = min - 1;
-      max = max + 1;
+      min -= 1;
+      max += 1;
     } else {
-      // Tambahkan padding 10%
       const padding = (max - min) * 0.1;
-      min = min - padding;
-      max = max + padding;
+      min -= padding;
+      max += padding;
     }
     return [min, max];
   }
+
   // Chart Card Component
   const ChartCard = ({
     title,
@@ -147,14 +152,12 @@ export default function DashboardPage() {
     color,
     Icon,
     unit,
-    chartData,
   }: {
     title: string;
     dataKey: SensorKey;
     color: string;
     Icon: React.FC;
     unit: string;
-    chartData: SensorDatum[];
   }) => {
     const yDomain = getYAxisDomain(chartData, dataKey);
     return (
@@ -169,11 +172,8 @@ export default function DashboardPage() {
           <Plot
             data={[
               {
-                x: chartData.map((d) =>
-                  d.timeFormatted
-                    ? d.timeFormatted
-                    : new Date(d.timestamp).toLocaleString()
-                ),
+                // KOREKSI: Langsung gunakan `timeFormatted` karena sudah pasti ada.
+                x: chartData.map((d) => d.timeFormatted),
                 y: chartData.map((d) => d[dataKey]),
                 type: "scatter",
                 mode: "lines+markers",
@@ -187,9 +187,9 @@ export default function DashboardPage() {
               height: 200,
               margin: { l: 40, r: 10, t: 10, b: 40 },
               xaxis: {
-                title: "Time",
+                title: "Waktu", // Lebih deskriptif
                 tickmode: "auto",
-                nticks: 8,
+                nticks: 6, // Mengurangi jumlah tick agar tidak terlalu ramai
                 showgrid: true,
                 zeroline: false,
               },
@@ -239,139 +239,68 @@ export default function DashboardPage() {
       />
     </button>
   );
-
   return (
     <ProtectedRoute>
       <div className="flex min-h-screen bg-gray-50">
         <Sidebar navItems={navItems} />
-
         <div className="flex-1 flex flex-col">
           <AppHeader />
-
-          {/* Dashboard Content */}
           <main className="flex-1 p-6 space-y-6">
-            {/* Dashboard Header */}
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-2xl font-bold text-gray-900">Dashboard</h2>
                 <p className="text-sm text-gray-500 mt-1">
                   Terakhir diperbarui{" "}
-                  {latest
-                    ? new Date(latest.timestamp).toLocaleTimeString()
-                    : "-"}
+                  {/* KOREKSI: Gunakan `timeFormatted` yang sudah ada */}
+                  {latest ? latest.timeFormatted : ":"}
                 </p>
-              </div>
-              <div className="flex items-center space-x-4">
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm text-gray-600">Mode Auto</span>
-                  <ToggleSwitch checked={modeAuto} onChange={setModeAuto} />
-                </div>
-                <button
-                  className="flex items-center px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-                  onClick={loadData}
-                >
-                  <RefreshIcon />
-                  <span className="ml-2">Refresh</span>
-                </button>
               </div>
             </div>
 
             {error && <div className="text-red-500">{error}</div>}
-
-            {/* Manual Override Indicator */}
-            {modeAuto === false && (
-              <div>
-                <div className="px-4 py-2 bg-yellow-500 text-white rounded-lg font-semibold shadow inline-block">
-                  Manual Override Aktif
-                </div>
-              </div>
-            )}
-
-            {/* Sensor Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {sensorData.map((sensor, index) => (
-                <div key={index} className="bg-gray-100 rounded-lg p-4">
-                  <div className="mb-3">
-                    <h3 className="text-sm font-medium text-gray-600">
-                      {sensor.title}
-                    </h3>
+              {/* KOREKSI: Gunakan `sensorCards` hasil dari useMemo */}
+              {sensorCards.map((sensor, index) => (
+                <div key={index} className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
+                  <h3 className="text-sm font-medium text-gray-600 mb-3">
+                    {sensor.title}
+                  </h3>
+                  <div className="flex items-baseline space-x-1 mb-3">
+                    <span className="text-3xl font-bold text-gray-900">
+                      {sensor.value}
+                    </span>
+                    <span className="text-sm text-gray-500">{sensor.unit}</span>
                   </div>
-                  <div className="space-y-3">
-                    <div className="flex items-baseline space-x-1">
-                      <span className="text-3xl font-bold text-gray-900">
-                        {sensor.value}
+                  <div className="flex justify-between text-xs text-gray-500">
+                    <span className="flex items-center gap-2">
+                      Status
+                      <span className="bg-green-100 text-green-800 px-2 py-0.5 rounded-full font-medium">
+                        {sensor.status}
                       </span>
-                      <span className="text-sm text-gray-500">
-                        {sensor.unit}
-                      </span>
-                    </div>
-                    <div className="flex justify-between text-xs">
-                      <div className="flex items-center space-x-1">
-                        <span className="text-gray-500">Status</span>
-                        <span className="bg-green-500 text-white px-2 py-1 rounded text-xs">
-                          {sensor.status}
-                        </span>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <span className="text-gray-500">Tren</span>
-                        <span className="flex items-center">
-                          {sensor.trend.toLowerCase() === "turun" ? (
-                            <ArrowDown
-                              size={14}
-                              className="ml-1"
-                              color="#ef4444"
-                            />
-                          ) : (
-                            <ArrowUp
-                              size={14}
-                              className="ml-1"
-                              color="#22c55e"
-                            />
-                          )}
-                        </span>
-                      </div>
-                    </div>
+                    </span>
+                    <span className="flex items-center gap-1">
+                      Tren
+                      {/* KOREKSI: Logika untuk menampilkan ikon tren yang benar */}
+                      {sensor.trend === "Naik" ? (
+                        <ArrowUp size={14} className="text-green-500" />
+                      ) : sensor.trend === "Turun" ? (
+                        <ArrowDown size={14} className="text-red-500" />
+                      ) : (
+                        <Minus size={14} className="text-gray-400" />
+                      )}
+                    </span>
                   </div>
                 </div>
               ))}
             </div>
 
-            {/* Charts */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <ChartCard
-                title="Suhu Udara"
-                dataKey="temperature"
-                color="#ef4444"
-                Icon={TemperatureIcon}
-                unit="°C"
-                chartData={data}
-              />
-              <ChartCard
-                title="Kelembapan Udara"
-                dataKey="humidity"
-                color="#3b82f6"
-                Icon={HumidityIcon}
-                unit="%"
-                chartData={data}
-              />
-              <ChartCard
-                title="Intensitas Cahaya"
-                dataKey="light"
-                color="#f59e0b"
-                Icon={LightIntensityIcon}
-                unit="lux"
-                chartData={data}
-              />
-              <ChartCard
-                title="Kelembapan Media"
-                dataKey="moisture"
-                color="#10b981"
-                Icon={MoistureIcon}
-                unit="%"
-                chartData={data}
-              />
+             {/* ... (Bagian Chart dan Status Sistem & Aktuator tetap sama, hanya saja sumber datanya sudah benar) ... */}
+             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+               <ChartCard title="Suhu Udara" dataKey="temperature" color="#ef4444" Icon={TemperatureIcon} unit="°C" />
+               <ChartCard title="Kelembapan Udara" dataKey="humidity" color="#3b82f6" Icon={HumidityIcon} unit="%" />
+               <ChartCard title="Intensitas Cahaya" dataKey="light" color="#f59e0b" Icon={LightIntensityIcon} unit="lux" />
+               <ChartCard title="Kelembapan Media" dataKey="moisture" color="#10b981" Icon={MoistureIcon} unit="%" />
             </div>
-
             {/* System Status */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200">
               <div className="p-4 border-b border-gray-200">

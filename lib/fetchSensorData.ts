@@ -5,15 +5,18 @@ import {
   query,
   orderByKey,
   limitToLast,
-  get,
+  get
 } from "@/lib/firebaseConfig";
 
-interface SensorData {
-  timestamp: number;
+interface SensorValue {
   temperature: number;
   humidity: number;
   light: number;
   moisture: number;
+}
+
+export interface SensorData extends SensorValue {
+  timestamp: number;
   timeFormatted: string;
 }
 
@@ -29,14 +32,21 @@ export async function fetchSensorData(
     );
 
     const snapshot = await get(dataRef);
-    if (!snapshot.exists()) return [];
+    if (!snapshot.exists()) {
+      console.log("No sensor data found.");
+      return [];
+    }
 
     const results: SensorData[] = [];
 
     snapshot.forEach((child) => {
-      const data = child.val();
-      const formattedTime = new Date(data.timestamp * 1000).toLocaleTimeString(
-        [],
+      // 1. Ambil timestamp dari KEY, bukan dari VALUE
+      const timestamp = Number(child.key); // <-- INI KUNCI PAKE UNIX TIME
+      const data: SensorValue = child.val();
+
+      // 2. Format waktu menggunakan timestamp yang benar
+      const formattedTime = new Date(timestamp * 1000).toLocaleTimeString(
+        'en-GB',
         {
           hour: "2-digit",
           minute: "2-digit",
@@ -44,16 +54,23 @@ export async function fetchSensorData(
           hour12: false,
         }
       );
-
+      // 3. Gabungkan semua data sesuai interface SensorData
       results.push({
-        ...data,
+        timestamp: timestamp,
+        temperature: data.temperature,
+        humidity: data.humidity,
+        light: data.light,
+        moisture: data.moisture,
         timeFormatted: formattedTime,
       });
     });
 
-    return results;
+    // 4. Balik urutan array agar data terbaru berada di indeks pertama
+    return results.reverse();
+
   } catch (error) {
     console.error("Gagal mengambil data sensor:", error);
+    // Melempar kembali error
     throw error;
   }
 }
