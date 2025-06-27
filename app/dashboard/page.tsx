@@ -4,10 +4,7 @@ import { useState, useEffect, useMemo } from "react"; // KOREKSI: Tambahkan useM
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { useAuth } from "@/context/AuthContext";
-import { 
-  fetchSensorData, 
-  SensorData 
-} from "@/lib/fetchSensorData";
+import { fetchSensorData, SensorData } from "@/lib/fetchSensorData";
 import {
   fetchActuatorData,
   updateActuatorState,
@@ -36,7 +33,9 @@ export default function DashboardPage() {
   const { user } = useAuth();
   const router = useRouter();
   const [modeAuto, setModeAuto] = useState(true);
-  const [actuatorStates, setActuatorStates] = useState<ActuatorData | null>(null);
+  const [actuatorStates, setActuatorStates] = useState<ActuatorData | null>(
+    null
+  );
   const [data, setData] = useState<SensorData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -305,7 +304,10 @@ export default function DashboardPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {/* KOREKSI: Gunakan `sensorCards` hasil dari useMemo */}
               {sensorCards.map((sensor, index) => (
-                <div key={index} className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
+                <div
+                  key={index}
+                  className="bg-white rounded-lg p-4 shadow-sm border border-gray-200"
+                >
                   <h3 className="text-sm font-medium text-gray-600 mb-3">
                     {sensor.title}
                   </h3>
@@ -337,12 +339,36 @@ export default function DashboardPage() {
                 </div>
               ))}
             </div>
-             {/* ... (Bagian Chart dan Status Sistem & Aktuator tetap sama, hanya saja sumber datanya sudah benar) ... */}
-             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-               <ChartCard title="Suhu Udara" dataKey="temperature" color="#ef4444" Icon={TemperatureIcon} unit="°C" />
-               <ChartCard title="Kelembapan Udara" dataKey="humidity" color="#3b82f6" Icon={HumidityIcon} unit="%" />
-               <ChartCard title="Intensitas Cahaya" dataKey="light" color="#f59e0b" Icon={LightIntensityIcon} unit="lux" />
-               <ChartCard title="Kelembapan Media" dataKey="moisture" color="#10b981" Icon={MoistureIcon} unit="%" />
+            {/* ... (Bagian Chart dan Status Sistem & Aktuator tetap sama, hanya saja sumber datanya sudah benar) ... */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <ChartCard
+                title="Suhu Udara"
+                dataKey="temperature"
+                color="#ef4444"
+                Icon={TemperatureIcon}
+                unit="°C"
+              />
+              <ChartCard
+                title="Kelembapan Udara"
+                dataKey="humidity"
+                color="#3b82f6"
+                Icon={HumidityIcon}
+                unit="%"
+              />
+              <ChartCard
+                title="Intensitas Cahaya"
+                dataKey="light"
+                color="#f59e0b"
+                Icon={LightIntensityIcon}
+                unit="lux"
+              />
+              <ChartCard
+                title="Kelembapan Media"
+                dataKey="moisture"
+                color="#10b981"
+                Icon={MoistureIcon}
+                unit="%"
+              />
             </div>
             {/* System Status */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200">
@@ -380,35 +406,58 @@ export default function DashboardPage() {
                 </div>
               </div>
             </div>
-          {/* Actuator Status */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-            <div className="p-4 border-b border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900">
+            {/* Actuator Status */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+              <div className="p-4 border-b border-gray-200">
+                <h3 className="text-lg font-semibold text-gray-900">
                   Status Aktuator
-              </h3>
+                </h3>
+              </div>
+              <div className="p-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {[
+                    { name: "Fan", pin: "16" },
+                    { name: "Humidifier", pin: "17" },
+                    { name: "Light", pin: "18" },
+                  ].map((actuator) => (
+                    <div
+                      key={actuator.pin}
+                      className="flex flex-col items-center p-4 rounded-lg bg-gray-50 border"
+                    >
+                      <span className="text-lg font-medium text-gray-700">
+                        {actuator.name}
+                      </span>
+                      <div className="my-3">
+                        {/* Wrapper untuk Toggle */}
+                        <ToggleSwitch
+                          // Baca status 'checked' dari state, !!actuatorStates... mengubah 1->true, 0/undefined->false
+                          checked={!!actuatorStates?.[actuator.pin]}
+                          // Panggil handler dengan pinId yang sesuai saat diubah
+                          onChange={(isChecked) =>
+                            handleActuatorToggle(actuator.pin, isChecked)
+                          }
+                          // Tombol non-aktif jika data belum dimuat
+                          disabled={!actuatorStates}
+                        />
+                      </div>
+                      <span
+                        className={`px-3 py-1 text-sm font-bold rounded-full ${
+                          actuatorStates?.[actuator.pin]
+                            ? "bg-green-100 text-green-800" // Gaya untuk status ON
+                            : "bg-gray-200 text-gray-800" // Gaya untuk status OFF
+                        }`}
+                      >
+                        {
+                          actuatorStates === null
+                            ? "Loading..." // Tampilkan 'Loading...' jika data belum siap
+                            : actuatorStates?.[actuator.pin]
+                            ? "ON" // Teks jika status 1 (true)
+                            : "OFF" // Teks jika status 0 atau undefined (false)
+                        }
+                      </span>
+                    </div>
+                  ))}
                 </div>
-                  </div>
-                  <div className="p-4">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {[
-                      { name: "Fan", pin: "16" },
-                      { name: "Humidifier", pin: "17" },
-                      { name: "Light", pin: "18" },
-                    ].map((actuator) => (
-                    <div key={actuator.pin} className="flex flex-col items-center">
-                      <span className="text-gray-600 mb-2">{actuator.name}</span>
-                      <ToggleSwitch
-                      // Baca status 'checked' dari state, !!actuatorStates... mengubah 1->true, 0/undefined->false
-                      checked={!!actuatorStates?.[actuator.pin]}
-                      // Panggil handler dengan pinId yang sesuai saat diubah
-                      onChange={(isChecked) =>
-                      handleActuatorToggle(actuator.pin, isChecked)
-                      }
-                      // Tombol non-aktif jika data belum dimuat
-                     disabled={!actuatorStates}
-                    />
-                  </div>
-                ))}
               </div>
             </div>
           </main>
