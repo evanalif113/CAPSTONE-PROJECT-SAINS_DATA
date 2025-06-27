@@ -337,7 +337,6 @@ export default function DashboardPage() {
                 </div>
               ))}
             </div>
-
              {/* ... (Bagian Chart dan Status Sistem & Aktuator tetap sama, hanya saja sumber datanya sudah benar) ... */}
              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                <ChartCard title="Suhu Udara" dataKey="temperature" color="#ef4444" Icon={TemperatureIcon} unit="°C" />
@@ -381,37 +380,36 @@ export default function DashboardPage() {
                 </div>
               </div>
             </div>
-
-            {/* Actuator Status */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-              <div className="p-4 border-b border-gray-200">
-                <h3 className="text-lg font-semibold text-gray-900">
+          {/* Actuator Status */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div className="p-4 border-b border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-900">
                   Status Aktuator
-                </h3>
+              </h3>
+                </div>
                   </div>
-                    </div>
-                    <div className="p-4">
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        {[
-                          { name: "Fan", pin: "16" },
-                          { name: "Humidifier", pin: "17" },
-                          { name: "Light", pin: "18" },
-                        ].map((actuator) => (
-                          <div key={actuator.pin} className="flex flex-col items-center">
-                            <span className="text-gray-600 mb-2">{actuator.name}</span>
-                            <ToggleSwitch
-                              // Baca status 'checked' dari state, !!actuatorStates... mengubah 1->true, 0/undefined->false
-                              checked={!!actuatorStates?.[actuator.pin]}
-                              // Panggil handler dengan pinId yang sesuai saat diubah
-                              onChange={(isChecked) =>
-                                handleActuatorToggle(actuator.pin, isChecked)
-                              }
-                              // Tombol non-aktif jika data belum dimuat
-                              disabled={!actuatorStates}
-                            />
-                          </div>
-                        ))}
-                      </div>
+                  <div className="p-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {[
+                      { name: "Fan", pin: "16" },
+                      { name: "Humidifier", pin: "17" },
+                      { name: "Light", pin: "18" },
+                    ].map((actuator) => (
+                    <div key={actuator.pin} className="flex flex-col items-center">
+                      <span className="text-gray-600 mb-2">{actuator.name}</span>
+                      <ToggleSwitch
+                      // Baca status 'checked' dari state, !!actuatorStates... mengubah 1->true, 0/undefined->false
+                      checked={!!actuatorStates?.[actuator.pin]}
+                      // Panggil handler dengan pinId yang sesuai saat diubah
+                      onChange={(isChecked) =>
+                      handleActuatorToggle(actuator.pin, isChecked)
+                      }
+                      // Tombol non-aktif jika data belum dimuat
+                     disabled={!actuatorStates}
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
           </main>
         </div>
