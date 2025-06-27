@@ -4,13 +4,19 @@ import { useState, useEffect, useMemo } from "react"; // KOREKSI: Tambahkan useM
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { useAuth } from "@/context/AuthContext";
-// KOREKSI: Impor tipe data SensorData dari sumber aslinya
-import { fetchSensorData, SensorData } from "@/lib/fetchSensorData";
+import { 
+  fetchSensorData, 
+  SensorData 
+} from "@/lib/fetchSensorData";
+import {
+  fetchActuatorData,
+  updateActuatorState,
+  ActuatorData,
+} from "@/lib/fetchActuatorData";
 import AppHeader from "@/components/AppHeader";
 import Sidebar from "@/components/Sidebar";
 import { getNavItems } from "@/components/navItems";
 import {
-  RefreshIcon,
   TemperatureIcon,
   HumidityIcon,
   LightIntensityIcon,
@@ -30,18 +36,14 @@ export default function DashboardPage() {
   const { user } = useAuth();
   const router = useRouter();
   const [modeAuto, setModeAuto] = useState(true);
-  const [fanEnabled, setFanEnabled] = useState(false);
-  const [humidifierEnabled, setHumidifierEnabled] = useState(false);
-  const [lightEnabled, setLightEnabled] = useState(false);
-
-  // KOREKSI: Gunakan tipe data SensorData yang diimpor
+  const [actuatorStates, setActuatorStates] = useState<ActuatorData | null>(null);
   const [data, setData] = useState<SensorData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const intervalData = 60;
 
-  const loadData = async () => {
+  const loadSensorData = async () => {
     if (!user) return;
     // Hindari setLoading(true) pada refresh interval agar UI tidak berkedip
     // setLoading akan true hanya pada pemuatan awal
@@ -57,11 +59,26 @@ export default function DashboardPage() {
     }
   };
 
+  const loadActuatorData = async () => {
+    if (!user) return;
+    try {
+      const result = await fetchActuatorData(user.uid);
+      if (result) {
+        setActuatorStates(result);
+      }
+    } catch (err) {
+      // Anda bisa menambahkan state error spesifik untuk aktuator jika perlu
+      console.error("Gagal memuat data aktuator:", err);
+      setError((prevError) => prevError || "Gagal memuat status aktuator");
+    }
+  };
+
   useEffect(() => {
     if (user) {
       setLoading(true); // Set loading hanya sekali saat user pertama kali ada
-      loadData();
-      const interval = setInterval(loadData, 10000); // 10 detik polling
+      loadActuatorData();
+      loadSensorData();
+      const interval = setInterval(loadSensorData, 10000); // 10 detik polling
       return () => clearInterval(interval);
     }
   }, [user]);
@@ -214,6 +231,33 @@ export default function DashboardPage() {
       </div>
     );
   };
+
+  const handleActuatorToggle = async (pinId: string, checked: boolean) => {
+    if (!user || !actuatorStates) return;
+
+    const newState = checked ? 1 : 0;
+    const oldStates = { ...actuatorStates }; // Simpan state lama untuk rollback
+
+    // 1. Pembaruan UI Optimis: Langsung ubah state lokal agar UI responsif
+    setActuatorStates((prev) => {
+      if (!prev) return null;
+      return {
+        ...prev,
+        [pinId]: newState,
+      };
+    });
+
+    try {
+      // 2. Kirim pembaruan ke Firebase
+      await updateActuatorState(user.uid, pinId, newState);
+    } catch (error) {
+      // 3. Jika gagal, kembalikan UI ke state sebelumnya (rollback)
+      console.error("Gagal update aktuator, mengembalikan state.");
+      setActuatorStates(oldStates);
+      // Tampilkan notifikasi error ke pengguna jika perlu
+    }
+  };
+
   // ToggleSwitch tetap
   const ToggleSwitch = ({
     checked,
@@ -344,32 +388,30 @@ export default function DashboardPage() {
                 <h3 className="text-lg font-semibold text-gray-900">
                   Status Aktuator
                 </h3>
-              </div>
-              <div className="p-4">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="flex flex-col items-center">
-                    <span className="text-gray-600 mb-2">Fan</span>
-                    <ToggleSwitch
-                      checked={fanEnabled}
-                      onChange={setFanEnabled}
-                    />
                   </div>
-                  <div className="flex flex-col items-center">
-                    <span className="text-gray-600 mb-2">Humidifier</span>
-                    <ToggleSwitch
-                      checked={humidifierEnabled}
-                      onChange={setHumidifierEnabled}
-                    />
-                  </div>
-                  <div className="flex flex-col items-center">
-                    <span className="text-gray-600 mb-2">Light</span>
-                    <ToggleSwitch
-                      checked={lightEnabled}
-                      onChange={setLightEnabled}
-                    />
-                  </div>
-                </div>
-              </div>
+                    </div>
+                    <div className="p-4">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {[
+                          { name: "Fan", pin: "16" },
+                          { name: "Humidifier", pin: "17" },
+                          { name: "Light", pin: "18" },
+                        ].map((actuator) => (
+                          <div key={actuator.pin} className="flex flex-col items-center">
+                            <span className="text-gray-600 mb-2">{actuator.name}</span>
+                            <ToggleSwitch
+                              // Baca status 'checked' dari state, !!actuatorStates... mengubah 1->true, 0/undefined->false
+                              checked={!!actuatorStates?.[actuator.pin]}
+                              // Panggil handler dengan pinId yang sesuai saat diubah
+                              onChange={(isChecked) =>
+                                handleActuatorToggle(actuator.pin, isChecked)
+                              }
+                              // Tombol non-aktif jika data belum dimuat
+                              disabled={!actuatorStates}
+                            />
+                          </div>
+                        ))}
+                      </div>
             </div>
           </main>
         </div>

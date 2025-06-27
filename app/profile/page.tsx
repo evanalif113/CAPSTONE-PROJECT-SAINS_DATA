@@ -12,21 +12,21 @@ import {
   updatePassword,
   reauthenticateWithCredential,
   EmailAuthProvider,
-} from "firebase/auth";
+}from "firebase/auth";
 import { EditIcon, SaveIcon, CancelIcon } from "@/components/Icon"; // Asumsi Icon ada
 
 
 export default function ProfilePage() {
   // 1. PERBAIKAN: Gunakan hooks dan state yang relevan
-  const { user, loading, logout } = useAuth();
   const navItems = getNavItems("/profile");
 
+  const { user, loading, logout } = useAuth();
   const [activeTab, setActiveTab] = useState("Personal Information");
   const [isEditing, setIsEditing] = useState(false);
 
   // State untuk form edit profil
   const [displayName, setDisplayName] = useState("");
-  const [photoURL, setPhotoURL] = useState(""); // Meskipun tidak ada di UI, ini polanya
+  const [photoURL, setPhotoURL] = useState("");
 
   // State untuk form ubah password
   const [currentPassword, setCurrentPassword] = useState("");
