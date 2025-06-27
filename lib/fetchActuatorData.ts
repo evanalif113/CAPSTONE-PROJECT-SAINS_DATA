@@ -3,7 +3,7 @@ import {
   database,
   ref,
   get,
-    set // Kita menggunakan 'update' untuk mengubah data spesifik
+  set // Kita menggunakan 'update' untuk mengubah data spesifik
 } from "@/lib/firebaseConfig";
 
 /**
