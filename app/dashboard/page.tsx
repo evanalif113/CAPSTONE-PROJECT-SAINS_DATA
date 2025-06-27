@@ -19,7 +19,7 @@ import { ArrowUp, ArrowDown } from "lucide-react";
 import ProtectedRoute from "@/components/ProtectedRoute";
 
 const navItems = getNavItems("/");
-const Plot = dynamic(() => import("react-plotly.js"), { ssr: true });
+const Plot = dynamic(() => import("react-plotly.js"), { ssr: false });
 
 // Tipe union untuk key sensor
 type SensorKey = "temperature" | "humidity" | "light" | "moisture";
