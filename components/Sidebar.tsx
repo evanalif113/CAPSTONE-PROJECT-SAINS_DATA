@@ -20,7 +20,7 @@ const Sidebar: React.FC = () => {
 
   return (
     <>
-      {/* Overlay untuk mobile */}
+      {/* Overlay untuk mobile, ini sudah benar */}
       <div
         role="button"
         tabIndex={0}
@@ -33,18 +33,21 @@ const Sidebar: React.FC = () => {
         )}
       />
 
-      {/* Sidebar */}
+      {/* Kontainer Sidebar */}
       <aside
         className={cn(
-          "fixed top-0 left-0 z-40 flex h-full w-64 flex-col bg-slate-800 text-white shadow-xl transition-transform lg:relative lg:w-20 lg:translate-x-0 lg:shadow-none",
+          "fixed top-0 left-0 z-40 flex h-full w-64 flex-col bg-slate-800 text-white transition-transform duration-300 ease-in-out",
+          // Perilaku di Desktop: Selalu terlihat, tidak bergeser, dan lebarnya 64
+          "lg:relative lg:translate-x-0 lg:w-64",
+          // Perilaku di Mobile: Bergeser berdasarkan state
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
-        <div className="flex h-16 shrink-0 items-center justify-center border-b border-slate-700">
+        <div className="flex h-16 shrink-0 items-center justify-center border-b border-slate-700 px-4">
           <img
             src="/img/icon.png"
             alt="Logo Kumbung Sense"
-            className="w-10 h-10 rounded-full object-cover"
+            className="h-10 w-10 rounded-full object-cover"
           />
         </div>
         <nav className="flex-1 space-y-2 overflow-y-auto p-2">
@@ -54,19 +57,19 @@ const Sidebar: React.FC = () => {
               href={item.href}
               onClick={closeSidebar}
               className={cn(
-                "flex flex-col items-center rounded-lg p-2 text-center transition-colors lg:h-16 lg:justify-center",
+                "flex items-center gap-4 rounded-lg p-3 text-left font-medium transition-colors", // Menggunakan gap-4 untuk jarak yang konsisten
                 item.active
-                  ? "bg-slate-900 text-white shadow-inner"
+                  ? "bg-slate-900 text-white"
                   : "text-slate-400 hover:bg-slate-700 hover:text-white"
               )}
               aria-current={item.active ? "page" : undefined}
             >
-              <item.icon className="h-6 w-6" />
-              <span className="mt-1 text-xs">{item.name}</span>
+              <item.icon className="h-6 w-6 shrink-0" />
+              {/* Perbaikan Kunci ada di sini */}
+              <span className="whitespace-nowrap">{item.name}</span>
             </Link>
           ))}
         </nav>
-        <div className="flex-1"></div>
       </aside>
     </>
   );
