@@ -1,19 +1,14 @@
 import React from "react";
-import { 
-  LogOut 
-} from "lucide-react";
+import { Menu, LogOut } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
+import { useUI } from "@/context/UIContext";
 
 const AppHeader: React.FC = () => {
+  const { toggleSidebar } = useUI();
+  const { logout, user, loading } = useAuth();
 
-const { 
-  logout,
-  user,
-  loading 
-} = useAuth();
-
-const router = useRouter();
+  const router = useRouter();
 
   const handleLogout = async () => {
     console.log("Mencoba untuk logout...");
@@ -26,6 +21,9 @@ const router = useRouter();
     <header className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
       <div className="flex items-center space-x-4">
         {/* Ganti logo lama dengan img logo */}
+        <button onClick={toggleSidebar}>
+          <Menu />
+        </button>
         <img
           src="/img/icon.png"
           alt="Logo Kumbung Sense"
@@ -50,8 +48,9 @@ const router = useRouter();
           onClick={handleLogout}
           className="p-2 bg-red-600 hover:bg-red-700 text-white rounded-full transition-colors"
           title="Logout"
-          aria-label="Logout">
-          <LogOut/>
+          aria-label="Logout"
+        >
+          <LogOut />
         </button>
       </div>
     </header>
