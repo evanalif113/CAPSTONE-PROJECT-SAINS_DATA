@@ -3,7 +3,7 @@ import {
   database,
   ref,
   get,
-  set // Kita menggunakan 'update' untuk mengubah data spesifik
+  update, // Kita menggunakan 'update' untuk mengubah data spesifik
 } from "@/lib/firebaseConfig";
 
 /**
@@ -54,7 +54,7 @@ export async function updateActuatorState(
 ): Promise<void> {
   try {
     const dataRef = ref(database, `${userId}/aktuator/data`);
-    
+
     // Objek 'updates' menentukan path spesifik yang akan diubah.
     // Kunci dinamis [actuatorId] akan menjadi "16", "17", dll.
     const updates = {
@@ -63,9 +63,8 @@ export async function updateActuatorState(
 
     // Fungsi 'update' hanya akan mengubah field yang ada di dalam objek 'updates',
     // tanpa mempengaruhi data aktuator lainnya.
-    await set(dataRef, updates);
+    await update(dataRef, updates);
     console.log(`Status aktuator ${PinId} berhasil diubah menjadi ${newState}`);
-    
   } catch (error) {
     console.error(`Gagal mengubah status aktuator ${PinId}:`, error);
     throw error;

@@ -1,7 +1,25 @@
 // Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app"
-import { getDatabase, ref, query, orderByKey, limitToLast, get, set, onValue, off, startAt, endAt} from "firebase/database"
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "firebase/auth"
+import { initializeApp } from "firebase/app";
+import {
+  getDatabase,
+  ref,
+  query,
+  orderByKey,
+  limitToLast,
+  get,
+  set,
+  onValue,
+  off,
+  startAt,
+  endAt,
+  update,
+} from "firebase/database";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+} from "firebase/auth";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -11,12 +29,13 @@ import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, si
 const firebaseConfig = {
   apiKey: "AIzaSyD14wZkvP46yP3jQAwzUBOSh9kf8m-7vwg",
   authDomain: "kumbung-sense.firebaseapp.com",
-  databaseURL: "https://kumbung-sense-default-rtdb.asia-southeast1.firebasedatabase.app",
+  databaseURL:
+    "https://kumbung-sense-default-rtdb.asia-southeast1.firebasedatabase.app",
   projectId: "kumbung-sense",
   storageBucket: "kumbung-sense.firebasestorage.app",
   messagingSenderId: "845687946504",
   appId: "1:845687946504:web:3540585e9d68d4ec2d40bd",
-  measurementId: "G-F9H5CQQ24V"
+  measurementId: "G-F9H5CQQ24V",
 };
 
 // Initialize Firebase
@@ -37,6 +56,7 @@ export {
   endAt,
   auth,
   set,
+  update,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
