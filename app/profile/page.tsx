@@ -116,8 +116,7 @@ export default function ProfilePage() {
   return (
     <ProtectedRoute>
       <div className="flex min-h-screen bg-gray-50">
-        <Sidebar navItems={navItems} />
-
+        <Sidebar/>
         <div className="flex-1 flex flex-col">
           {/* 5. PERBAIKAN: Gunakan fungsi `logout` langsung dari context */}
           <AppHeader/>
