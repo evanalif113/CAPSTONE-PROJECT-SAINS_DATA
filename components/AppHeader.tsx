@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import { Menu, LogOut } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
@@ -21,7 +23,11 @@ const AppHeader: React.FC = () => {
     <header className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
       <div className="flex items-center space-x-4">
         {/* Ganti logo lama dengan img logo */}
-        <button onClick={toggleSidebar}>
+        <button
+          onClick={toggleSidebar}
+          className="p-2 text-gray-600 rounded-md hover:bg-gray-100 lg:hidden"
+          aria-label="Buka sidebar"
+        >
           <Menu />
         </button>
         <img
