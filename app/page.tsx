@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 export default function Home() {
   const router = useRouter();
   useEffect(() => {
-    router.replace("/authentication"); // Redirect to the login page
+    router.push("/authentication"); // Redirect to the login page
   }, [router]);
   return null;
 }
