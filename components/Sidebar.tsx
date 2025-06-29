@@ -67,7 +67,6 @@ const Sidebar: React.FC = () => {
             </Link>
           ))}
         </nav>
-        {/* <div className="flex-1"></div> <-- BARIS INI SUDAH DIHAPUS */}
       </aside>
     </>
   );

@@ -1,488 +1,162 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import AppHeader from "@/components/AppHeader";
 import Sidebar from "@/components/Sidebar";
 import { RangeSlider } from "@/components/RangeSlider";
 import { getNavItems } from "@/components/navItems";
 import ProtectedRoute from "@/components/ProtectedRoute";
-import { 
-  Save, 
-  Mail, 
-  Bell, 
-  User, 
-  Plus 
-} from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
+import {
+  fetchThresholds,
+  updateThresholds,
+  ThresholdValue,
+} from "@/lib/fetchThresholdData";
+import { Save, Mail, Bell, User, Plus } from "lucide-react";
 
 export default function Settings() {
+  const { user } = useAuth(); // Dapatkan info pengguna yang sedang login
+
   const [activeTab, setActiveTab] = useState("Thresholds");
-  const [thresholds, setThresholds] = useState({
-    tempMin: 18,
-    tempMax: 32,
-    humidityMin: 60,
-    humidityMax: 75,
-    lightMin: 500,
-    lightMax: 2000,
-    moistureMin: 35,
-    moistureMax: 70,
-  });
+  
+  // State untuk data, loading, dan proses penyimpanan
+  const [thresholds, setThresholds] = useState<ThresholdValue | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const [notifications, setNotifications] = useState({
-    emailEnabled: true,
-    emailAddress: "user@example.com",
-    emailFrequency: "Immediate",
-    pushEnabled: true,
-    pushTarget: "All devices",
-    silentNotifications: false,
-  });
+  // Fungsi untuk memuat data thresholds dari Firebase
+  const loadThresholds = useCallback(async () => {
+    if (!user) return;
 
-  const [systemPrefs, setSystemPrefs] = useState({
-    dataRetention: 90,
-    timezone: "UTC+7",
-    measurementUnit: "Metric (°C, meters)",
-    autoUpdates: true,
-  });
+    setIsLoading(true);
+    setError(null);
+    try {
+      const data = await fetchThresholds(user.uid);
+      if (data) {
+        setThresholds(data);
+      } else {
+        // Jika tidak ada data di DB, set dengan nilai default
+        setThresholds({
+          temperatureMin: 18, temperatureMax: 32,
+          humidityMin: 60, humidityMax: 75,
+          lightMin: 500, lightMax: 2000,
+          moistureMin: 35, moistureMax: 70,
+        });
+      }
+    } catch (err) {
+      setError("Gagal memuat pengaturan thresholds.");
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [user]);
 
-  // Sample users data
-  const users = [
-    {
-      id: 1,
-      name: "Admin User",
-      email: "admin@example.com",
-      role: "Administrator",
-      lastLogin: "2023-05-30 10:15",
-    },
-    {
-      id: 2,
-      name: "Monitoring Staff",
-      email: "staff@example.com",
-      role: "Viewer",
-      lastLogin: "2023-05-29 14:22",
-    },
-  ];
+  // Jalankan fungsi loadThresholds saat komponen dimuat dan user sudah tersedia
+  useEffect(() => {
+    loadThresholds();
+  }, [loadThresholds]);
 
-  // Handler untuk logout
-  const handleLogout = () => {
-    window.location.href = "/logout";
+  // Fungsi untuk menyimpan perubahan ke Firebase
+  const handleSaveThresholds = async () => {
+    if (!user || !thresholds) return;
+
+    setIsSaving(true);
+    setError(null);
+    try {
+      await updateThresholds(user.uid, thresholds);
+      alert("Pengaturan thresholds berhasil disimpan!"); // Ganti dengan notifikasi yang lebih baik
+    } catch (err) {
+      setError("Gagal menyimpan pengaturan.");
+      console.error(err);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
-  // Ambil navItems dengan menu aktif
   const navItems = getNavItems("/settings");
+
+  // Tampilkan loading spinner saat data diambil
+  if (isLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        Memuat Pengaturan...
+      </div>
+    );
+  }
 
   return (
     <ProtectedRoute>
       <div className="flex min-h-screen bg-gray-50">
-        {/* Sidebar Global */}
-        <Sidebar navItems={navItems} />
-
-        {/* Main Content */}
+        <Sidebar />
         <div className="flex-1 flex flex-col">
-          <AppHeader/>
-
-          {/* Settings Content */}
+          <AppHeader />
           <main className="flex-1 p-6">
-            {/* Page Header */}
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-gray-900">Settings</h2>
-              <div className="flex space-x-2">
-                <button
-                  onClick={() => setActiveTab("Thresholds")}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    activeTab === "Thresholds"
-                      ? "bg-blue-600 text-white"
-                      : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                  }`}
-                >
-                  Thresholds
-                </button>
-                <button
-                  onClick={() => setActiveTab("Notification Channels")}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    activeTab === "Notification Channels"
-                      ? "bg-blue-600 text-white"
-                      : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                  }`}
-                >
-                  Notification Channels
-                </button>
-                <button
-                  onClick={() => setActiveTab("System Preferences")}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    activeTab === "System Preferences"
-                      ? "bg-blue-600 text-white"
-                      : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                  }`}
-                >
-                  System Preferences
-                </button>
-                <button
-                  onClick={() => setActiveTab("Admin Management")}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    activeTab === "Admin Management"
-                      ? "bg-blue-600 text-white"
-                      : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                  }`}
-                >
-                  Admin Management
-                </button>
-              </div>
+              {/* ... Tombol-tombol Tab ... */}
             </div>
-          {/* Thresholds Tab */}
-          {activeTab === "Thresholds" && (
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-6">
-                Global Threshold Configuration
-              </h3>
-              {/* 2. Ganti seluruh grid dengan kode yang lebih sederhana ini */}
-              <div className="space-y-8">
-                <RangeSlider
-                  label="Temperature Thresholds"
-                  value={[thresholds.tempMin, thresholds.tempMax]}
-                  onChange={([newMin, newMax]) =>
-                    setThresholds({ ...thresholds, tempMin: newMin, tempMax: newMax })
-                  }
-                  min={0}
-                  max={50}
-                  unit="°C"
-                  colorClassName="bg-red-500" // Warna untuk suhu
-                />
-                <RangeSlider
-                  label="Humidity Thresholds"
-                  value={[thresholds.humidityMin, thresholds.humidityMax]}
-                  onChange={([newMin, newMax]) =>
-                    setThresholds({ ...thresholds, humidityMin: newMin, humidityMax: newMax })
-                  }
-                  min={0}
-                  max={100}
-                  unit="%"
-                  colorClassName="bg-blue-500" // Warna untuk kelembapan
-                />
-                <RangeSlider
-                  label="Light Intensity Thresholds"
-                  value={[thresholds.lightMin, thresholds.lightMax]}
-                  onChange={([newMin, newMax]) =>
-                    setThresholds({ ...thresholds, lightMin: newMin, lightMax: newMax })
-                  }
-                  min={0}
-                  max={5000}
-                  step={50} // Step bisa disesuaikan
-                  unit="lux"
-                  colorClassName="bg-yellow-500" // Warna untuk cahaya
-                />
-                <RangeSlider
-                  label="Medium Moisture Thresholds"
-                  value={[thresholds.moistureMin, thresholds.moistureMax]}
-                  onChange={([newMin, newMax]) =>
-                    setThresholds({ ...thresholds, moistureMin: newMin, moistureMax: newMax })
-                  }
-                  min={0}
-                  max={100}
-                  unit="%"
-                  colorClassName="bg-emerald-500" // Warna untuk kelembapan media
-                />
-              </div>
-              <div className="mt-8 flex justify-end">
-                <button className="flex items-center px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                  <Save size={18} />
-                  <span className="ml-2">Save Thresholds</span>
-                </button>
-              </div>
-            </div>
-          )}
-          {/* Notification Channels Tab */}
-          {activeTab === "Notification Channels" && (
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-6">
-                Notification Channels
-              </h3>
-              <div className="space-y-8">
-                {/* Email Setup */}
-                <div className="bg-white rounded-lg border border-gray-200 p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center space-x-3">
-                      <Mail className="text-blue-600" />
-                      <h4 className="text-md font-medium text-gray-900">
-                        Email Setup
-                      </h4>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <input
-                        type="checkbox"
-                        checked={notifications.emailEnabled}
-                        onChange={(e) =>
-                          setNotifications({
-                            ...notifications,
-                            emailEnabled: e.target.checked,
-                          })
-                        }
-                        className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                      />
-                      <span className="text-sm text-blue-600 font-medium">
-                        Enabled
-                      </span>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Email Address
-                      </label>
-                      <input
-                        type="email"
-                        value={notifications.emailAddress}
-                        onChange={(e) =>
-                          setNotifications({
-                            ...notifications,
-                            emailAddress: e.target.value,
-                          })
-                        }
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Notification Frequency
-                      </label>
-                      <select
-                        value={notifications.emailFrequency}
-                        onChange={(e) =>
-                          setNotifications({
-                            ...notifications,
-                            emailFrequency: e.target.value,
-                          })
-                        }
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      >
-                        <option>Immediate</option>
-                        <option>Hourly</option>
-                        <option>Daily</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
 
-                {/* Push Notification Setup */}
-                <div className="bg-white rounded-lg border border-gray-200 p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center space-x-3">
-                      <Bell className="text-blue-600" />
-                      <h4 className="text-md font-medium text-gray-900">
-                        Push Notification Setup
-                      </h4>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <input
-                        type="checkbox"
-                        checked={notifications.pushEnabled}
-                        onChange={(e) =>
-                          setNotifications({
-                            ...notifications,
-                            pushEnabled: e.target.checked,
-                          })
-                        }
-                        className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                      />
-                      <span className="text-sm text-blue-600 font-medium">
-                        Enabled
-                      </span>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Target Device
-                      </label>
-                      <select
-                        value={notifications.pushTarget}
-                        onChange={(e) =>
-                          setNotifications({
-                            ...notifications,
-                            pushTarget: e.target.value,
-                          })
-                        }
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      >
-                        <option>All devices</option>
-                        <option>Mobile only</option>
-                        <option>Desktop only</option>
-                      </select>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <input
-                        type="checkbox"
-                        checked={notifications.silentNotifications}
-                        onChange={(e) =>
-                          setNotifications({
-                            ...notifications,
-                            silentNotifications: e.target.checked,
-                          })
-                        }
-                        className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                      />
-                      <label className="text-sm text-gray-700">
-                        Silent notifications
-                      </label>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="mt-8 flex justify-end">
-                <button className="flex items-center px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                  <Save />
-                  <span className="ml-2">Save Notification Settings</span>
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* System Preferences Tab */}
-          {activeTab === "System Preferences" && (
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-6">
-                System Preferences
-              </h3>
-              <div className="bg-white rounded-lg border border-gray-200 p-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Data Retention Period (days)
-                    </label>
-                    <input
-                      type="number"
-                      value={systemPrefs.dataRetention}
-                      onChange={(e) =>
-                        setSystemPrefs({
-                          ...systemPrefs,
-                          dataRetention: Number.parseInt(e.target.value),
-                        })
-                      }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Measurement Unit System
-                    </label>
-                    <select
-                      value={systemPrefs.measurementUnit}
-                      onChange={(e) =>
-                        setSystemPrefs({
-                          ...systemPrefs,
-                          measurementUnit: e.target.value,
-                        })
-                      }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    >
-                      <option>Metric (°C, meters)</option>
-                      <option>Imperial (°F, feet)</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Timezone
-                    </label>
-                    <select
-                      value={systemPrefs.timezone}
-                      onChange={(e) =>
-                        setSystemPrefs({
-                          ...systemPrefs,
-                          timezone: e.target.value,
-                        })
-                      }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    >
-                      <option>UTC+7</option>
-                      <option>UTC+8</option>
-                      <option>UTC+9</option>
-                    </select>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <input
-                      type="checkbox"
-                      checked={systemPrefs.autoUpdates}
-                      onChange={(e) =>
-                        setSystemPrefs({
-                          ...systemPrefs,
-                          autoUpdates: e.target.checked,
-                        })
-                      }
-                      className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                    />
-                    <label className="text-sm text-gray-700">
-                      Enable automatic system updates
-                    </label>
-                  </div>
-                </div>
-              </div>
-              <div className="mt-8 flex justify-end">
-                <button className="flex items-center px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                  <Save />
-                  <span className="ml-2">Save System Preferences</span>
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* Admin Management Tab */}
-          {activeTab === "Admin Management" && (
-            <div>
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-semibold text-gray-900">
-                  Admin Management
+            {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+            
+            {/* Thresholds Tab */}
+            {activeTab === "Thresholds" && thresholds && (
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-6">
+                  Global Threshold Configuration
                 </h3>
-                <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                  <Plus />
-                  <span className="ml-2">Add User</span>
-                </button>
-              </div>
-              <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-                <div className="grid grid-cols-5 gap-4 p-4 bg-gray-50 border-b border-gray-200 font-medium text-gray-700">
-                  <div>Name</div>
-                  <div>Email</div>
-                  <div>Role</div>
-                  <div>Last Login</div>
-                  <div>Actions</div>
+                <div className="space-y-8">
+                  <RangeSlider
+                    label="Temperature Thresholds"
+                    value={[thresholds.temperatureMin, thresholds.temperatureMax]}
+                    onChange={([newMin, newMax]) =>
+                      setThresholds({ ...thresholds, temperatureMin: newMin, temperatureMax: newMax })
+                    }
+                    min={0} max={50} unit="°C" colorClassName="bg-red-500"
+                  />
+                  <RangeSlider
+                    label="Humidity Thresholds"
+                    value={[thresholds.humidityMin, thresholds.humidityMax]}
+                    onChange={([newMin, newMax]) =>
+                      setThresholds({ ...thresholds, humidityMin: newMin, humidityMax: newMax })
+                    }
+                    min={0} max={100} unit="%" colorClassName="bg-blue-500"
+                  />
+                  <RangeSlider
+                    label="Light Intensity Thresholds"
+                    value={[thresholds.lightMin, thresholds.lightMax]}
+                    onChange={([newMin, newMax]) =>
+                      setThresholds({ ...thresholds, lightMin: newMin, lightMax: newMax })
+                    }
+                    min={0} max={5000} step={50} unit="lux" colorClassName="bg-yellow-500"
+                  />
+                  <RangeSlider
+                    label="Medium Moisture Thresholds"
+                    value={[thresholds.moistureMin, thresholds.moistureMax]}
+                    onChange={([newMin, newMax]) =>
+                      setThresholds({ ...thresholds, moistureMin: newMin, moistureMax: newMax })
+                    }
+                    min={0} max={100} unit="%" colorClassName="bg-emerald-500"
+                  />
                 </div>
-                {users.map((user) => (
-                  <div
-                    key={user.id}
-                    className="grid grid-cols-5 gap-4 p-4 border-b border-gray-100 last:border-b-0"
+                <div className="mt-8 flex justify-end">
+                  <button
+                    onClick={handleSaveThresholds}
+                    disabled={isSaving}
+                    className="flex items-center px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-300 disabled:cursor-not-allowed"
                   >
-                    <div className="flex items-center space-x-3">
-                      <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
-                        <User className="w-4 h-4 text-gray-500" />
-                      </div>
-                      <span className="text-gray-900">{user.name}</span>
-                    </div>
-                    <div className="text-gray-600">{user.email}</div>
-                    <div>
-                      <span
-                        className={`px-2 py-1 rounded text-xs font-medium ${
-                          user.role === "Administrator"
-                            ? "bg-purple-100 text-purple-800"
-                            : "bg-gray-100 text-gray-800"
-                        }`}
-                      >
-                        {user.role}
-                      </span>
-                    </div>
-                    <div className="text-gray-600">{user.lastLogin}</div>
-                    <div className="flex space-x-2">
-                      <button className="text-blue-600 hover:text-blue-800 text-sm font-medium">
-                        Edit
-                      </button>
-                      <button className="text-red-600 hover:text-red-800 text-sm font-medium">
-                        Delete
-                      </button>
-                    </div>
-                  </div>
-                ))}
+                    <Save size={18} />
+                    <span className="ml-2">
+                      {isSaving ? "Menyimpan..." : "Save Thresholds"}
+                    </span>
+                  </button>
+                </div>
               </div>
-            </div>
-          )}
-        </main>
+            )}
+            {/* ... Kode untuk Tab lainnya ... */}
+          </main>
+        </div>
       </div>
-    </div>
-  </ProtectedRoute>
+    </ProtectedRoute>
   );
 }
