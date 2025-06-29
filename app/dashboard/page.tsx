@@ -25,8 +25,6 @@ const Plot = dynamic(() => import("react-plotly.js"), { ssr: false });
 
 type SensorKey = "temperature" | "humidity" | "light" | "moisture";
 
-// Hapus interface SensorDatum karena kita sudah impor SensorData
-
 export default function DashboardPage() {
   const { user } = useAuth();
   const router = useRouter();
@@ -192,7 +190,7 @@ export default function DashboardPage() {
                 type: "scatter",
                 mode: "lines+markers",
                 marker: { color },
-                line: { color, width: 3 },
+                line: { color, width: 2.5 },
                 name: title,
               },
             ]}
