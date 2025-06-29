@@ -234,7 +234,8 @@ export default function DashboardPage() {
   const handleActuatorToggle = async (pinId: string, checked: boolean) => {
     if (!user || !actuatorStates) return;
 
-    const newState = checked ? 1 : 0;
+    // UBAH LOGIKA: checked (ON) = 0, unchecked (OFF) = 1
+    const newState = checked ? 0 : 1;
     const oldStates = { ...actuatorStates }; // Simpan state lama untuk rollback
 
     // 1. Pembaruan UI Optimis: Langsung ubah state lokal agar UI responsif
@@ -430,29 +431,30 @@ export default function DashboardPage() {
                       <div className="my-3">
                         {/* Wrapper untuk Toggle */}
                         <ToggleSwitch
-                          // Baca status 'checked' dari state, !!actuatorStates... mengubah 1->true, 0/undefined->false
-                          checked={!!actuatorStates?.[actuator.pin]}
+                          // UBAH LOGIKA: Toggle 'checked' jika state adalah 0 (ON)
+                          checked={actuatorStates?.[actuator.pin] === 0}
                           // Panggil handler dengan pinId yang sesuai saat diubah
                           onChange={(isChecked) =>
                             handleActuatorToggle(actuator.pin, isChecked)
                           }
                           // Tombol non-aktif jika data belum dimuat
-                          disabled={!actuatorStates}
+                          disabled={actuatorStates === null}
                         />
                       </div>
                       <span
                         className={`px-3 py-1 text-sm font-bold rounded-full ${
-                          actuatorStates?.[actuator.pin]
+                          // UBAH LOGIKA: Gaya ON jika state adalah 0
+                          actuatorStates?.[actuator.pin] === 0
                             ? "bg-green-100 text-green-800" // Gaya untuk status ON
                             : "bg-gray-200 text-gray-800" // Gaya untuk status OFF
                         }`}
                       >
-                        {
-                          actuatorStates === null
-                            ? "Loading..." // Tampilkan 'Loading...' jika data belum siap
-                            : actuatorStates?.[actuator.pin]
-                            ? "ON" // Teks jika status 1 (true)
-                            : "OFF" // Teks jika status 0 atau undefined (false)
+                        {actuatorStates === null
+                          ? "Loading..." // Tampilkan 'Loading...' jika data belum siap
+                          // UBAH LOGIKA: Tampilkan ON jika state adalah 0
+                          : actuatorStates?.[actuator.pin] === 0
+                          ? "ON" // Teks jika status 0
+                          : "OFF" // Teks jika status 1
                         }
                       </span>
                     </div>
