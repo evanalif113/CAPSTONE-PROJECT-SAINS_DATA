@@ -4,7 +4,6 @@
 import { useState, useEffect, FormEvent } from "react";
 import AppHeader from "@/components/AppHeader";
 import Sidebar from "@/components/Sidebar";
-import { getNavItems } from "@/components/navItems";
 import { useAuth } from "@/context/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import {
@@ -17,9 +16,6 @@ import { EditIcon, SaveIcon, CancelIcon } from "@/components/Icon"; // Asumsi Ic
 
 
 export default function ProfilePage() {
-  // 1. PERBAIKAN: Gunakan hooks dan state yang relevan
-  const navItems = getNavItems("/profile");
-
   const { user, loading, logout } = useAuth();
   const [activeTab, setActiveTab] = useState("Personal Information");
   const [isEditing, setIsEditing] = useState(false);
@@ -120,14 +116,12 @@ export default function ProfilePage() {
         <div className="flex-1 flex flex-col">
           {/* 5. PERBAIKAN: Gunakan fungsi `logout` langsung dari context */}
           <AppHeader/>
-
           <main className="flex-1 p-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-gray-900">
                 Profil Pengguna
               </h2>
             </div>
-
             {/* Tab Navigation */}
             <div className="flex space-x-2 border-b mb-6">
               <button

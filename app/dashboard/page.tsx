@@ -12,7 +12,6 @@ import {
 } from "@/lib/fetchActuatorData";
 import AppHeader from "@/components/AppHeader";
 import Sidebar from "@/components/Sidebar";
-import { getNavItems } from "@/components/navItems";
 import {
   TemperatureIcon,
   HumidityIcon,
@@ -22,7 +21,6 @@ import {
 import { ArrowUp, ArrowDown, Minus } from "lucide-react"; // KOREKSI: Tambahkan ikon Minus
 import ProtectedRoute from "@/components/ProtectedRoute";
 
-const navItems = getNavItems("/");
 const Plot = dynamic(() => import("react-plotly.js"), { ssr: false });
 
 type SensorKey = "temperature" | "humidity" | "light" | "moisture";

@@ -16,10 +16,7 @@ import {
 } from "lucide-react";
 import AppHeader from "@/components/AppHeader";
 import Sidebar from "@/components/Sidebar";
-import { getNavItems } from "@/components/navItems";
 import ProtectedRoute from "@/components/ProtectedRoute";
-
-const navItems = getNavItems("/intelligence");
 
 // Sample data
 const kpiData = [

@@ -1,13 +1,35 @@
 "use client";
 
 import React from "react";
-import Link from "next/link";
+import Link from "next/link"; // Tetap gunakan Link
 import { usePathname } from "next/navigation";
 import { useUI } from "@/context/UIContext";
 import { useAuth } from "@/context/AuthContext";
-import { getNavItems } from "./navItems";
 import { cn } from "@/lib/utils";
 
+import { 
+  House, ChartBarIcon, Lightbulb, Cpu, Bell, Settings, User
+} from "lucide-react";
+
+// --- DATA NAVIGASI ---
+const baseNavItems = [
+  { name: "Beranda", href: "/dashboard", icon: House },
+  { name: "Data", href: "/data", icon: ChartBarIcon },
+  { name: "Intelijen", href: "/intelligence", icon: Lightbulb },
+  { name: "Perangkat", href: "/device", icon: Cpu },
+  { name: "Notifikasi", href: "/alerts", icon: Bell },
+  { name: "Pengaturan", href: "/settings", icon: Settings },
+  { name: "Profil", href: "/profile", icon: User },
+];
+
+function getNavItems(activeHref: string) {
+  return baseNavItems.map((item) => ({
+    ...item,
+    active: item.href === activeHref,
+  }));
+}
+
+// --- KOMPONEN SIDEBAR ---
 const Sidebar: React.FC = () => {
   const { isSidebarOpen, closeSidebar } = useUI();
   const { user } = useAuth();
@@ -20,7 +42,7 @@ const Sidebar: React.FC = () => {
 
   return (
     <>
-      {/* Overlay untuk mobile */}
+      {/* Overlay tidak berubah */}
       <div
         role="button"
         tabIndex={0}
@@ -33,7 +55,6 @@ const Sidebar: React.FC = () => {
         )}
       />
 
-      {/* Kontainer Sidebar */}
       <aside
         className={cn(
           "fixed top-0 left-0 z-40 flex h-full w-60 flex-col bg-slate-800 text-white transition-transform duration-300 ease-in-out",
@@ -50,10 +71,11 @@ const Sidebar: React.FC = () => {
         </div>
         <nav className="flex-1 space-y-2 overflow-y-auto p-2">
           {navItems.map((item) => (
+            // INI CARA TERBAIK: Menggunakan <Link>
             <Link
               key={item.name}
               href={item.href}
-              onClick={closeSidebar}
+              onClick={closeSidebar} // onClick tetap bisa digunakan di Link
               className={cn(
                 "flex items-center gap-4 rounded-lg p-3 text-left font-medium transition-colors",
                 item.active

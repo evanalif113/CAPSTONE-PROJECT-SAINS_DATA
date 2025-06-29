@@ -3,7 +3,6 @@
 import { useState } from "react";
 import AppHeader from "@/components/AppHeader";
 import Sidebar from "@/components/Sidebar";
-import { getNavItems } from "@/components/navItems";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import {
   TriangleAlert,
@@ -18,9 +17,6 @@ export default function Alerts() {
   const handleLogout = () => {
     window.location.href = "/logout";
   };
-
-  // Ambil navItems dengan menu aktif
-  const navItems = getNavItems("/alerts");
 
   // Sample data
   const activeAlerts = [

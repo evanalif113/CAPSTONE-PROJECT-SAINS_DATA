@@ -3,10 +3,7 @@
 import { useState } from "react";
 import AppHeader from "@/components/AppHeader";
 import Sidebar from "@/components/Sidebar";
-import { getNavItems } from "@/components/navItems";
 import ProtectedRoute from "@/components/ProtectedRoute";
-
-const navItems = getNavItems("/device");
 
 // Komponen modal untuk tambah device
 interface DeviceModalProps {

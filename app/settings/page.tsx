@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback } from "react";
 import AppHeader from "@/components/AppHeader";
 import Sidebar from "@/components/Sidebar";
 import { RangeSlider } from "@/components/RangeSlider";
-import { getNavItems } from "@/components/navItems";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { useAuth } from "@/context/AuthContext";
 import {
@@ -73,8 +72,6 @@ export default function Settings() {
       setIsSaving(false);
     }
   };
-
-  const navItems = getNavItems("/settings");
 
   // Tampilkan loading spinner saat data diambil
   if (isLoading) {

@@ -6,7 +6,6 @@ import { useAuth } from "@/context/AuthContext";
 import { fetchSensorData } from "@/lib/fetchSensorData";
 import AppHeader from "@/components/AppHeader";
 import Sidebar from "@/components/Sidebar";
-import { getNavItems } from "@/components/navItems";
 import {
   DownloadIcon,
   TemperatureIcon,
@@ -47,8 +46,6 @@ export default function DataHistory() {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("Environmental Trends");
   const [selectedPeriod, setSelectedPeriod] = useState<Period>(periods[0]);
-
-  const navItems = getNavItems("/data");
   const [data, setData] = useState<SensorDatum[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
