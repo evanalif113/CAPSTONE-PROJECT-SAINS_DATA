@@ -6,7 +6,7 @@ Aplikasi monitoring dan kontrol IoT untuk kumbung jamur berbasis Framework React
 
 Kumbung Sense adalah aplikasi web yang membantu petani jamur dalam memantau dan mengontrol kondisi lingkungan kumbung secara real-time. Dengan integrasi IoT, pengguna dapat melihat data sensor (suhu, kelembapan, intensitas cahaya, kelembapan media tanam) dan mengatur perangkat (kipas, humidifier, lampu) langsung dari dashboard.
 
-## Features
+## Fitur-fitur
 
 - Autentikasi user (login/logout)
 - Dashboard monitoring sensor secara real-time
@@ -19,12 +19,12 @@ Kumbung Sense adalah aplikasi web yang membantu petani jamur dalam memantau dan 
 ## Tech Stack
 
 - [React](https://reactjs.org/)
-- [Next.js](https://nextjs.org/)
+- [Next.js](https://nextjs.org/) 
 - [TypeScript](https://www.typescriptlang.org/)
-- [Firebase](https://firebase.google.com)
-- [Tailwind CSS](https://tailwindcss.com/)
+- [Firebase](https://firebase.google.com) (Database)
+- [Tailwind CSS](https://tailwindcss.com/) (CSS)
 - [Plotly.js](https://plotly.com/javascript/) (visualisasi data)
-- [lucide-react](https://)
+- [lucide-react](https://) (Icon Library)
 
 ## Getting Started
 

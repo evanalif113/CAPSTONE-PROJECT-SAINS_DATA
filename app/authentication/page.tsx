@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { auth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "@/lib/firebaseConfig"
 
 export default function Authentication() {
+  const router = useRouter();
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
@@ -26,7 +27,7 @@ export default function Authentication() {
       setEmail("")
       setPassword("")
       setTimeout(() => {
-        window.location.href = "/authentication"; // redirect ke halaman login
+      router.push("/authentication"); // redirect ke halaman login
       }, 1200)
     } catch (err: any) {
       setError(err.message || "Registrasi gagal.")
