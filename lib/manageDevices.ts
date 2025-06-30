@@ -1,12 +1,13 @@
 // lib/manageDevices.ts
-import { database, ref, get, set, push, remove } from "@/lib/firebaseConfig";
+import { database, ref, get, set, push, remove, update } from "@/lib/firebaseConfig";
 
 export interface Device {
   id: string; // ID unik dari Firebase
   name: string;
   location: string;
   type: 'sensor' | 'actuator';
-  sensorId?: string; // Opsional, hanya untuk tipe sensor
+  sensorId?: number; // Opsional, hanya untuk tipe sensor
+  status?: 'active' | 'inactive'; // Status perangkat
 }
 
 // Mengambil semua perangkat
@@ -35,6 +36,20 @@ export async function addDevice(userId: string, deviceData: Omit<Device, 'id'>):
     console.log("Perangkat baru berhasil ditambahkan.");
   } catch (error) {
     console.error("Gagal menambah perangkat:", error);
+    throw error;
+  }
+}
+
+// <<< FUNGSI BARU DITAMBAHKAN DI SINI >>>
+// Memperbarui perangkat yang ada
+export async function updateDevice(userId: string, deviceId: string, deviceData: Partial<Omit<Device, 'id'>>): Promise<void> {
+  const deviceRef = ref(database, `${userId}/devices/${deviceId}`);
+  try {
+    // Gunakan 'update' untuk memperbarui hanya field yang diberikan
+    await update(deviceRef, deviceData);
+    console.log("Perangkat berhasil diperbarui.");
+  } catch (error) {
+    console.error("Gagal memperbarui perangkat:", error);
     throw error;
   }
 }
