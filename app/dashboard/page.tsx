@@ -4,7 +4,10 @@ import { useState, useEffect, useMemo } from "react"; // KOREKSI: Tambahkan useM
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { useAuth } from "@/context/AuthContext";
-import { fetchSensorData, SensorData } from "@/lib/fetchSensorData";
+import { 
+  fetchSensorData, 
+  SensorData 
+} from "@/lib/fetchSensorData";
 import {
   fetchActuatorData,
   updateActuatorState,
