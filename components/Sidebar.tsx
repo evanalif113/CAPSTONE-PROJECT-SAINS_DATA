@@ -57,8 +57,8 @@ const Sidebar: React.FC = () => {
 
       <aside
         className={cn(
-          "fixed top-0 left-0 z-40 flex h-full w-60 flex-col bg-slate-800 text-white transition-transform duration-300 ease-in-out",
-          "lg:relative lg:translate-x-0 lg:w-64 lg:shadow-none",
+          "fixed top-0 left-0 z-40 flex h-screen w-60 flex-col bg-slate-800 text-white transition-transform duration-300 ease-in-out",
+          "lg:relative lg:translate-x-0 lg:w-28 lg:shadow-none",
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
@@ -78,6 +78,7 @@ const Sidebar: React.FC = () => {
               onClick={closeSidebar} // onClick tetap bisa digunakan di Link
               className={cn(
                 "flex items-center gap-4 rounded-lg p-3 text-left font-medium transition-colors",
+                "lg:flex-col lg:gap-1 lg:text-center", // Perubahan untuk desktop
                 item.active
                   ? "bg-slate-900 text-white"
                   : "text-slate-400 hover:bg-slate-700 hover:text-white"
@@ -85,7 +86,7 @@ const Sidebar: React.FC = () => {
               aria-current={item.active ? "page" : undefined}
             >
               <item.icon className="h-6 w-6 shrink-0" />
-              <span className="whitespace-nowrap">{item.name}</span>
+              <span>{item.name}</span>
             </Link>
           ))}
         </nav>
