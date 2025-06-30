@@ -21,8 +21,8 @@ import {
   LightIntensityIcon,
   MoistureIcon,
 } from "@/components/Icon";
-import  ToggleSwitch from "@/components/ToggleSwitch"; // Pastikan komponen ToggleSwitch ada
-import { ArrowUp, ArrowDown, Minus } from "lucide-react"; // KOREKSI: Tambahkan ikon Minus
+import  ToggleSwitch from "@/components/ToggleSwitch";
+import { ArrowUp, ArrowDown, Minus } from "lucide-react";
 import ProtectedRoute from "@/components/ProtectedRoute";
 
 const Plot = dynamic(() => import("react-plotly.js"), { ssr: false });
