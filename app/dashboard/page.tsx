@@ -21,6 +21,7 @@ import {
   LightIntensityIcon,
   MoistureIcon,
 } from "@/components/Icon";
+import  ToggleSwitch from "@/components/ToggleSwitch"; // Pastikan komponen ToggleSwitch ada
 import { ArrowUp, ArrowDown, Minus } from "lucide-react"; // KOREKSI: Tambahkan ikon Minus
 import ProtectedRoute from "@/components/ProtectedRoute";
 
@@ -257,31 +258,7 @@ export default function DashboardPage() {
     }
   };
 
-  // ToggleSwitch tetap
-  const ToggleSwitch = ({
-    checked,
-    onChange,
-    disabled = false,
-  }: {
-    checked: boolean;
-    onChange: (val: boolean) => void;
-    disabled?: boolean;
-  }) => (
-    <button
-      type="button"
-      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-        checked ? "bg-green-600" : "bg-gray-200"
-      } ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
-      onClick={() => !disabled && onChange(!checked)}
-      disabled={disabled}
-    >
-      <span
-        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-          checked ? "translate-x-6" : "translate-x-1"
-        }`}
-      />
-    </button>
-  );
+
   return (
     <ProtectedRoute>
       <div className="flex min-h-screen bg-gray-50">

@@ -13,6 +13,8 @@ import {
   startAt,
   endAt,
   update,
+  remove,
+  push,
 } from "firebase/database";
 import {
   getAuth,
@@ -52,10 +54,12 @@ export {
   get,
   onValue,
   off,
+  remove,
   startAt,
   endAt,
   auth,
   set,
+  push,
   update,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
