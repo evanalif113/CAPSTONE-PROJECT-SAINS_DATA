@@ -4,14 +4,17 @@ import { useState, useEffect, useCallback } from "react";
 import AppHeader from "@/components/AppHeader";
 import Sidebar from "@/components/Sidebar";
 import ProtectedRoute from "@/components/ProtectedRoute";
-import { TriangleAlert, ClockAlert, Bell } from "lucide-react";
+import { TriangleAlert, ClockAlert, Bell, Trash2, Check } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import {
   Notification,
   fetchNotifications,
-  addNotification
+  addNotification,
+  deleteNotification,
+  markNotificationAsRead,
 } from "@/lib/fetchNotificationData";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import { cn } from "@/lib/utils";
 
 export default function Alerts() {
   const { user } = useAuth();
@@ -41,6 +44,26 @@ export default function Alerts() {
     } catch (error) {
       console.error("Gagal mengirim notifikasi tes:", error);
       // Anda bisa menambahkan feedback error ke pengguna di sini
+    }
+  };
+
+  const handleDeleteAlert = async (alertId: string) => {
+    if (!user) return;
+    try {
+      await deleteNotification(user.uid, alertId);
+      refetchAlerts();
+    } catch (error) {
+      console.error("Gagal menghapus notifikasi:", error);
+    }
+  };
+
+  const handleMarkAsRead = async (alertId: string) => {
+    if (!user) return;
+    try {
+      await markNotificationAsRead(user.uid, alertId);
+      refetchAlerts();
+    } catch (error) {
+      console.error("Gagal menandai notifikasi:", error);
     }
   };
 
@@ -129,18 +152,43 @@ export default function Alerts() {
                     alerts.map((alert) => (
                       <div
                         key={alert.id}
-                        className="bg-white rounded-lg border border-gray-200 p-4"
+                        className={cn(
+                          "bg-white rounded-lg border border-gray-200 p-4 transition-colors",
+                          alert.read && "bg-gray-100"
+                        )}
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center space-x-3">
                             {renderAlertIcon(alert.message)}
-                            <span className="text-gray-900 font-medium">
-                              {alert.message}
-                            </span>
+                            <div className={cn(alert.read && "text-gray-500")}>
+                              <span className="text-gray-900 font-medium">
+                                {alert.message}
+                              </span>
+                              <p className="text-sm text-gray-500">
+                                {new Date(alert.timestamp).toLocaleString(
+                                  "id-ID"
+                                )}
+                              </p>
+                            </div>
                           </div>
-                          <span className="text-sm text-gray-500">
-                            {new Date(alert.timestamp).toLocaleString("id-ID")}
-                          </span>
+                          <div className="flex items-center gap-2">
+                            {!alert.read && (
+                              <button
+                                onClick={() => handleMarkAsRead(alert.id)}
+                                className="p-2 text-gray-500 hover:text-green-600 hover:bg-green-100 rounded-full"
+                                title="Tandai sudah dibaca"
+                              >
+                                <Check size={16} />
+                              </button>
+                            )}
+                            <button
+                              onClick={() => handleDeleteAlert(alert.id)}
+                              className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-100 rounded-full"
+                              title="Hapus notifikasi"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </div>
                         </div>
                       </div>
                     ))

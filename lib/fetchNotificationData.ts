@@ -36,6 +36,21 @@ export const addNotification = async (userId: string, message: string): Promise<
 };
 
 /**
+ * Menandai notifikasi sebagai sudah dibaca.
+ * @param userId - ID pengguna.
+ * @param notificationId - ID notifikasi yang akan ditandai.
+ */
+export const markNotificationAsRead = async (userId: string, notificationId: string): Promise<void> => {
+  try {
+    const notificationRef = ref(database, `${userId}/notifications/${notificationId}`);
+    await update(notificationRef, { read: true });
+  } catch (error) {
+    console.error("Error marking notification as read:", error);
+    throw new Error("Gagal menandai notifikasi.");
+  }
+};
+
+/**
  * Mengambil semua notifikasi untuk pengguna tertentu.
  * @param userId - ID pengguna.
  * @returns Promise yang resolve dengan array notifikasi, diurutkan dari yang terbaru.
