@@ -8,8 +8,8 @@ import { Device } from '@/lib/manageDevices';
 import { ActuatorData, updateActuatorState } from '@/lib/fetchActuatorData';
 
 import { Edit, Trash2 } from 'lucide-react';
-import ToggleSwitch from './ToggleSwitch';
-import LoadingSpinner from './LoadingSpinner';
+import ToggleSwitch from '@/components/ToggleSwitch';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 interface ActuatorCardProps {
   device: Device;
@@ -37,7 +37,8 @@ const ActuatorCard: React.FC<ActuatorCardProps> = ({ device, userId, onEdit, onD
   }, [userId]);
 
   const handleActuatorChange = useCallback((pin: string, newState: boolean) => {
-    updateActuatorState(userId, pin, newState ? 1 : 0);
+    // Logika dibalik: ON (true) akan mengirim 0, OFF (false) akan mengirim 1
+    updateActuatorState(userId, pin, newState ? 0 : 1);
   }, [userId]);
 
   return (
@@ -53,21 +54,21 @@ const ActuatorCard: React.FC<ActuatorCardProps> = ({ device, userId, onEdit, onD
           </span>
         </div>
         
-        {loading ? <div className="py-8 flex justify-center"><LoadingSpinner size="sm"/></div> : (
+        {loading ? <div className="py-8 flex justify-center"><LoadingSpinner/></div> : (
           <div className="mt-4 space-y-3">
-            <div className="flex justify-between items-center"><span className="font-medium">Kipas (Pin 16)</span><ToggleSwitch checked={!!states?.['16']} onChange={(val) => handleActuatorChange('16', val)} /></div>
-            <div className="flex justify-between items-center"><span className="font-medium">Humidifier (Pin 17)</span><ToggleSwitch checked={!!states?.['17']} onChange={(val) => handleActuatorChange('17', val)} /></div>
-            <div className="flex justify-between items-center"><span className="font-medium">Lampu (Pin 18)</span><ToggleSwitch checked={!!states?.['18']} onChange={(val) => handleActuatorChange('18', val)} /></div>
-            <div className="flex justify-between items-center"><span className="font-medium">Pompa (Pin 19)</span><ToggleSwitch checked={!!states?.['19']} onChange={(val) => handleActuatorChange('19', val)} /></div>
+            <div className="flex justify-between items-center"><span className="font-medium">Kipas</span><ToggleSwitch checked={!states?.['16']} onChange={(val) => handleActuatorChange('16', val)} /></div>
+            <div className="flex justify-between items-center"><span className="font-medium">Humidifier</span><ToggleSwitch checked={!states?.['17']} onChange={(val) => handleActuatorChange('17', val)} /></div>
+            <div className="flex justify-between items-center"><span className="font-medium">Lampu</span><ToggleSwitch checked={!states?.['18']} onChange={(val) => handleActuatorChange('18', val)} /></div>
+            <div className="flex justify-between items-center"><span className="font-medium">Pompa</span><ToggleSwitch checked={!states?.['19']} onChange={(val) => handleActuatorChange('19', val)} /></div>
           </div>
         )}
       </div>
 
       <div className="mt-6 border-t pt-4 flex justify-end gap-2">
-         <button onClick={onEdit} className="text-gray-500 hover:text-blue-700 p-1">
+         <button onClick={onEdit} className="text-gray-600 hover:text-blue-700 p-1">
           <Edit size={16} />
         </button>
-        <button onClick={onDelete} className="text-gray-500 hover:text-red-700 p-1">
+        <button onClick={onDelete} className="text-gray-600 hover:text-red-700 p-1">
           <Trash2 size={16} />
         </button>
       </div>

@@ -79,15 +79,18 @@ const DeviceModal: React.FC<DeviceModalProps> = ({ onClose, onSubmit, initialDat
             />
              {isEditMode && <p className="text-xs text-gray-500 mt-1">Nomor Seri tidak dapat diubah.</p>}
           </div>
-
+          
+          {/* --- INPUT FIELD SENSOR --- */}
           <div>
             <label htmlFor="name" className="block text-sm font-medium text-gray-700">Nama Perangkat</label>
             <input id="name" type="text" value={name} onChange={(e) => setName(e.target.value)} className="w-full mt-1 px-3 py-2 border rounded-md" />
           </div>
+          {/* --- INPUT FIELD LOKASI --- */}
           <div>
             <label htmlFor="location" className="block text-sm font-medium text-gray-700">Lokasi</label>
             <input id="location" type="text" value={location} onChange={(e) => setLocation(e.target.value)} className="w-full mt-1 px-3 py-2 border rounded-md" />
           </div>
+          {/* --- INPUT FIELD TIPE --- */}
           <div>
             <label htmlFor="type" className="block text-sm font-medium text-gray-700">Tipe Perangkat</label>
             <select 
