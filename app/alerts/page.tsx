@@ -13,11 +13,6 @@ import {
 export default function Alerts() {
   const [activeTab, setActiveTab] = useState("Active Alerts");
 
-  // Handler untuk logout
-  const handleLogout = () => {
-    window.location.href = "/logout";
-  };
-
   // Sample data
   const activeAlerts = [
     {
