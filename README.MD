@@ -1,6 +1,6 @@
 # Kumbung Sense
 
-Aplikasi monitoring dan kontrol IoT untuk kumbung jamur berbasis Framework React
+Aplikasi monitoring dan kontrol IoT untuk kumbung jamur berbasis Framework Next.Js
 
 ## Overview
 
@@ -10,18 +10,19 @@ Kumbung Sense adalah aplikasi web yang membantu petani jamur dalam memantau dan 
 
 - Autentikasi user (login/logout)
 - Dashboard monitoring sensor secara real-time
-- Kontrol perangkat (fan, humidifier, lampu)
-- Riwayat data sensor dan aktuator
+- Kontrol perangkat
+- Riwayat data sensor dan log aktuator
 - Notifikasi
-- Manajemen device
+- Profil Pengguna
+- Manajemen perangkat
 - Responsive UI
 
 ## Tech Stack
 
-- [React](https://reactjs.org/)
-- [Next.js](https://nextjs.org/) 
-- [TypeScript](https://www.typescriptlang.org/)
-- [Firebase](https://firebase.google.com) (Database)
+- [React](https://reactjs.org/) (Library)
+- [Next.js](https://nextjs.org/) (Framework Development)
+- [TypeScript](https://www.typescriptlang.org/) (Programming Language)
+- [Firebase](https://firebase.google.com) (Database and Backend)
 - [Tailwind CSS](https://tailwindcss.com/) (CSS)
 - [Plotly.js](https://plotly.com/javascript/) (visualisasi data)
 - [lucide-react](https://) (Icon Library)
@@ -63,8 +64,9 @@ Untuk melakukan deployment aplikasi, ikuti langkah-langkah berikut:
 Kumbung Sense memanfaatkan teknologi berikut untuk memberikan fungsionalitasnya:
 
 - **React** dan **Next.js** untuk antarmuka pengguna yang responsif dan dinamis.
-- **TypeScript** untuk pengembangan yang lebih aman dan terstruktur.
-- **Firebase Auth** untuk autentikasi pengguna yang aman.
+- **TypeScript** untuk bahasa pengembangan website yang lebih aman dan terstruktur.
+- **Firebase Authentication** untuk autentikasi pengguna yang aman.
+- **Firebase Database** untuk Database No SQL
 - **Tailwind CSS** untuk desain antarmuka yang modern dan responsif.
 - **Plotly.js** untuk visualisasi data sensor yang interaktif.
 
