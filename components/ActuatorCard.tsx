@@ -39,7 +39,8 @@ const ActuatorCard: React.FC<ActuatorCardProps> = ({ device, userId, onEdit, onD
 
   const handleActuatorChange = useCallback((pin: string, newState: boolean) => {
     // Logika dibalik: ON (true) akan mengirim 0, OFF (false) akan mengirim 1
-    updateActuatorState(userId, pin, newState ? 0 : 1);
+    // Tambahkan 'manual' sebagai mode pemicu
+    updateActuatorState(userId, pin, newState ? 0 : 1, 'manual');
   }, [userId]);
 
   return (

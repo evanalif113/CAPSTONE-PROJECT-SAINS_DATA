@@ -4,16 +4,18 @@ import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { useAuth } from "@/context/AuthContext";
 import { fetchSensorData } from "@/lib/fetchSensorData";
+import { fetchActuatorLogs, ActuatorLog } from "@/lib/fetchActuatorLog";
 import AppHeader from "@/components/AppHeader";
 import Sidebar from "@/components/Sidebar";
 import {
-  DownloadIcon,
   TemperatureIcon,
   HumidityIcon,
   LightIntensityIcon,
   MoistureIcon,
 } from "@/components/Icon";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import LoadingSpinner from "@/components/LoadingSpinner";
+import { cn } from "@/lib/utils";
 
 const Plot = dynamic(() => import("react-plotly.js"), { ssr: false });
 
@@ -44,41 +46,55 @@ const periods: Period[] = [
 
 export default function DataHistory() {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState("Environmental Trends");
-  // Gunakan periode default sebagai 1 jam
+  const [activeTab, setActiveTab] = useState("Grafik Sensor");
   const [selectedPeriod, setSelectedPeriod] = useState<Period>(periods[1]);
-  const [data, setData] = useState<SensorDatum[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [sensorData, setSensorData] = useState<SensorDatum[]>([]);
+  const [sensorLoading, setSensorLoading] = useState(true);
+  const [actuatorLogs, setActuatorLogs] = useState<ActuatorLog[]>([]);
+  const [logsLoading, setLogsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const loadDataForPeriod = async () => {
-      if (!user || !selectedPeriod) return;
+    if (!user) return;
 
-      setLoading(true);
-      try {
-        const result = await fetchSensorData(user.uid, selectedPeriod.valueInMinutes);
-        setData(result);
-        setError(null);
-      } catch (err) {
-        console.error(err);
-        setError("Gagal memuat data sensor");
-      } finally {
-        setLoading(false);
+    const loadData = async () => {
+      setError(null);
+      if (activeTab === "Grafik Sensor") {
+        setSensorLoading(true);
+        try {
+          const result = await fetchSensorData(user.uid, selectedPeriod.valueInMinutes);
+          setSensorData(result);
+        } catch (err) {
+          console.error(err);
+          setError("Gagal memuat data sensor");
+        } finally {
+          setSensorLoading(false);
+        }
+      } else if (activeTab === "Log Aktuator") {
+        setLogsLoading(true);
+        try {
+          const result = await fetchActuatorLogs(user.uid);
+          setActuatorLogs(result);
+        } catch (err) {
+          console.error(err);
+          setError("Gagal memuat log aktuator");
+        } finally {
+          setLogsLoading(false);
+        }
       }
     };
 
-    loadDataForPeriod();
-  }, [user, selectedPeriod]);
+    loadData();
+  }, [user, activeTab, selectedPeriod]);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user || !selectedPeriod) return;
 
     if (selectedPeriod?.label === "30 Menit") {
       const interval = setInterval(async () => {
         try {
           const result = await fetchSensorData(user.uid, selectedPeriod.valueInMinutes);
-          setData(result);
+          setSensorData(result);
         } catch (err) {
           console.error("Gagal melakukan polling data:", err);
         }
@@ -104,11 +120,9 @@ export default function DataHistory() {
     return [min, max];
   }
 
-  // --- PERBAIKAN ADA DI DALAM KOMPONEN INI ---
   const ChartCard = ({ title, dataKey, color, Icon, unit, chartData }: { title: string; dataKey: keyof SensorDatum; color: string; Icon: React.FC; unit: string; chartData: SensorDatum[] }) => {
     const yDomain = getYAxisDomain(chartData, dataKey);
     
-    // Buat salinan array dengan urutan kronologis (terlama -> terbaru) untuk chart
     const chronologicalData = [...chartData].reverse();
 
     return (
@@ -120,7 +134,6 @@ export default function DataHistory() {
             <div className="p-4">
                 <Plot
                     data={[{
-                        // Gunakan data yang urutannya sudah benar
                         x: chronologicalData.map((d) => d.timeFormatted ? d.timeFormatted : new Date(d.timestamp).toLocaleString("id-ID")),
                         y: chronologicalData.map((d) => d[dataKey] as number),
                         type: "scatter",
@@ -156,48 +169,110 @@ export default function DataHistory() {
           <AppHeader />
           <main className="flex-1 p-6">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">Data History</h2>
-              <div className="flex space-x-2">
-                 {/* ... */}
-              </div>
+              <h2 className="text-2xl font-bold text-gray-900">Riwayat Data</h2>
             </div>
 
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
-              <div>
-                <span className="text-sm text-gray-600">Pilih Periode:</span>
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {periods.map((period) => (
-                    <button
-                      key={period.label}
-                      onClick={() => setSelectedPeriod(period)}
-                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                        selectedPeriod?.label === period.label
-                          ? "bg-blue-600 text-white"
-                          : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                      }`}
-                    >
-                      {period.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                 {/* ... */}
-              </div>
+            {/* Navigasi Tab */}
+            <div className="flex space-x-2 border-b mb-6">
+              <button
+                onClick={() => setActiveTab("Grafik Sensor")}
+                className={`px-4 py-2 text-sm font-medium ${
+                  activeTab === "Grafik Sensor"
+                    ? "border-b-2 border-blue-600 text-blue-600"
+                    : "text-gray-500 hover:text-gray-700"
+                }`}
+              >
+                Grafik Sensor
+              </button>
+              <button
+                onClick={() => setActiveTab("Log Aktuator")}
+                className={`px-4 py-2 text-sm font-medium ${
+                  activeTab === "Log Aktuator"
+                    ? "border-b-2 border-blue-600 text-blue-600"
+                    : "text-gray-500 hover:text-gray-700"
+                }`}
+              >
+                Log Aktuator
+              </button>
             </div>
 
-            {loading && <div className="text-center text-gray-500 py-8">Memuat data...</div>}
             {error && <div className="text-center text-red-500 py-8">{error}</div>}
 
-            {activeTab === "Environmental Trends" && !loading && !error && (
-              <div className="space-y-8">
-                <ChartCard title="Suhu Udara" dataKey="temperature" color="#ef4444" Icon={TemperatureIcon} unit="°C" chartData={data} />
-                <ChartCard title="Kelembapan Udara" dataKey="humidity" color="#3b82f6" Icon={HumidityIcon} unit="%" chartData={data} />
-                <ChartCard title="Intensitas Cahaya" dataKey="light" color="#f59e0b" Icon={LightIntensityIcon} unit="lux" chartData={data} />
-                <ChartCard title="Kelembapan Media" dataKey="moisture" color="#10b981" Icon={MoistureIcon} unit="%" chartData={data} />
+            {/* Konten Tab Grafik Sensor */}
+            {activeTab === "Grafik Sensor" && (
+              <div>
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
+                  <div>
+                    <span className="text-sm text-gray-600">Pilih Periode:</span>
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {periods.map((period) => (
+                        <button
+                          key={period.label}
+                          onClick={() => setSelectedPeriod(period)}
+                          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                            selectedPeriod?.label === period.label
+                              ? "bg-blue-600 text-white"
+                              : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                          }`}
+                        >
+                          {period.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                {sensorLoading ? (
+                  <div className="text-center py-8"><LoadingSpinner /></div>
+                ) : (
+                  <div className="space-y-8">
+                    <ChartCard title="Suhu Udara" dataKey="temperature" color="#ef4444" Icon={TemperatureIcon} unit="°C" chartData={sensorData} />
+                    <ChartCard title="Kelembapan Udara" dataKey="humidity" color="#3b82f6" Icon={HumidityIcon} unit="%" chartData={sensorData} />
+                    <ChartCard title="Intensitas Cahaya" dataKey="light" color="#f59e0b" Icon={LightIntensityIcon} unit="lux" chartData={sensorData} />
+                    <ChartCard title="Kelembapan Media" dataKey="moisture" color="#10b981" Icon={MoistureIcon} unit="%" chartData={sensorData} />
+                  </div>
+                )}
               </div>
             )}
-             {/* ... */}
+
+            {/* Konten Tab Log Aktuator */}
+            {activeTab === "Log Aktuator" && (
+              <div>
+                {logsLoading ? (
+                  <div className="text-center py-8"><LoadingSpinner /></div>
+                ) : actuatorLogs.length === 0 ? (
+                  <div className="text-center text-gray-500 py-10 bg-white rounded-lg border">
+                    <p>Tidak ada riwayat log aktuator.</p>
+                  </div>
+                ) : (
+                  <div className="bg-white rounded-lg shadow-sm border overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Waktu</th>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pin</th>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mode</th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {actuatorLogs.map((log) => (
+                          <tr key={log.id}>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(log.timestamp).toLocaleString('id-ID')}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{log.pin}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm">
+                              <span className={cn("px-2 inline-flex text-xs leading-5 font-semibold rounded-full", log.state === 0 ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800")}>
+                                {log.state === 0 ? 'ON' : 'OFF'}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 capitalize">{log.mode}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            )}
           </main>
         </div>
       </div>

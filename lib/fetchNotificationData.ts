@@ -5,14 +5,14 @@ import {
   get,
   update, // 'update' lebih aman karena hanya mengubah field yang diberikan
   remove,
-  push, // Impor 'push' untuk membuat data baru
+  set, // Impor 'set' untuk menggunakan key kustom
 } from "@/lib/firebaseConfig";
 
 export interface Notification {
-  id: string; // ID unik untuk notifikasi
+  id: string; // ID unik untuk notifikasi (akan menjadi timestamp)
   message: string; // Pesan notifikasi
-  timestamp: number; // Waktu notifikasi dalam format UNIX timestamp
   read: boolean; // Status apakah notifikasi sudah dibaca
+  timestamp: number; // Timestamp tetap disimpan untuk kemudahan akses
 }
 
 /**
@@ -22,13 +22,14 @@ export interface Notification {
  */
 export const addNotification = async (userId: string, message: string): Promise<void> => {
   try {
-    const notificationsRef = ref(database, `${userId}/notifications`);
+    const timestamp = Date.now();
+    const notificationRef = ref(database, `${userId}/notifications/${timestamp}`);
     const newNotification = {
       message,
-      timestamp: Date.now(),
       read: false,
+      timestamp: timestamp, // Simpan juga di dalam objek untuk konsistensi
     };
-    await push(notificationsRef, newNotification);
+    await set(notificationRef, newNotification);
   } catch (error) {
     console.error("Error adding notification:", error);
     throw new Error("Gagal menambahkan notifikasi.");
@@ -62,7 +63,7 @@ export const fetchNotifications = async (userId: string): Promise<Notification[]
 
     if (snapshot.exists()) {
       const data = snapshot.val();
-      // Ubah objek menjadi array dan urutkan dari yang terbaru
+      // Ubah objek menjadi array dan urutkan dari yang terbaru berdasarkan key (timestamp)
       const notifications = Object.keys(data)
         .map((key) => ({
           id: key,

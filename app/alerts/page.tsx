@@ -39,8 +39,18 @@ export default function Alerts() {
   const handleTestNotification = async () => {
     if (!user) return;
     try {
-      await addNotification(user.uid, "Ini adalah notifikasi tes manual.");
-      refetchAlerts(); // Muat ulang daftar setelah menambahkan
+      const message = "Ini adalah notifikasi tes manual.";
+      await addNotification(user.uid, message);
+      // Perbarui state secara manual untuk UI yang responsif
+      setAlerts((prevAlerts) => {
+        const newAlert: Notification = {
+          id: Date.now().toString(),
+          message,
+          read: false,
+          timestamp: Date.now(),
+        };
+        return [newAlert, ...prevAlerts];
+      });
     } catch (error) {
       console.error("Gagal mengirim notifikasi tes:", error);
       // Anda bisa menambahkan feedback error ke pengguna di sini

@@ -248,8 +248,8 @@ export default function DashboardPage() {
     });
 
     try {
-      // 2. Kirim pembaruan ke Firebase
-      await updateActuatorState(user.uid, pinId, newState);
+      // 2. Kirim pembaruan ke Firebase dengan mode 'manual'
+      await updateActuatorState(user.uid, pinId, newState, 'manual');
     } catch (error) {
       // 3. Jika gagal, kembalikan UI ke state sebelumnya (rollback)
       console.error("Gagal update aktuator, mengembalikan state.");

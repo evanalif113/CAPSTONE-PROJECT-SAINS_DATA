@@ -5,6 +5,7 @@ import {
   get,
   update, // Kita menggunakan 'update' untuk mengubah data spesifik
 } from "@/lib/firebaseConfig";
+import { addActuatorLog } from "@/lib/fetchActuatorLog"; // Impor fungsi logging
 
 /**
  * Mendefinisikan struktur data untuk status aktuator.
@@ -45,12 +46,14 @@ export async function fetchActuatorData(
  * @param userId - ID pengguna yang datanya akan diupdate.
  * @param actuatorId - ID dari aktuator yang akan diubah (misal: "16").
  * @param newState - Status baru untuk aktuator (0 atau 1).
+ * @param mode - Mode pemicu aksi ('manual' atau 'auto').
  * @returns Sebuah promise yang akan resolve ketika update selesai.
  */
 export async function updateActuatorState(
   userId: string,
   PinId: string,
-  newState: 0 | 1
+  newState: 0 | 1,
+  mode: 'manual' | 'auto'
 ): Promise<void> {
   try {
     const dataRef = ref(database, `${userId}/aktuator/data`);
@@ -64,7 +67,15 @@ export async function updateActuatorState(
     // Fungsi 'update' hanya akan mengubah field yang ada di dalam objek 'updates',
     // tanpa mempengaruhi data aktuator lainnya.
     await update(dataRef, updates);
-    console.log(`Status aktuator ${PinId} berhasil diubah menjadi ${newState}`);
+
+    // Tambahkan log setelah state berhasil diubah
+    await addActuatorLog(userId, {
+      pin: PinId,
+      state: newState,
+      mode: mode,
+    });
+
+    console.log(`Status aktuator ${PinId} berhasil diubah menjadi ${newState} (Mode: ${mode})`);
   } catch (error) {
     console.error(`Gagal mengubah status aktuator ${PinId}:`, error);
     throw error;
