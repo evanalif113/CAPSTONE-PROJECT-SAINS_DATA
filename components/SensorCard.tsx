@@ -9,6 +9,7 @@ import { SensorData } from '@/lib/fetchSensorData';
 
 import { Edit, Trash2, Thermometer, Droplets, Sun, Sprout } from 'lucide-react';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import StatusIndicator from '@/components/StatusIndicator';
 
 interface SensorCardProps {
   device: Device;
@@ -53,7 +54,7 @@ const SensorCard: React.FC<SensorCardProps> = ({ device, userId, onEdit, onDelet
           </span>
         </div>
         
-        {loading ? <div className="py-8 flex justify-center"><LoadingSpinner size="sm"/></div> : (
+        {loading? <div className="py-8 flex justify-center"><LoadingSpinner size="sm"/></div> : (
           <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
             <div className="flex items-center gap-2"><Thermometer size={18} className="text-red-500"/> Suhu: <span className="font-semibold">{data?.temperature?.toFixed(2) ?? 'N/A'}°C</span></div>
             <div className="flex items-center gap-2"><Droplets size={18} className="text-blue-500"/> Kelembapan: <span className="font-semibold">{data?.humidity?.toFixed(2) ?? 'N/A'}%</span></div>
@@ -63,13 +64,16 @@ const SensorCard: React.FC<SensorCardProps> = ({ device, userId, onEdit, onDelet
         )}
       </div>
 
-      <div className="mt-6 border-t pt-4 flex justify-end gap-2">
-        <button onClick={onEdit} className="text-gray-500 hover:text-blue-700 p-1">
-          <Edit size={16} />
-        </button>
-        <button onClick={onDelete} className="text-gray-500 hover:text-red-700 p-1">
-          <Trash2 size={16} />
-        </button>
+      <div className="mt-6 border-t pt-4 flex justify-between items-center">
+        <StatusIndicator status={device.status} />
+        <div className="flex gap-2">
+          <button onClick={onEdit} className="text-gray-500 hover:text-blue-700 p-1">
+            <Edit size={16} />
+          </button>
+          <button onClick={onDelete} className="text-gray-500 hover:text-red-700 p-1">
+            <Trash2 size={16} />
+          </button>
+        </div>
       </div>
     </div>
   );
