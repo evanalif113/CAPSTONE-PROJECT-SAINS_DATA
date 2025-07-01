@@ -11,7 +11,8 @@ import {
   updatePassword,
   reauthenticateWithCredential,
   EmailAuthProvider,
-}from "firebase/auth";
+  deleteUser,
+} from "firebase/auth";
 import { EditIcon, SaveIcon, CancelIcon } from "@/components/Icon"; // Asumsi Icon ada
 
 
@@ -28,6 +29,7 @@ export default function ProfilePage() {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [deletePassword, setDeletePassword] = useState("");
 
   // State untuk feedback (loading, error, success)
   const [isSaving, setIsSaving] = useState(false);
@@ -106,6 +108,41 @@ export default function ProfilePage() {
       }
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleDeleteAccount = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!user || !user.email) return;
+
+    if (
+      !window.confirm(
+        "APAKAH ANDA YAKIN? Tindakan ini tidak dapat diurungkan dan akan menghapus semua data Anda secara permanen."
+      )
+    ) {
+      return;
+    }
+
+    setIsSaving(true);
+    setError(null);
+    setSuccess(null);
+
+    const credential = EmailAuthProvider.credential(user.email, deletePassword);
+
+    try {
+      await reauthenticateWithCredential(user, credential);
+      await deleteUser(user);
+      // Logout dan redirect akan ditangani oleh onAuthStateChanged di AuthContext
+      setSuccess("Akun berhasil dihapus.");
+    } catch (err: any) {
+      if (err.code === "auth/wrong-password") {
+        setError("Password yang Anda masukkan salah untuk menghapus akun.");
+      } else {
+        setError(err.message || "Gagal menghapus akun.");
+      }
+    } finally {
+      setIsSaving(false);
+      setDeletePassword("");
     }
   };
 
@@ -302,6 +339,49 @@ export default function ProfilePage() {
                       {isSaving ? "Memproses..." : "Ubah Password"}
                     </button>
                   </form>
+                </div>
+
+                {/* Zona Berbahaya - Hapus Akun */}
+                <div className="mt-8">
+                  <h3 className="text-lg font-semibold text-red-600 mb-2">
+                    Zona Berbahaya
+                  </h3>
+                  <div className="bg-white rounded-lg border border-red-300 p-6">
+                    <p className="text-sm text-gray-700 mb-4">
+                      Menghapus akun Anda adalah tindakan permanen. Semua data
+                      Anda akan dihapus dan tidak dapat dipulihkan. Untuk
+                      melanjutkan, masukkan password Anda saat ini.
+                    </p>
+                    <form
+                      onSubmit={handleDeleteAccount}
+                      className="space-y-4 max-w-md"
+                    >
+                      <div>
+                        <label className="block text-sm font-medium">
+                          Password Anda
+                        </label>
+                        <input
+                          type="password"
+                          value={deletePassword}
+                          onChange={(e) => setDeletePassword(e.target.value)}
+                          required
+                          className="mt-1 block w-full input-style border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500"
+                        />
+                      </div>
+                      {error && (
+                        <p className="text-sm text-red-600">{error}</p>
+                      )}
+                      <button
+                        type="submit"
+                        disabled={isSaving}
+                        className="w-full flex items-center justify-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
+                      >
+                        {isSaving
+                          ? "Menghapus..."
+                          : "Hapus Akun Secara Permanen"}
+                      </button>
+                    </form>
+                  </div>
                 </div>
               </div>
             )}
