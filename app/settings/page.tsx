@@ -37,10 +37,10 @@ export default function Settings() {
       } else {
         // Jika tidak ada data di DB, set dengan nilai default
         setThresholds({
-          temperatureMin: 18, temperatureMax: 32,
-          humidityMin: 60, humidityMax: 75,
+          temperatureMin: 20, temperatureMax: 30,
+          humidityMin: 70, humidityMax: 90,
           lightMin: 500, lightMax: 2000,
-          moistureMin: 35, moistureMax: 70,
+          moistureMin: 65, moistureMax: 70,
         });
       }
     } catch (err) {
@@ -90,7 +90,7 @@ export default function Settings() {
           <AppHeader />
           <main className="flex-1 p-6">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">Settings</h2>
+              <h2 className="text-2xl font-bold text-gray-900">Pengaturan</h2>
               {/* ... Tombol-tombol Tab ... */}
             </div>
 
@@ -100,11 +100,11 @@ export default function Settings() {
             {activeTab === "Thresholds" && thresholds && (
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-6">
-                  Global Threshold Configuration
+                  Konfigurasi Ambang Batas
                 </h3>
                 <div className="space-y-8">
                   <RangeSlider
-                    label="Temperature Thresholds"
+                    label="Ambang Batas Suhu"
                     value={[thresholds.temperatureMin, thresholds.temperatureMax]}
                     onChange={([newMin, newMax]) =>
                       setThresholds({ ...thresholds, temperatureMin: newMin, temperatureMax: newMax })
@@ -112,7 +112,7 @@ export default function Settings() {
                     min={0} max={50} unit="°C" colorClassName="bg-red-500"
                   />
                   <RangeSlider
-                    label="Humidity Thresholds"
+                    label="Ambang Batas Kelembapan"
                     value={[thresholds.humidityMin, thresholds.humidityMax]}
                     onChange={([newMin, newMax]) =>
                       setThresholds({ ...thresholds, humidityMin: newMin, humidityMax: newMax })
@@ -120,7 +120,7 @@ export default function Settings() {
                     min={0} max={100} unit="%" colorClassName="bg-blue-500"
                   />
                   <RangeSlider
-                    label="Light Intensity Thresholds"
+                    label="Ambang Batas Cahaya"
                     value={[thresholds.lightMin, thresholds.lightMax]}
                     onChange={([newMin, newMax]) =>
                       setThresholds({ ...thresholds, lightMin: newMin, lightMax: newMax })
@@ -128,7 +128,7 @@ export default function Settings() {
                     min={0} max={5000} step={50} unit="lux" colorClassName="bg-yellow-500"
                   />
                   <RangeSlider
-                    label="Medium Moisture Thresholds"
+                    label="Ambang Batas Kelembapan Media"
                     value={[thresholds.moistureMin, thresholds.moistureMax]}
                     onChange={([newMin, newMax]) =>
                       setThresholds({ ...thresholds, moistureMin: newMin, moistureMax: newMax })
