@@ -59,7 +59,6 @@ const ActuatorCard: React.FC<ActuatorCardProps> = ({ device, userId, onEdit, onD
             <div className="flex justify-between items-center"><span className="font-medium">Kipas</span><ToggleSwitch checked={!states?.['16']} onChange={(val) => handleActuatorChange('16', val)} /></div>
             <div className="flex justify-between items-center"><span className="font-medium">Humidifier</span><ToggleSwitch checked={!states?.['17']} onChange={(val) => handleActuatorChange('17', val)} /></div>
             <div className="flex justify-between items-center"><span className="font-medium">Lampu</span><ToggleSwitch checked={!states?.['18']} onChange={(val) => handleActuatorChange('18', val)} /></div>
-            <div className="flex justify-between items-center"><span className="font-medium">Pompa</span><ToggleSwitch checked={!states?.['19']} onChange={(val) => handleActuatorChange('19', val)} /></div>
           </div>
         )}
       </div>
