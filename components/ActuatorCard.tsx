@@ -10,6 +10,7 @@ import { ActuatorData, updateActuatorState } from '@/lib/fetchActuatorData';
 import { Edit, Trash2 } from 'lucide-react';
 import ToggleSwitch from '@/components/ToggleSwitch';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import StatusIndicator from '@/components/StatusIndicator';
 
 interface ActuatorCardProps {
   device: Device;
@@ -63,13 +64,16 @@ const ActuatorCard: React.FC<ActuatorCardProps> = ({ device, userId, onEdit, onD
         )}
       </div>
 
-      <div className="mt-6 border-t pt-4 flex justify-end gap-2">
-         <button onClick={onEdit} className="text-gray-600 hover:text-blue-700 p-1">
-          <Edit size={16} />
-        </button>
-        <button onClick={onDelete} className="text-gray-600 hover:text-red-700 p-1">
-          <Trash2 size={16} />
-        </button>
+      <div className="mt-6 border-t pt-4 flex justify-between items-center">
+        <StatusIndicator status={device.status || 'inactive'} />
+        <div className="flex gap-2">
+          <button onClick={onEdit} className="text-gray-600 hover:text-blue-700 p-1">
+            <Edit size={16} />
+          </button>
+          <button onClick={onDelete} className="text-gray-600 hover:text-red-700 p-1">
+            <Trash2 size={16} />
+          </button>
+        </div>
       </div>
     </div>
   );
