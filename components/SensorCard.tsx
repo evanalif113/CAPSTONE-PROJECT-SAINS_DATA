@@ -65,7 +65,7 @@ const SensorCard: React.FC<SensorCardProps> = ({ device, userId, onEdit, onDelet
       </div>
 
       <div className="mt-6 border-t pt-4 flex justify-between items-center">
-        <StatusIndicator status={device.status} />
+        <StatusIndicator status={device.status || 'inactive'} />
         <div className="flex gap-2">
           <button onClick={onEdit} className="text-gray-500 hover:text-blue-700 p-1">
             <Edit size={16} />
