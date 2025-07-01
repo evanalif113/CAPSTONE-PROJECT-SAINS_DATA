@@ -45,7 +45,8 @@ const periods: Period[] = [
 export default function DataHistory() {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("Environmental Trends");
-  const [selectedPeriod, setSelectedPeriod] = useState<Period>(periods[0]);
+  // Gunakan periode default sebagai 1 jam
+  const [selectedPeriod, setSelectedPeriod] = useState<Period>(periods[1]);
   const [data, setData] = useState<SensorDatum[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

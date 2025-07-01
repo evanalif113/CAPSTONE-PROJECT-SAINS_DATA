@@ -69,7 +69,7 @@ export default function Authentication() {
         <p className="text-center text-gray-600 mb-6">Teknologi AIoT untuk Budidaya Jamur yang Lebih Cerdas dan Presisi</p>
 
         {/* Signup instruction */}
-        <p className="text-center text-gray-500 text-sm mb-8">Masukan Akun untuk mengakses dashboard</p>
+        <p className="text-center text-gray-500 text-sm mb-8">Masukan Akun untuk mengakses Dashboard</p>
 
         {/* Error/Success Message */}
         {error && <div className="mb-4 text-red-600 text-sm text-center">{error}</div>}

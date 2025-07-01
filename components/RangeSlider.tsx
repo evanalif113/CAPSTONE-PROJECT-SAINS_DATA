@@ -4,7 +4,7 @@
 import * as Slider from "@radix-ui/react-slider";
 
 interface RangeSliderProps {
-  label: string;
+  label: string; //label untuk slider
   value: [number, number]; // Array dengan dua nilai: [min, max]
   onChange: (newValue: [number, number]) => void;
   min: number;
