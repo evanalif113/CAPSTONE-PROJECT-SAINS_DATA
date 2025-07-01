@@ -31,7 +31,7 @@ Kumbung Sense adalah aplikasi web yang membantu petani jamur dalam memantau dan 
 
 1. **Clone repository:**
    ```bash
-   git clone https://github.com/username/kumbung-sense.git
+   git clone https://github.com/evanalif113/Kumbung-Sense.git
    cd kumbung-sense
    ```
 2. **Install dependencies:**
