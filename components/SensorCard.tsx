@@ -56,10 +56,10 @@ const SensorCard: React.FC<SensorCardProps> = ({ device, userId, onEdit, onDelet
         
         {loading? <div className="py-8 flex justify-center"><LoadingSpinner/></div> : (
           <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
-            <div className="flex items-center gap-2"><Thermometer size={18} className="text-red-500"/> Suhu: <span className="font-semibold">{data?.temperature?.toFixed(2) ?? 'N/A'}°C</span></div>
-            <div className="flex items-center gap-2"><Droplets size={18} className="text-blue-500"/> Kelembapan: <span className="font-semibold">{data?.humidity?.toFixed(2) ?? 'N/A'}%</span></div>
-            <div className="flex items-center gap-2"><Sun size={18} className="text-yellow-500"/> Cahaya: <span className="font-semibold">{data?.light?.toFixed(1) ?? 'N/A'} lux</span></div>
-            <div className="flex items-center gap-2"><Sprout size={18} className="text-green-500"/> Media: <span className="font-semibold">{data?.moisture?.toFixed(1) ?? 'N/A'}%</span></div>
+            <div className="flex items-center gap-2"><Thermometer size={18} className="text-red-500"/><span className="font-semibold">{data?.temperature?.toFixed(2) ?? 'N/A'} °C</span></div>
+            <div className="flex items-center gap-2"><Droplets size={18} className="text-blue-500"/><span className="font-semibold">{data?.humidity?.toFixed(2) ?? 'N/A'} %</span></div>
+            <div className="flex items-center gap-2"><Sun size={18} className="text-yellow-500"/><span className="font-semibold">{data?.light?.toFixed(1) ?? 'N/A'} lux</span></div>
+            <div className="flex items-center gap-2"><Sprout size={18} className="text-green-500"/><span className="font-semibold">{data?.moisture?.toFixed(1) ?? 'N/A'} %</span></div>
           </div>
         )}
       </div>
