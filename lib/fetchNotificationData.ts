@@ -5,14 +5,35 @@ import {
   get,
   update, // 'update' lebih aman karena hanya mengubah field yang diberikan
   remove,
+  push, // Impor 'push' untuk membuat data baru
 } from "@/lib/firebaseConfig";
 
-interface Notification {
+export interface Notification {
   id: string; // ID unik untuk notifikasi
   message: string; // Pesan notifikasi
   timestamp: number; // Waktu notifikasi dalam format UNIX timestamp
   read: boolean; // Status apakah notifikasi sudah dibaca
 }
+
+/**
+ * Menambahkan notifikasi baru untuk pengguna.
+ * @param userId - ID pengguna.
+ * @param message - Pesan notifikasi.
+ */
+export const addNotification = async (userId: string, message: string): Promise<void> => {
+  try {
+    const notificationsRef = ref(database, `${userId}/notifications`);
+    const newNotification = {
+      message,
+      timestamp: Date.now(),
+      read: false,
+    };
+    await push(notificationsRef, newNotification);
+  } catch (error) {
+    console.error("Error adding notification:", error);
+    throw new Error("Gagal menambahkan notifikasi.");
+  }
+};
 
 /**
  * Mengambil semua notifikasi untuk pengguna tertentu.

@@ -8,7 +8,7 @@ import {
   get
 } from "@/lib/firebaseConfig";
 
-interface SensorValue {
+export interface SensorValue {
   temperature: number;
   humidity: number;
   light: number;

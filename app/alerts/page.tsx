@@ -1,77 +1,58 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import AppHeader from "@/components/AppHeader";
 import Sidebar from "@/components/Sidebar";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import { TriangleAlert, ClockAlert, Bell } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 import {
-  TriangleAlert,
-  ClockAlert,
-  Bell,
-} from "lucide-react";
+  Notification,
+  fetchNotifications,
+  addNotification
+} from "@/lib/fetchNotificationData";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 export default function Alerts() {
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("Active Alerts");
+  const [alerts, setAlerts] = useState<Notification[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Sample data
-  const activeAlerts = [
-    {
-      id: 1,
-      type: "critical",
-      message: "Temperature exceeds threshold (35°C)",
-      time: "15 minutes ago",
-      icon: "triangle-red",
-    },
-    {
-      id: 2,
-      type: "warning",
-      message: "Humidity below optimal range (55%)",
-      time: "1 hour ago",
-      icon: "triangle-yellow",
-    },
-    {
-      id: 3,
-      type: "critical",
-      message: "Medium moisture critically low (30%)",
-      time: "2 hours ago",
-      icon: "triangle-red",
-    },
-  ];
-
-  const notificationSettings = [
-    { type: "Temperature High", threshold: "> 32°C", email: true, push: true },
-    { type: "Temperature Low", threshold: "< 18°C", email: false, push: true },
-    { type: "Humidity High", threshold: "> 75%", email: true, push: false },
-    { type: "Humidity Low", threshold: "< 60%", email: true, push: true },
-    {
-      type: "Light Intensity Low",
-      threshold: "< 500 lux",
-      email: false,
-      push: true,
-    },
-    {
-      type: "Medium Moisture Low",
-      threshold: "< 35%",
-      email: true,
-      push: true,
-    },
-    { type: "Device Fault", threshold: "Any", email: true, push: true },
-  ];
-
-  // Tipe untuk iconType
-  type IconType = "triangle-red" | "triangle-yellow" | "bell-blue" | string;
-
-  const renderAlertIcon = (iconType: IconType) => {
-    switch (iconType) {
-      case "triangle-red":
-        return <TriangleAlert className="text-red-500" />;
-      case "triangle-yellow":
-        return <ClockAlert className="text-yellow-500" />;
-      case "bell-blue":
-        return <Bell className="text-blue-500" />;
-      default:
-        return <TriangleAlert className="text-gray-500" />;
+  const refetchAlerts = useCallback(() => {
+    if (user) {
+      setLoading(true);
+      fetchNotifications(user.uid)
+        .then(setAlerts)
+        .catch(console.error)
+        .finally(() => setLoading(false));
     }
+  }, [user]);
+
+  useEffect(() => {
+    refetchAlerts();
+  }, [refetchAlerts]);
+
+  const handleTestNotification = async () => {
+    if (!user) return;
+    try {
+      await addNotification(user.uid, "Ini adalah notifikasi tes manual.");
+      refetchAlerts(); // Muat ulang daftar setelah menambahkan
+    } catch (error) {
+      console.error("Gagal mengirim notifikasi tes:", error);
+      // Anda bisa menambahkan feedback error ke pengguna di sini
+    }
+  };
+
+  const renderAlertIcon = (message: string) => {
+    const lowerCaseMessage = message.toLowerCase();
+    if (lowerCaseMessage.includes("kritikal") || lowerCaseMessage.includes("tinggi")) {
+      return <TriangleAlert className="text-red-500" />;
+    }
+    if (lowerCaseMessage.includes("peringatan") || lowerCaseMessage.includes("di bawah")) {
+      return <ClockAlert className="text-yellow-500" />;
+    }
+    return <Bell className="text-blue-500" />;
   };
 
   return (
@@ -92,6 +73,12 @@ export default function Alerts() {
                 Alarm dan Notifikasi
               </h2>
               <div className="flex space-x-2">
+                <button
+                  onClick={handleTestNotification}
+                  className="px-4 py-2 rounded-lg text-sm font-medium bg-indigo-100 text-indigo-700 hover:bg-indigo-200 transition-colors"
+                >
+                  Kirim Notifikasi Tes
+                </button>
                 <button
                   onClick={() => setActiveTab("Active Alerts")}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
@@ -122,31 +109,42 @@ export default function Alerts() {
               <div>
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="text-lg font-semibold text-gray-900">
-                    Active Alerts
+                    Notifikasi Aktif
                   </h3>
                   <span className="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium">
-                    {activeAlerts.length} Active
+                    {alerts.length} Aktif
                   </span>
                 </div>
                 <div className="space-y-4">
-                  {activeAlerts.map((alert) => (
-                    <div
-                      key={alert.id}
-                      className="bg-white rounded-lg border border-gray-200 p-4"
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3">
-                          {renderAlertIcon(alert.icon)}
-                          <span className="text-gray-900 font-medium">
-                            {alert.message}
+                  {loading ? (
+                    <div className="flex justify-center items-center h-40">
+                      <LoadingSpinner />
+                    </div>
+                  ) : alerts.length === 0 ? (
+                    <div className="text-center text-gray-500 py-10 bg-white rounded-lg border">
+                      <Bell size={48} className="mx-auto text-gray-300 mb-4" />
+                      <p>Tidak ada notifikasi aktif.</p>
+                    </div>
+                  ) : (
+                    alerts.map((alert) => (
+                      <div
+                        key={alert.id}
+                        className="bg-white rounded-lg border border-gray-200 p-4"
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-3">
+                            {renderAlertIcon(alert.message)}
+                            <span className="text-gray-900 font-medium">
+                              {alert.message}
+                            </span>
+                          </div>
+                          <span className="text-sm text-gray-500">
+                            {new Date(alert.timestamp).toLocaleString("id-ID")}
                           </span>
                         </div>
-                        <span className="text-sm text-gray-500">
-                          {alert.time}
-                        </span>
                       </div>
-                    </div>
-                  ))}
+                    ))
+                  )}
                 </div>
               </div>
             )}
