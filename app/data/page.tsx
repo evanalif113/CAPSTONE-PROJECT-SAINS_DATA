@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { useAuth } from "@/context/AuthContext";
 import { fetchSensorData } from "@/lib/fetchSensorData";
-import { fetchActuatorLogs, ActuatorLog } from "@/lib/fetchActuatorLog";
+import { fetchActuatorLogs, ActuatorLog, deleteActuatorLogs } from "@/lib/fetchActuatorLog";
 import AppHeader from "@/components/AppHeader";
 import Sidebar from "@/components/Sidebar";
 import {
@@ -13,6 +13,7 @@ import {
   LightIntensityIcon,
   MoistureIcon,
 } from "@/components/Icon";
+import { Trash2 } from "lucide-react";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { cn } from "@/lib/utils";
@@ -52,6 +53,7 @@ export default function DataHistory() {
   const [sensorLoading, setSensorLoading] = useState(true);
   const [actuatorLogs, setActuatorLogs] = useState<ActuatorLog[]>([]);
   const [logsLoading, setLogsLoading] = useState(true);
+  const [isDeleting, setIsDeleting] = useState(false); // State untuk proses hapus
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -103,6 +105,24 @@ export default function DataHistory() {
       return () => clearInterval(interval);
     }
   }, [user, selectedPeriod]);
+
+  const handleDeleteLogs = async () => {
+    if (!user) return;
+
+    if (window.confirm("Apakah Anda yakin ingin menghapus semua riwayat log? Tindakan ini tidak dapat diurungkan.")) {
+      setIsDeleting(true);
+      setError(null);
+      try {
+        await deleteActuatorLogs(user.uid);
+        setActuatorLogs([]); // Kosongkan state di UI setelah berhasil
+      } catch (err) {
+        console.error(err);
+        setError("Gagal menghapus log aktuator.");
+      } finally {
+        setIsDeleting(false);
+      }
+    }
+  };
 
   function getYAxisDomain(data: SensorDatum[], key: keyof SensorDatum) {
     const vals = data.map((d) => d[key] as number);
@@ -237,6 +257,16 @@ export default function DataHistory() {
             {/* Konten Tab Log Aktuator */}
             {activeTab === "Log Aktuator" && (
               <div>
+                <div className="flex justify-end mb-4">
+                  <button
+                    onClick={handleDeleteLogs}
+                    disabled={logsLoading || isDeleting || actuatorLogs.length === 0}
+                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:bg-red-300 disabled:cursor-not-allowed"
+                  >
+                    <Trash2 size={16} />
+                    {isDeleting ? "Menghapus..." : "Hapus Semua Log"}
+                  </button>
+                </div>
                 {logsLoading ? (
                   <div className="text-center py-8"><LoadingSpinner /></div>
                 ) : actuatorLogs.length === 0 ? (

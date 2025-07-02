@@ -5,6 +5,7 @@ import {
   set, // Impor 'set'
   query,
   orderByChild,
+  remove, // Impor 'remove'
 } from "@/lib/firebaseConfig";
 
 export interface ActuatorLog {
@@ -59,5 +60,19 @@ export const fetchActuatorLogs = async (userId: string): Promise<ActuatorLog[]> 
   } catch (error) {
     console.error("Error fetching actuator logs:", error);
     throw new Error("Gagal mengambil data log aktuator.");
+  }
+};
+
+/**
+ * Menghapus semua log aktivitas aktuator untuk pengguna tertentu.
+ * @param userId - ID pengguna.
+ */
+export const deleteActuatorLogs = async (userId: string): Promise<void> => {
+  try {
+    const logRef = ref(database, `${userId}/actuator_logs`);
+    await remove(logRef);
+  } catch (error) {
+    console.error("Error deleting actuator logs:", error);
+    throw new Error("Gagal menghapus log aktuator.");
   }
 };
