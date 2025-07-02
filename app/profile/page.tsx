@@ -7,12 +7,10 @@ import Sidebar from "@/components/Sidebar";
 import { useAuth } from "@/context/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import {
-  updateProfile,
-  updatePassword,
-  reauthenticateWithCredential,
-  EmailAuthProvider,
-  deleteUser,
-} from "firebase/auth";
+  updateUserProfile,
+  changeUserPassword,
+  deleteUserAccount,
+} from "@/lib/fetchAuthentication";
 import { EditIcon, SaveIcon, CancelIcon } from "@/components/Icon"; // Asumsi Icon ada
 
 
@@ -54,7 +52,7 @@ export default function ProfilePage() {
     setSuccess(null);
 
     try {
-      await updateProfile(user, { displayName });
+      await updateUserProfile(user, displayName);
       setSuccess("Profil berhasil diperbarui!");
       setIsEditing(false);
     } catch (err: any) {
@@ -85,14 +83,8 @@ export default function ProfilePage() {
     setError(null);
     setSuccess(null);
 
-    const credential = EmailAuthProvider.credential(
-      user.email,
-      currentPassword
-    );
-
     try {
-      await reauthenticateWithCredential(user, credential);
-      await updatePassword(user, newPassword);
+      await changeUserPassword(user, currentPassword, newPassword);
       setSuccess("Password berhasil diubah!");
       // Kosongkan form password
       setCurrentPassword("");
@@ -127,11 +119,8 @@ export default function ProfilePage() {
     setError(null);
     setSuccess(null);
 
-    const credential = EmailAuthProvider.credential(user.email, deletePassword);
-
     try {
-      await reauthenticateWithCredential(user, credential);
-      await deleteUser(user);
+      await deleteUserAccount(user, deletePassword);
       // Logout dan redirect akan ditangani oleh onAuthStateChanged di AuthContext
       setSuccess("Akun berhasil dihapus.");
     } catch (err: any) {
