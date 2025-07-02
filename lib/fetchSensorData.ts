@@ -15,7 +15,7 @@ export interface SensorValue {
   moisture: number;
 }
 
-export interface SensorData extends SensorValue {
+export interface SensorDate extends SensorValue {
   timestamp: number;
   timeFormatted: string;
 }
@@ -30,7 +30,8 @@ export interface SensorData extends SensorValue {
 export async function fetchSensorData(
   userId: string,
   limit: number,
-): Promise<SensorData[]> {
+): Promise<SensorDate[]> {
+  console.log("fetchSensorData called with:", { userId, limit });
   try {
     const dataRef = query(
       ref(database, `${userId}/sensor/data`),
@@ -39,41 +40,50 @@ export async function fetchSensorData(
     );
 
     const snapshot = await get(dataRef);
+    console.log("Firebase snapshot exists:", snapshot.exists());
     if (!snapshot.exists()) {
       console.log("No sensor data found.");
       return [];
     }
 
-    const results: SensorData[] = [];
+    const results: SensorDate[] = [];
 
     snapshot.forEach((child) => {
       // 1. Ambil timestamp dari KEY, bukan dari VALUE
       const timestamp = Number(child.key); // <-- INI KUNCI PAKE UNIX TIME
+      console.log("Processing timestamp (from key):", timestamp);
       const data: SensorValue = child.val();
+      console.log("Sensor value from child:", data);
 
       // 2. Format waktu menggunakan timestamp yang benar
       const formattedTime = new Date(timestamp * 1000).toLocaleTimeString(
-        'en-GB',
+        'id-ID',
         {
+          timeZone: "Asia/Jakarta", // Pastikan zona waktu sesuai
           hour: "2-digit",
           minute: "2-digit",
           second: "2-digit",
           hour12: false,
         }
-      );
+      ).replace(/\./g, ':');  //replace untuk mengganti titik dengan titik dua
+      console.log("Formatted time:", formattedTime);
       // 3. Gabungkan semua data sesuai interface SensorData
-      results.push({
+      const resultItem = {
         timestamp: timestamp,
         temperature: data.temperature,
         humidity: data.humidity,
         light: data.light,
         moisture: data.moisture,
         timeFormatted: formattedTime,
-      });
+      };
+      console.log("Pushing item to results:", resultItem);
+      results.push(resultItem);
     });
 
     // 4. Balik urutan array agar data terbaru berada di indeks pertama
-    return results.reverse();
+    const reversedResults = results.reverse();
+    console.log("Final reversed results:", reversedResults);
+    return reversedResults;
 
   } catch (error) {
     console.error("Gagal mengambil data sensor:", error);

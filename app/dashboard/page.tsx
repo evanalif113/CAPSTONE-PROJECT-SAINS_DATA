@@ -6,7 +6,7 @@ import dynamic from "next/dynamic";
 import { useAuth } from "@/context/AuthContext";
 import { 
   fetchSensorData, 
-  SensorData 
+  SensorDate 
 } from "@/lib/fetchSensorData";
 import {
   fetchActuatorData,
@@ -36,7 +36,7 @@ export default function DashboardPage() {
   const [actuatorStates, setActuatorStates] = useState<ActuatorData | null>(
     null
   );
-  const [data, setData] = useState<SensorData[]>([]);
+  const [data, setData] = useState<SensorDate[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -143,7 +143,7 @@ export default function DashboardPage() {
 
   // ... (Komponen ChartCard dan ToggleSwitch tetap sama) ...
   // Helper untuk min/max domain YAxis
-  function getYAxisDomain(data: SensorData[], key: SensorKey) {
+  function getYAxisDomain(data: SensorDate[], key: SensorKey) {
     const vals = data.map((d) => d[key]);
     if (vals.length === 0) return [0, 1]; // Default jika tidak ada data
 
