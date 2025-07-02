@@ -17,6 +17,8 @@ import {
 import AppHeader from "@/components/AppHeader";
 import Sidebar from "@/components/Sidebar";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import dynamic from "next/dynamic";
+const Plot = dynamic(() => import("react-plotly.js"), { ssr: false });
 
 // Sample data
 const kpiData = [
@@ -170,6 +172,39 @@ function HarvestInputModal({
   );
 }
 
+// Helper untuk agregasi kualitas panen
+function getQualityDistribution(harvestData: Harvest[]) {
+  const counts = { A: 0, B: 0, C: 0 };
+  harvestData.forEach((h) => {
+    if (h.quality === "A") counts.A++;
+    else if (h.quality === "B") counts.B++;
+    else if (h.quality === "C") counts.C++;
+  });
+  return counts;
+}
+
+// Helper konversi kualitas ke angka
+function qualityToNumber(q: string) {
+  if (q === "A") return 3;
+  if (q === "B") return 2;
+  if (q === "C") return 1;
+  return 0;
+}
+
+// Helper histogram jumlah panen
+function getAmountBins(harvestData: Harvest[], binSize = 5) {
+  const amounts = harvestData.map((h) => h.amount);
+  const max = Math.max(...amounts, 0);
+  const bins = [];
+  for (let i = 0; i <= max; i += binSize) {
+    bins.push({
+      range: `${i}-${i + binSize - 1}`,
+      count: amounts.filter((a) => a >= i && a < i + binSize).length,
+    });
+  }
+  return bins;
+}
+
 export default function IntelligencePage() {
   const [period, setPeriod] = useState("30 Hari");
   const [metric, setMetric] = useState("Semua");
@@ -184,9 +219,9 @@ export default function IntelligencePage() {
   return (
     <ProtectedRoute>
       <div className="flex min-h-screen bg-gray-50">
-        <Sidebar/>
+        <Sidebar />
         <div className="flex-1 flex flex-col">
-          <AppHeader/>
+          <AppHeader />
           <main className="flex-1 p-6 space-y-8">
             {/* Header & Input Data Panen Button */}
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-2">
@@ -321,6 +356,111 @@ export default function IntelligencePage() {
               </div>
             </div>
 
+            {/* Analisis Lanjutan */}
+            <div className="mt-10">
+              <h2 className="text-xl font-bold mb-4">Analisis Lanjutan</h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {/* a. Donut Chart Distribusi Kualitas */}
+                <div className="bg-white rounded-lg p-4 shadow">
+                  <h3 className="font-semibold mb-2 text-center">
+                    Distribusi Kualitas Panen
+                  </h3>
+                  <Plot
+                    data={[
+                      {
+                        values: Object.values(
+                          getQualityDistribution(harvestData)
+                        ),
+                        labels: ["A (Sangat Baik)", "B (Baik)", "C (Cukup)"],
+                        type: "pie",
+                        hole: 0.5,
+                        marker: { colors: ["#22c55e", "#facc15", "#f87171"] },
+                        textinfo: "percent+label",
+                      },
+                    ]}
+                    layout={{
+                      height: 250,
+                      margin: { t: 10, b: 10, l: 10, r: 10 },
+                      showlegend: false,
+                    }}
+                    config={{ displayModeBar: false, responsive: true }}
+                    style={{ width: "100%", height: "250px" }}
+                  />
+                  <p className="text-xs text-gray-500 mt-2 text-center">
+                    Proporsi kualitas panen (A, B, C) untuk deteksi dini masalah
+                    produksi.
+                  </p>
+                </div>
+
+                {/* b. Korelasi Jumlah vs Kualitas (Scatter) */}
+                <div className="bg-white rounded-lg p-4 shadow">
+                  <h3 className="font-semibold mb-2 text-center">
+                    Korelasi Jumlah vs. Kualitas
+                  </h3>
+                  <Plot
+                    data={[
+                      {
+                        x: harvestData.map((h) => h.amount),
+                        y: harvestData.map((h) => qualityToNumber(h.quality)),
+                        mode: "markers",
+                        type: "scatter",
+                        marker: { color: "#3b82f6", size: 10 },
+                        text: harvestData.map(
+                          (h) => `Tanggal: ${h.date}<br>Kualitas: ${h.quality}`
+                        ),
+                      },
+                    ]}
+                    layout={{
+                      height: 250,
+                      margin: { t: 10, b: 40, l: 40, r: 10 },
+                      xaxis: { title: "Jumlah Panen (kg)" },
+                      yaxis: {
+                        title: "Kualitas (A=3, B=2, C=1)",
+                        tickvals: [1, 2, 3],
+                        ticktext: ["C", "B", "A"],
+                        range: [0.5, 3.5],
+                      },
+                    }}
+                    config={{ displayModeBar: false, responsive: true }}
+                    style={{ width: "100%", height: "250px" }}
+                  />
+                  <p className="text-xs text-gray-500 mt-2 text-center">
+                    Apakah panen besar cenderung berkualitas rendah? Optimasi
+                    strategi panen.
+                  </p>
+                </div>
+
+                {/* c. Histogram Frekuensi Jumlah Panen */}
+                <div className="bg-white rounded-lg p-4 shadow">
+                  <h3 className="font-semibold mb-2 text-center">
+                    Frekuensi Jumlah Panen
+                  </h3>
+                  <Plot
+                    data={[
+                      {
+                        x: getAmountBins(harvestData).map((bin) => bin.range),
+                        y: getAmountBins(harvestData).map((bin) => bin.count),
+                        type: "bar",
+                        marker: { color: "#6366f1" },
+                      },
+                    ]}
+                    layout={{
+                      height: 250,
+                      margin: { t: 10, b: 40, l: 40, r: 10 },
+                      xaxis: { title: "Rentang Jumlah Panen (kg)" },
+                      yaxis: { title: "Frekuensi" },
+                    }}
+                    config={{ displayModeBar: false, responsive: true }}
+                    style={{ width: "100%", height: "250px" }}
+                  />
+                  <p className="text-xs text-gray-500 mt-2 text-center">
+                    Pola panen: lebih sering panen kecil atau besar? Cek
+                    efisiensi operasional.
+                  </p>
+                </div>
+              </div>
+            </div>
+
             {/* Key Insights Panel */}
             <div className="bg-white rounded-xl shadow p-6 border border-gray-100">
               <div className="flex items-center mb-4">
@@ -383,7 +523,7 @@ export default function IntelligencePage() {
               onSubmit={handleAddHarvest}
             />
 
-            {/* Tabel Data Panen (opsional, tampilkan jika ada data) */}
+            {/* Tabel Data Panen */}
             {harvestData.length > 0 && (
               <div className="bg-white rounded-lg shadow border border-gray-200 p-4 mt-8">
                 <h2 className="text-lg font-semibold mb-4">
