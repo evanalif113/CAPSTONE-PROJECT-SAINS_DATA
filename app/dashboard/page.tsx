@@ -367,7 +367,7 @@ export default function DashboardPage() {
                       Terakhir data diterima
                     </span>
                     <span className="text-gray-900">
-                      {latest
+                      {latest && latest.timestamp
                         ? new Date(latest.timestamp).toLocaleString()
                         : "-"}
                     </span>
