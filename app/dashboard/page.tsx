@@ -13,6 +13,7 @@ import {
   updateActuatorState,
   ActuatorData,
 } from "@/lib/fetchActuatorData";
+import { fetchMode, updateMode } from "@/lib/fetchModeData";
 import AppHeader from "@/components/AppHeader";
 import Sidebar from "@/components/Sidebar";
 import {
@@ -74,11 +75,23 @@ export default function DashboardPage() {
     }
   };
 
+  const loadMode = async () => {
+    if (!user) return;
+    try {
+      const isAuto = await fetchMode(user.uid);
+      setModeAuto(isAuto);
+    } catch (err) {
+      console.error("Gagal memuat status mode:", err);
+      setError((prevError) => prevError || "Gagal memuat status mode");
+    }
+  };
+
   useEffect(() => {
     if (user) {
       setLoading(true); // Set loading hanya sekali saat user pertama kali ada
       loadActuatorData();
       loadSensorData();
+      loadMode();
       const interval = setInterval(loadSensorData, 10000); // 10 detik polling
       return () => clearInterval(interval);
     }
@@ -260,6 +273,18 @@ export default function DashboardPage() {
     }
   };
 
+  const handleModeToggle = async (isAuto: boolean) => {
+    if (!user) return;
+    const oldMode = modeAuto;
+    setModeAuto(isAuto); // Optimistic UI update
+    try {
+      await updateMode(user.uid, isAuto);
+    } catch (error) {
+      console.error("Gagal update mode, mengembalikan state.");
+      setModeAuto(oldMode); // Rollback on failure
+    }
+  };
+
 
   if (loading) {
     return (
@@ -318,6 +343,18 @@ export default function DashboardPage() {
                   {/* KOREKSI: Gunakan `timeFormatted` yang sudah ada */}
                   {latest ? latest.timeFormatted : ":"}
                 </p>
+              </div>
+              <div className="flex items-center gap-4">
+                <span className="font-medium text-gray-700">Mode Sistem:</span>
+                <div className="flex items-center gap-2">
+                  <span className={`font-semibold ${!modeAuto ? 'text-blue-600' : 'text-gray-400'}`}>Manual</span>
+                  <ToggleSwitch
+                    checked={modeAuto}
+                    onChange={handleModeToggle}
+                    disabled={!user}
+                  />
+                  <span className={`font-semibold ${modeAuto ? 'text-blue-600' : 'text-gray-400'}`}>Otomatis</span>
+                </div>
               </div>
             </div>
 
@@ -457,8 +494,8 @@ export default function DashboardPage() {
                           onChange={(isChecked) =>
                             handleActuatorToggle(actuator.pin, isChecked)
                           }
-                          // Tombol non-aktif jika data belum dimuat
-                          disabled={actuatorStates === null}
+                          // Tombol non-aktif jika data belum dimuat atau mode otomatis
+                          disabled={actuatorStates === null || modeAuto}
                         />
                       </div>
                       <span
@@ -477,6 +514,9 @@ export default function DashboardPage() {
                           : "OFF" // Teks jika status 1
                         }
                       </span>
+                      {modeAuto && (
+                        <span className="text-xs text-gray-500 mt-2">(Mode Otomatis)</span>
+                      )}
                     </div>
                   ))}
                 </div>
