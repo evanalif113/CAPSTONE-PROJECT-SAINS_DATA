@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   BarChart2,
   TrendingUp,
@@ -18,6 +18,7 @@ import AppHeader from "@/components/AppHeader";
 import Sidebar from "@/components/Sidebar";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import dynamic from "next/dynamic";
+import { useAuth } from "@/context/AuthContext";
 const Plot = dynamic(() => import("react-plotly.js"), { ssr: false });
 
 // Sample data
@@ -206,11 +207,24 @@ function getAmountBins(harvestData: Harvest[], binSize = 5) {
 }
 
 export default function IntelligencePage() {
+  const { user } = useAuth();
   const [period, setPeriod] = useState("30 Hari");
   const [metric, setMetric] = useState("Semua");
   const [dateRange, setDateRange] = useState({ from: "", to: "" });
   const [showHarvestModal, setShowHarvestModal] = useState(false);
   const [harvestData, setHarvestData] = useState<Harvest[]>([]);
+  const [greeting, setGreeting] = useState("");
+
+  useEffect(() => {
+    const currentHour = new Date().getHours();
+    if (currentHour >= 4 && currentHour < 11) {
+      setGreeting("Selamat Pagi");
+    } else if (currentHour >= 11 && currentHour < 18) {
+      setGreeting("Selamat Siang");
+    } else {
+      setGreeting("Selamat Malam");
+    }
+  }, []);
 
   const handleAddHarvest = (data: Harvest) => {
     setHarvestData((prev) => [...prev, data]);
@@ -223,11 +237,18 @@ export default function IntelligencePage() {
         <div className="flex-1 flex flex-col">
           <AppHeader />
           <main className="flex-1 p-6 space-y-8">
+            {/* Greeting */}
+            <div className="mb-4">
+              <h1 className="text-3xl font-bold text-gray-800">
+                {greeting}, {user?.displayName || "Pengguna"}!
+              </h1>
+              <p className="text-md text-gray-500">
+                Berikut adalah analisis data dari Kumbung Jamur Anda.
+              </p>
+            </div>
+
             {/* Header & Input Data Panen Button */}
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-2">
-              <h1 className="text-2xl font-bold text-gray-900">
-                Business Intelligence
-              </h1>
               <button
                 onClick={() => setShowHarvestModal(true)}
                 className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-semibold"
