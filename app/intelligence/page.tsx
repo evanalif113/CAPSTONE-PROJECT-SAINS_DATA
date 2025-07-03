@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   BarChart2,
   TrendingUp,
@@ -13,6 +13,7 @@ import {
   LineChart,
   PlusCircle,
   X,
+  Info,
 } from "lucide-react";
 import AppHeader from "@/components/AppHeader";
 import Sidebar from "@/components/Sidebar";
@@ -21,37 +22,45 @@ import dynamic from "next/dynamic";
 import { useAuth } from "@/context/AuthContext";
 const Plot = dynamic(() => import("react-plotly.js"), { ssr: false });
 
-// Sample data
-const kpiData = [
-  { label: "Total Panen", value: 1200, unit: "kg", trend: 5.2, up: true },
-  { label: "Suhu Rata-rata", value: 24.5, unit: "°C", trend: -1.1, up: false },
-  { label: "Kelembaban Rata-rata", value: 78, unit: "%", trend: 2.4, up: true },
-  { label: "Uptime Sistem", value: 99.7, unit: "%", trend: 0.3, up: true },
-];
-
-const monthlyProduction = [
-  { month: "Jan", panen: 100, kualitas: 90, efisiensi: 80 },
-  { month: "Feb", panen: 120, kualitas: 92, efisiensi: 85 },
-  { month: "Mar", panen: 130, kualitas: 91, efisiensi: 88 },
-  { month: "Apr", panen: 110, kualitas: 89, efisiensi: 82 },
-  { month: "Mei", panen: 140, kualitas: 93, efisiensi: 90 },
-  { month: "Jun", panen: 125, kualitas: 94, efisiensi: 87 },
-];
-
-const insights = [
-  "Produksi meningkat 5% dibanding bulan lalu.",
-  "Suhu rata-rata stabil dalam rentang optimal.",
-  "Efisiensi sistem meningkat setelah maintenance.",
-];
-
-// Komponen Modal Input Data Panen
+// --- Helper & Data ---
 type Harvest = {
   date: string;
   amount: number;
   quality: string;
   note: string;
+  avgTemp?: number;
+  avgHumidity?: number;
 };
 
+function getQualityDistribution(harvestData: Harvest[]) {
+  const counts = { A: 0, B: 0, C: 0 };
+  harvestData.forEach((h) => {
+    if (h.quality === "A") counts.A++;
+    else if (h.quality === "B") counts.B++;
+    else if (h.quality === "C") counts.C++;
+  });
+  return counts;
+}
+function qualityToNumber(q: string) {
+  if (q === "A") return 3;
+  if (q === "B") return 2;
+  if (q === "C") return 1;
+  return 0;
+}
+function getAmountBins(harvestData: Harvest[], binSize = 5) {
+  const amounts = harvestData.map((h) => h.amount);
+  const max = Math.max(...amounts, 0);
+  const bins = [];
+  for (let i = 0; i <= max; i += binSize) {
+    bins.push({
+      range: `${i}-${i + binSize - 1}`,
+      count: amounts.filter((a) => a >= i && a < i + binSize).length,
+    });
+  }
+  return bins;
+}
+
+// --- Modal Input Panen ---
 function HarvestInputModal({
   open,
   onClose,
@@ -67,6 +76,10 @@ function HarvestInputModal({
     quality: "",
     note: "",
   });
+
+  useEffect(() => {
+    if (open) setForm({ date: "", amount: 0, quality: "", note: "" });
+  }, [open]);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -173,39 +186,7 @@ function HarvestInputModal({
   );
 }
 
-// Helper untuk agregasi kualitas panen
-function getQualityDistribution(harvestData: Harvest[]) {
-  const counts = { A: 0, B: 0, C: 0 };
-  harvestData.forEach((h) => {
-    if (h.quality === "A") counts.A++;
-    else if (h.quality === "B") counts.B++;
-    else if (h.quality === "C") counts.C++;
-  });
-  return counts;
-}
-
-// Helper konversi kualitas ke angka
-function qualityToNumber(q: string) {
-  if (q === "A") return 3;
-  if (q === "B") return 2;
-  if (q === "C") return 1;
-  return 0;
-}
-
-// Helper histogram jumlah panen
-function getAmountBins(harvestData: Harvest[], binSize = 5) {
-  const amounts = harvestData.map((h) => h.amount);
-  const max = Math.max(...amounts, 0);
-  const bins = [];
-  for (let i = 0; i <= max; i += binSize) {
-    bins.push({
-      range: `${i}-${i + binSize - 1}`,
-      count: amounts.filter((a) => a >= i && a < i + binSize).length,
-    });
-  }
-  return bins;
-}
-
+// --- Main Page ---
 export default function IntelligencePage() {
   const { user } = useAuth();
   const [period, setPeriod] = useState("30 Hari");
@@ -214,21 +195,111 @@ export default function IntelligencePage() {
   const [showHarvestModal, setShowHarvestModal] = useState(false);
   const [harvestData, setHarvestData] = useState<Harvest[]>([]);
   const [greeting, setGreeting] = useState("");
+  const [mediaTanamKering, setMediaTanamKering] = useState(100);
 
   useEffect(() => {
     const currentHour = new Date().getHours();
-    if (currentHour >= 4 && currentHour < 11) {
-      setGreeting("Selamat Pagi");
-    } else if (currentHour >= 11 && currentHour < 18) {
+    if (currentHour >= 4 && currentHour < 11) setGreeting("Selamat Pagi");
+    else if (currentHour >= 11 && currentHour < 18)
       setGreeting("Selamat Siang");
-    } else {
-      setGreeting("Selamat Malam");
-    }
+    else setGreeting("Selamat Malam");
   }, []);
 
   const handleAddHarvest = (data: Harvest) => {
     setHarvestData((prev) => [...prev, data]);
   };
+
+  // KPI
+  const totalPanenBasah = useMemo(
+    () => harvestData.reduce((sum, h) => sum + h.amount, 0),
+    [harvestData]
+  );
+  const efisiensiBiologis = useMemo(
+    () =>
+      mediaTanamKering > 0 ? (totalPanenBasah / mediaTanamKering) * 100 : 0,
+    [totalPanenBasah, mediaTanamKering]
+  );
+  const avgTemp = useMemo(
+    () =>
+      harvestData.length > 0
+        ? harvestData.reduce((sum, h) => sum + (h.avgTemp || 0), 0) /
+          harvestData.length
+        : 0,
+    [harvestData]
+  );
+  const avgHumidity = useMemo(
+    () =>
+      harvestData.length > 0
+        ? harvestData.reduce((sum, h) => sum + (h.avgHumidity || 0), 0) /
+          harvestData.length
+        : 0,
+    [harvestData]
+  );
+
+  // KPI Cards Data
+  const kpiCards = [
+    {
+      label: "Efisiensi Biologis",
+      value: efisiensiBiologis,
+      unit: "%",
+      trend: efisiensiBiologis >= 100 ? 1 : -1,
+      up: efisiensiBiologis >= 100,
+      description: `Total Panen: ${totalPanenBasah} kg / Media Kering: ${mediaTanamKering} kg`,
+      color: "bg-green-100 text-green-800",
+      icon: <BarChart2 className="w-6 h-6" />,
+      tooltip:
+        "Efisiensi Biologis = (Total Panen Basah / Media Tanam Kering) × 100%",
+    },
+    {
+      label: "Total Panen",
+      value: totalPanenBasah,
+      unit: "kg",
+      trend: totalPanenBasah > 0 ? 1 : 0,
+      up: totalPanenBasah > 0,
+      description: "",
+      color: "bg-blue-100 text-blue-800",
+      icon: <FileText className="w-6 h-6" />,
+      tooltip: "Akumulasi seluruh panen basah (kg).",
+    },
+    {
+      label: "Suhu Rata-rata",
+      value: avgTemp.toFixed(1),
+      unit: "°C",
+      trend: 0,
+      up: true,
+      description: "",
+      color: "bg-yellow-100 text-yellow-800",
+      icon: <AreaChart className="w-6 h-6" />,
+      tooltip: "Rata-rata suhu lingkungan saat panen.",
+    },
+    {
+      label: "Kelembaban Rata-rata",
+      value: avgHumidity.toFixed(1),
+      unit: "%",
+      trend: 0,
+      up: true,
+      description: "",
+      color: "bg-cyan-100 text-cyan-800",
+      icon: <LineChart className="w-6 h-6" />,
+      tooltip: "Rata-rata kelembapan lingkungan saat panen.",
+    },
+  ];
+
+  // Badge warna kualitas
+  function QualityBadge({ quality }: { quality: string }) {
+    let color = "bg-gray-200 text-gray-800";
+    if (quality === "A") color = "bg-green-200 text-green-800";
+    else if (quality === "B") color = "bg-yellow-200 text-yellow-800";
+    else if (quality === "C") color = "bg-red-200 text-red-800";
+    return (
+      <span className={`px-2 py-1 rounded-full text-xs font-bold ${color}`}>
+        {quality}
+      </span>
+    );
+  }
+
+  // Empty state
+  const isEmpty = harvestData.length === 0;
 
   return (
     <ProtectedRoute>
@@ -247,7 +318,25 @@ export default function IntelligencePage() {
               </p>
             </div>
 
-            {/* Header & Input Data Panen Button */}
+            {/* Input Berat Media Tanam Kering */}
+            <div className="mb-4 flex items-center gap-2">
+              <label className="text-sm text-gray-700">
+                Berat Media Tanam Kering (kg):
+              </label>
+              <input
+                type="number"
+                value={mediaTanamKering}
+                onChange={(e) => setMediaTanamKering(Number(e.target.value))}
+                className="border rounded px-2 py-1 text-sm w-24"
+                min={1}
+              />
+              <span className="text-xs text-gray-400">
+                <Info className="inline w-4 h-4 mr-1" />
+                Ubah jika batch media tanam baru.
+              </span>
+            </div>
+
+            {/* Input Data Panen Button */}
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-2">
               <button
                 onClick={() => setShowHarvestModal(true)}
@@ -260,33 +349,39 @@ export default function IntelligencePage() {
 
             {/* KPI Cards */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              {kpiData.map((kpi, idx) => (
+              {kpiCards.map((kpi, idx) => (
                 <div
                   key={idx}
-                  className="bg-white rounded-xl shadow p-5 flex flex-col items-start border border-gray-100"
+                  className={`rounded-xl shadow p-5 flex flex-col items-start border border-gray-100 relative ${kpi.color}`}
                 >
                   <div className="flex items-center space-x-2 mb-2">
+                    {kpi.icon}
                     <span className="text-lg font-semibold">{kpi.label}</span>
+                    <span className="group relative">
+                      <Info className="w-4 h-4 text-gray-400 ml-1 cursor-pointer" />
+                      <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-black text-white text-xs rounded px-2 py-1 z-10 whitespace-nowrap">
+                        {kpi.tooltip}
+                      </span>
+                    </span>
                     {kpi.up ? (
                       <TrendingUp className="text-green-500 w-5 h-5" />
                     ) : (
                       <TrendingDown className="text-red-500 w-5 h-5" />
                     )}
-                    <span
-                      className={`text-xs ${
-                        kpi.up ? "text-green-600" : "text-red-600"
-                      }`}
-                    >
-                      {kpi.trend > 0 ? "+" : ""}
-                      {kpi.trend}%
-                    </span>
                   </div>
                   <div className="text-3xl font-bold text-gray-900">
-                    {kpi.value}
+                    {typeof kpi.value === "number"
+                      ? Number(kpi.value).toFixed(1)
+                      : kpi.value}
                     <span className="text-base font-normal text-gray-500 ml-1">
                       {kpi.unit}
                     </span>
                   </div>
+                  {kpi.description && (
+                    <div className="text-xs text-gray-500 mt-1">
+                      {kpi.description}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -358,7 +453,6 @@ export default function IntelligencePage() {
                   </span>
                 </div>
                 <div className="h-56 flex items-center justify-center text-gray-400">
-                  {/* Placeholder chart, ganti dengan chart library sesuai kebutuhan */}
                   <span>[Line Chart Sample]</span>
                 </div>
               </div>
@@ -371,7 +465,6 @@ export default function IntelligencePage() {
                   </span>
                 </div>
                 <div className="h-56 flex items-center justify-center text-gray-400">
-                  {/* Placeholder chart, ganti dengan chart library sesuai kebutuhan */}
                   <span>[Bar Chart Sample]</span>
                 </div>
               </div>
@@ -491,9 +584,31 @@ export default function IntelligencePage() {
                 </span>
               </div>
               <ul className="list-disc ml-6 text-gray-700 space-y-1">
-                {insights.map((ins, idx) => (
-                  <li key={idx}>{ins}</li>
-                ))}
+                {isEmpty ? (
+                  <li>
+                    Belum ada data panen. Silakan input data untuk melihat
+                    insight.
+                  </li>
+                ) : (
+                  <>
+                    <li>
+                      {efisiensiBiologis >= 100
+                        ? "Efisiensi Biologis sangat baik."
+                        : "Efisiensi Biologis masih perlu ditingkatkan."}
+                    </li>
+                    <li>
+                      Suhu rata-rata panen: {avgTemp.toFixed(1)}°C, kelembapan
+                      rata-rata: {avgHumidity.toFixed(1)}%
+                    </li>
+                    <li>
+                      Panen terbanyak:{" "}
+                      {harvestData.length > 0
+                        ? Math.max(...harvestData.map((h) => h.amount))
+                        : 0}{" "}
+                      kg
+                    </li>
+                  </>
+                )}
               </ul>
             </div>
 
@@ -545,33 +660,72 @@ export default function IntelligencePage() {
             />
 
             {/* Tabel Data Panen */}
-            {harvestData.length > 0 && (
-              <div className="bg-white rounded-lg shadow border border-gray-200 p-4 mt-8">
-                <h2 className="text-lg font-semibold mb-4">
-                  Riwayat Data Panen
-                </h2>
+            <div className="bg-white rounded-lg shadow border border-gray-200 p-4 mt-8 overflow-x-auto">
+              <h2 className="text-lg font-semibold mb-4">
+                Riwayat Data Panen & Korelasi Lingkungan
+              </h2>
+              {isEmpty ? (
+                <div className="text-gray-400 text-center py-8">
+                  Belum ada data panen.
+                </div>
+              ) : (
                 <table className="w-full text-sm">
-                  <thead>
+                  <thead className="sticky top-0 bg-white z-10">
                     <tr className="border-b">
-                      <th className="py-2 text-left">Tanggal</th>
-                      <th className="py-2 text-left">Jumlah (kg)</th>
+                      <th className="py-2 text-left cursor-pointer">Tanggal</th>
+                      <th className="py-2 text-left cursor-pointer">
+                        Jumlah (kg)
+                      </th>
+                      <th className="py-2 text-left">Suhu Rata-rata (°C)</th>
+                      <th className="py-2 text-left">
+                        Kelembapan Rata-rata (%)
+                      </th>
                       <th className="py-2 text-left">Kualitas</th>
                       <th className="py-2 text-left">Catatan</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {harvestData.map((row, idx) => (
-                      <tr key={idx} className="border-b last:border-b-0">
-                        <td className="py-2">{row.date}</td>
-                        <td className="py-2">{row.amount}</td>
-                        <td className="py-2">{row.quality}</td>
-                        <td className="py-2">{row.note}</td>
-                      </tr>
-                    ))}
+                    {harvestData
+                      .sort(
+                        (a, b) =>
+                          new Date(b.date).getTime() -
+                          new Date(a.date).getTime()
+                      )
+                      .map((row, idx) => (
+                        <tr
+                          key={idx}
+                          className={`border-b last:border-b-0 ${
+                            row.quality === "A"
+                              ? "bg-green-50"
+                              : row.quality === "B"
+                              ? "bg-yellow-50"
+                              : row.quality === "C"
+                              ? "bg-red-50"
+                              : ""
+                          }`}
+                        >
+                          <td className="py-2">{row.date}</td>
+                          <td className="py-2 font-bold">{row.amount}</td>
+                          <td className="py-2">
+                            {row.avgTemp !== undefined
+                              ? Number(row.avgTemp).toFixed(1)
+                              : "-"}
+                          </td>
+                          <td className="py-2">
+                            {row.avgHumidity !== undefined
+                              ? Number(row.avgHumidity).toFixed(1)
+                              : "-"}
+                          </td>
+                          <td className="py-2">
+                            <QualityBadge quality={row.quality} />
+                          </td>
+                          <td className="py-2">{row.note}</td>
+                        </tr>
+                      ))}
                   </tbody>
                 </table>
-              </div>
-            )}
+              )}
+            </div>
           </main>
         </div>
       </div>
