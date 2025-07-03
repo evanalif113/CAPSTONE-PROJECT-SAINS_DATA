@@ -10,7 +10,7 @@ import {
 
 export interface ActuatorLog {
   id: string;
-  pin: string;
+  pinId: number;
   state: 0 | 1; // Status yang diatur: 0 (ON) atau 1 (OFF)
   mode: 'auto' | 'manual';
   timestamp: number;

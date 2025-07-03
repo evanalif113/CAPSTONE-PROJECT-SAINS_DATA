@@ -51,7 +51,7 @@ export async function fetchActuatorData(
  */
 export async function updateActuatorState(
   userId: string,
-  PinId: string,
+  PinId: number,
   newState: 0 | 1,
   mode: 'manual' | 'auto'
 ): Promise<void> {
@@ -70,7 +70,7 @@ export async function updateActuatorState(
 
     // Tambahkan log setelah state berhasil diubah
     await addActuatorLog(userId, {
-      pin: PinId,
+      pinId: PinId,
       state: newState,
       mode: mode,
     });

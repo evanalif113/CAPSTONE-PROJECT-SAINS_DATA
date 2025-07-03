@@ -233,7 +233,7 @@ export default function DashboardPage() {
     );
   };
 
-  const handleActuatorToggle = async (pinId: string, checked: boolean) => {
+  const handleActuatorToggle = async (pinId: number, checked: boolean) => {
     if (!user || !actuatorStates) return;
 
     // UBAH LOGIKA: checked (ON) = 0, unchecked (OFF) = 1
@@ -437,9 +437,9 @@ export default function DashboardPage() {
               <div className="p-4">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   {[
-                    { name: "Fan", pin: "16" },
-                    { name: "Humidifier", pin: "17" },
-                    { name: "Light", pin: "18" },
+                    { name: "Fan", pin: 16 },
+                    { name: "Humidifier", pin: 17 },
+                    { name: "Light", pin: 18 },
                   ].map((actuator) => (
                     <div
                       key={actuator.pin}
