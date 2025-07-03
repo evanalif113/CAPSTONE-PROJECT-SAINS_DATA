@@ -22,8 +22,10 @@ import {
   MoistureIcon,
 } from "@/components/Icon";
 import  ToggleSwitch from "@/components/ToggleSwitch";
-import { ArrowUp, ArrowDown, Minus } from "lucide-react";
+import { ArrowUp, ArrowDown, Minus, HardDrive } from "lucide-react";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import Link from "next/link";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 const Plot = dynamic(() => import("react-plotly.js"), { ssr: false });
 
@@ -259,9 +261,51 @@ export default function DashboardPage() {
   };
 
 
+  if (loading) {
+    return (
+      <ProtectedRoute>
+        <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
+          <Sidebar />
+          <div className="flex-1 flex flex-col">
+            <AppHeader />
+            <main className="flex-1 p-6 flex items-center justify-center">
+              <LoadingSpinner />
+            </main>
+          </div>
+        </div>
+      </ProtectedRoute>
+    );
+  }
+
+  // Cek jika tidak ada data sama sekali setelah loading selesai
+  if (!data.length && !actuatorStates) {
+    return (
+      <ProtectedRoute>
+        <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
+          <Sidebar />
+          <div className="flex-1 flex flex-col">
+            <AppHeader />
+            <main className="flex-1 p-6 flex flex-col items-center justify-center text-center">
+              <HardDrive size={64} className="text-gray-400 dark:text-gray-500 mb-4" />
+              <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-200 mb-2">
+                Tidak Ada Data Perangkat
+              </h2>
+              <p className="text-gray-500 dark:text-gray-400 mb-4">
+                Sepertinya Anda belum menambahkan perangkat. Silakan tambahkan perangkat untuk mulai memonitor.
+              </p>
+              <Link href="/device" className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                Tambahkan Perangkat
+              </Link>
+            </main>
+          </div>
+        </div>
+      </ProtectedRoute>
+    );
+  }
+
   return (
     <ProtectedRoute>
-      <div className="flex min-h-screen bg-gray-50">
+      <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
         <Sidebar/>
         <div className="flex-1 flex flex-col">
           <AppHeader />
