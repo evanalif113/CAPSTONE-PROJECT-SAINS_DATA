@@ -57,10 +57,10 @@ export default function DataHistory() {
   const [isDeletingSensor, setIsDeletingSensor] = useState(false); // State untuk proses hapus sensor
   const [error, setError] = useState<string | null>(null);
 
-  const actuatorNames: { [key: string]: string } = {
-    "16": "Fan",
-    "17": "Humidifier",
-    "18": "Light",
+  const actuatorNames: { [key: number]: string } = {
+    16: "Fan",
+    17: "Humidifier",
+    18: "Light",
   };
 
   useEffect(() => {
@@ -324,7 +324,7 @@ export default function DataHistory() {
                         {actuatorLogs.map((log) => (
                           <tr key={log.id}>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{new Date(log.timestamp).toLocaleString('id-ID')}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{actuatorNames[log.pin] || log.pin}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{actuatorNames[log.pinId] || log.pinId}</td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm">
                               <span className={cn("px-2 inline-flex text-xs leading-5 font-semibold rounded-full", log.state === 0 ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200" : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200")}>
                                 {log.state === 0 ? 'ON' : 'OFF'}

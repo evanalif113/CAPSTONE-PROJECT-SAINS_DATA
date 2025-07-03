@@ -37,7 +37,7 @@ const ActuatorCard: React.FC<ActuatorCardProps> = ({ device, userId, onEdit, onD
     return () => unsubscribe();
   }, [userId]);
 
-  const handleActuatorChange = useCallback((pin: string, newState: boolean) => {
+  const handleActuatorChange = useCallback((pin: number, newState: boolean) => {
     // Logika dibalik: ON (true) akan mengirim 0, OFF (false) akan mengirim 1
     // Tambahkan 'manual' sebagai mode pemicu
     updateActuatorState(userId, pin, newState ? 0 : 1, 'manual');
@@ -58,9 +58,9 @@ const ActuatorCard: React.FC<ActuatorCardProps> = ({ device, userId, onEdit, onD
         
         {loading ? <div className="py-8 flex justify-center"><LoadingSpinner/></div> : (
           <div className="mt-4 space-y-3">
-            <div className="flex justify-between items-center"><span className="font-medium">Kipas</span><ToggleSwitch checked={!states?.['16']} onChange={(val) => handleActuatorChange('16', val)} /></div>
-            <div className="flex justify-between items-center"><span className="font-medium">Humidifier</span><ToggleSwitch checked={!states?.['17']} onChange={(val) => handleActuatorChange('17', val)} /></div>
-            <div className="flex justify-between items-center"><span className="font-medium">Lampu</span><ToggleSwitch checked={!states?.['18']} onChange={(val) => handleActuatorChange('18', val)} /></div>
+            <div className="flex justify-between items-center"><span className="font-medium">Kipas</span><ToggleSwitch checked={!states?.['16']} onChange={(val) => handleActuatorChange(16, val)} /></div>
+            <div className="flex justify-between items-center"><span className="font-medium">Humidifier</span><ToggleSwitch checked={!states?.['17']} onChange={(val) => handleActuatorChange(17, val)} /></div>
+            <div className="flex justify-between items-center"><span className="font-medium">Lampu</span><ToggleSwitch checked={!states?.['18']} onChange={(val) => handleActuatorChange(18, val)} /></div>
           </div>
         )}
       </div>
