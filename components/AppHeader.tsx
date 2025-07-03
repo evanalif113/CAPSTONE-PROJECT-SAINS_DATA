@@ -17,6 +17,8 @@ const AppHeader: React.FC = () => {
   const handleLogout = async () => {
     console.log("Mencoba untuk logout...");
     await logout();
+    // Hapus cookie saat logout
+    document.cookie = "firebaseIdToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
     console.log("Proses logout selesai.");
     router.push("/authentication"); // Arahkan ke halaman login setelah logout
   };

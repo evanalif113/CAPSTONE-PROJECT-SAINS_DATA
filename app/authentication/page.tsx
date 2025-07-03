@@ -42,7 +42,12 @@ export default function Authentication() {
     setError("");
     setSuccess("");
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const idToken = await userCredential.user.getIdToken();
+      
+      // Set cookie untuk session management di middleware
+      document.cookie = `firebaseIdToken=${idToken}; path=/; max-age=3600`; // max-age 1 jam
+
       setSuccess("Login berhasil! Mengalihkan...");
       window.location.href = "/dashboard"; // redirect ke dashboard
     } catch (err: any) {
