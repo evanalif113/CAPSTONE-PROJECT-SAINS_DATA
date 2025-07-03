@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { useAuth } from "@/context/AuthContext";
-import { fetchSensorData } from "@/lib/fetchSensorData";
+import { fetchSensorData, deleteSensorData } from "@/lib/fetchSensorData";
 import { fetchActuatorLogs, ActuatorLog, deleteActuatorLogs } from "@/lib/fetchActuatorLog";
 import AppHeader from "@/components/AppHeader";
 import Sidebar from "@/components/Sidebar";
@@ -53,7 +53,8 @@ export default function DataHistory() {
   const [sensorLoading, setSensorLoading] = useState(true);
   const [actuatorLogs, setActuatorLogs] = useState<ActuatorLog[]>([]);
   const [logsLoading, setLogsLoading] = useState(true);
-  const [isDeleting, setIsDeleting] = useState(false); // State untuk proses hapus
+  const [isDeleting, setIsDeleting] = useState(false); // State untuk proses hapus log
+  const [isDeletingSensor, setIsDeletingSensor] = useState(false); // State untuk proses hapus sensor
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -105,6 +106,24 @@ export default function DataHistory() {
       return () => clearInterval(interval);
     }
   }, [user, selectedPeriod]);
+
+  const handleDeleteSensorData = async () => {
+    if (!user) return;
+
+    if (window.confirm("Apakah Anda yakin ingin menghapus semua riwayat data sensor? Tindakan ini tidak dapat diurungkan.")) {
+      setIsDeletingSensor(true);
+      setError(null);
+      try {
+        await deleteSensorData(user.uid);
+        setSensorData([]); // Kosongkan state di UI setelah berhasil
+      } catch (err) {
+        console.error(err);
+        setError("Gagal menghapus data sensor.");
+      } finally {
+        setIsDeletingSensor(false);
+      }
+    }
+  };
 
   const handleDeleteLogs = async () => {
     if (!user) return;
@@ -223,7 +242,6 @@ export default function DataHistory() {
               <div>
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
                   <div>
-                    <span className="text-sm text-gray-600">Pilih Periode:</span>
                     <div className="flex flex-wrap gap-2 mt-2">
                       {periods.map((period) => (
                         <button
@@ -240,9 +258,21 @@ export default function DataHistory() {
                       ))}
                     </div>
                   </div>
+                  <button
+                    onClick={handleDeleteSensorData}
+                    disabled={sensorLoading || isDeletingSensor || sensorData.length === 0}
+                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:bg-red-300 disabled:cursor-not-allowed"
+                  >
+                    <Trash2 size={16} />
+                    {isDeletingSensor ? "Menghapus..." : "Hapus Semua Data"}
+                  </button>
                 </div>
                 {sensorLoading ? (
                   <div className="text-center py-8"><LoadingSpinner /></div>
+                ) : sensorData.length === 0 ? (
+                  <div className="text-center text-gray-500 py-10 bg-white rounded-lg border">
+                    <p>Tidak ada riwayat data sensor.</p>
+                  </div>
                 ) : (
                   <div className="space-y-8">
                     <ChartCard title="Suhu Udara" dataKey="temperature" color="#ef4444" Icon={TemperatureIcon} unit="°C" chartData={sensorData} />

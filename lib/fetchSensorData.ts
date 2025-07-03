@@ -5,7 +5,8 @@ import {
   query,
   orderByKey,
   limitToLast,
-  get
+  get,
+  remove
 } from "@/lib/firebaseConfig";
 
 export interface SensorValue {
@@ -88,6 +89,22 @@ export async function fetchSensorData(
   } catch (error) {
     console.error("Gagal mengambil data sensor:", error);
     // Melempar kembali error
+    throw error;
+  }
+}
+
+/**
+ * Menghapus semua data sensor untuk pengguna tertentu.
+ * @param userId - ID pengguna yang datanya akan dihapus.
+ * @returns Sebuah promise yang akan resolve ketika data berhasil dihapus.
+ */
+export async function deleteSensorData(userId: string): Promise<void> {
+  try {
+    const dataRef = ref(database, `${userId}/sensor/data`);
+    await remove(dataRef);
+    console.log(`Sensor data for user ${userId} deleted successfully.`);
+  } catch (error) {
+    console.error("Gagal menghapus data sensor:", error);
     throw error;
   }
 }
