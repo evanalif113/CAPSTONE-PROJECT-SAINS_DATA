@@ -57,6 +57,12 @@ export default function DataHistory() {
   const [isDeletingSensor, setIsDeletingSensor] = useState(false); // State untuk proses hapus sensor
   const [error, setError] = useState<string | null>(null);
 
+  const actuatorNames: { [key: string]: string } = {
+    "16": "Fan",
+    "17": "Humidifier",
+    "18": "Light",
+  };
+
   useEffect(() => {
     if (!user) return;
 
@@ -304,23 +310,23 @@ export default function DataHistory() {
                     <p>Tidak ada riwayat log aktuator.</p>
                   </div>
                 ) : (
-                  <div className="bg-white rounded-lg shadow-sm border overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
-                      <thead className="bg-gray-50">
+                  <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700 overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                      <thead className="bg-gray-50 dark:bg-gray-700">
                         <tr>
-                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Waktu</th>
-                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pin</th>
-                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mode</th>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Waktu</th>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Aktuator</th>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Mode</th>
                         </tr>
                       </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
+                      <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                         {actuatorLogs.map((log) => (
                           <tr key={log.id}>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(log.timestamp).toLocaleString('id-ID')}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{log.pin}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{new Date(log.timestamp).toLocaleString('id-ID')}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{actuatorNames[log.pin] || log.pin}</td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm">
-                              <span className={cn("px-2 inline-flex text-xs leading-5 font-semibold rounded-full", log.state === 0 ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800")}>
+                              <span className={cn("px-2 inline-flex text-xs leading-5 font-semibold rounded-full", log.state === 0 ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200" : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200")}>
                                 {log.state === 0 ? 'ON' : 'OFF'}
                               </span>
                             </td>
