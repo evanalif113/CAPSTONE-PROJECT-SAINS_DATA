@@ -56,6 +56,8 @@ export default function DataHistory() {
   const [isDeleting, setIsDeleting] = useState(false); // State untuk proses hapus log
   const [isDeletingSensor, setIsDeletingSensor] = useState(false); // State untuk proses hapus sensor
   const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [logsPerPage] = useState(10);
 
   const actuatorNames: { [key: number]: string } = {
     16: "Fan",
@@ -230,7 +232,10 @@ export default function DataHistory() {
                 Grafik Sensor
               </button>
               <button
-                onClick={() => setActiveTab("Log Aktuator")}
+                onClick={() => {
+                  setActiveTab("Log Aktuator");
+                  setCurrentPage(1); // Reset ke halaman pertama saat tab diubah
+                }}
                 className={`px-4 py-2 text-sm font-medium ${
                   activeTab === "Log Aktuator"
                     ? "border-b-2 border-blue-600 text-blue-600"
@@ -264,14 +269,6 @@ export default function DataHistory() {
                       ))}
                     </div>
                   </div>
-                  <button
-                    onClick={handleDeleteSensorData}
-                    disabled={sensorLoading || isDeletingSensor || sensorData.length === 0}
-                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:bg-red-300 disabled:cursor-not-allowed"
-                  >
-                    <Trash2 size={16} />
-                    {isDeletingSensor ? "Menghapus..." : "Hapus Semua Data"}
-                  </button>
                 </div>
                 {sensorLoading ? (
                   <div className="text-center py-8"><LoadingSpinner /></div>
@@ -280,12 +277,24 @@ export default function DataHistory() {
                     <p>Tidak ada riwayat data sensor.</p>
                   </div>
                 ) : (
-                  <div className="space-y-8">
-                    <ChartCard title="Suhu Udara" dataKey="temperature" color="#ef4444" Icon={TemperatureIcon} unit="°C" chartData={sensorData} />
-                    <ChartCard title="Kelembapan Udara" dataKey="humidity" color="#3b82f6" Icon={HumidityIcon} unit="%" chartData={sensorData} />
-                    <ChartCard title="Intensitas Cahaya" dataKey="light" color="#f59e0b" Icon={LightIntensityIcon} unit="lux" chartData={sensorData} />
-                    <ChartCard title="Kelembapan Media" dataKey="moisture" color="#10b981" Icon={MoistureIcon} unit="%" chartData={sensorData} />
-                  </div>
+                  <>
+                    <div className="space-y-8">
+                      <ChartCard title="Suhu Udara" dataKey="temperature" color="#ef4444" Icon={TemperatureIcon} unit="°C" chartData={sensorData} />
+                      <ChartCard title="Kelembapan Udara" dataKey="humidity" color="#3b82f6" Icon={HumidityIcon} unit="%" chartData={sensorData} />
+                      <ChartCard title="Intensitas Cahaya" dataKey="light" color="#f59e0b" Icon={LightIntensityIcon} unit="lux" chartData={sensorData} />
+                      <ChartCard title="Kelembapan Media" dataKey="moisture" color="#10b981" Icon={MoistureIcon} unit="%" chartData={sensorData} />
+                    </div>
+                    <div className="mt-8 flex justify-end">
+                      <button
+                        onClick={handleDeleteSensorData}
+                        disabled={sensorLoading || isDeletingSensor || sensorData.length === 0}
+                        className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:bg-red-300 disabled:cursor-not-allowed"
+                      >
+                        <Trash2 size={16} />
+                        {isDeletingSensor ? "Menghapus..." : "Hapus Semua Data"}
+                      </button>
+                    </div>
+                  </>
                 )}
               </div>
             )}
@@ -293,16 +302,6 @@ export default function DataHistory() {
             {/* Konten Tab Log Aktuator */}
             {activeTab === "Log Aktuator" && (
               <div>
-                <div className="flex justify-end mb-4">
-                  <button
-                    onClick={handleDeleteLogs}
-                    disabled={logsLoading || isDeleting || actuatorLogs.length === 0}
-                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:bg-red-300 disabled:cursor-not-allowed"
-                  >
-                    <Trash2 size={16} />
-                    {isDeleting ? "Menghapus..." : "Hapus Semua Log"}
-                  </button>
-                </div>
                 {logsLoading ? (
                   <div className="text-center py-8"><LoadingSpinner /></div>
                 ) : actuatorLogs.length === 0 ? (
@@ -310,32 +309,70 @@ export default function DataHistory() {
                     <p>Tidak ada riwayat log aktuator.</p>
                   </div>
                 ) : (
-                  <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700 overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                      <thead className="bg-gray-50 dark:bg-gray-700">
-                        <tr>
-                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Waktu</th>
-                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Aktuator</th>
-                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
-                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Mode</th>
-                        </tr>
-                      </thead>
-                      <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                        {actuatorLogs.map((log) => (
-                          <tr key={log.id}>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{new Date(log.timestamp).toLocaleString('id-ID')}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{actuatorNames[log.pinId] || log.pinId}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm">
-                              <span className={cn("px-2 inline-flex text-xs leading-5 font-semibold rounded-full", log.state === 0 ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200" : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200")}>
-                                {log.state === 0 ? 'ON' : 'OFF'}
-                              </span>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 capitalize">{log.mode}</td>
+                  <>
+                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700 overflow-x-auto">
+                      <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                        <thead className="bg-gray-50 dark:bg-gray-700">
+                          <tr>
+                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Waktu</th>
+                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Aktuator</th>
+                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
+                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Mode</th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                        </thead>
+                        <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                          {actuatorLogs
+                            .slice((currentPage - 1) * logsPerPage, currentPage * logsPerPage)
+                            .map((log) => (
+                            <tr key={log.id}>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{new Date(log.timestamp).toLocaleString('id-ID')}</td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{actuatorNames[log.pinId] || log.pinId}</td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm">
+                                <span className={cn("px-2 inline-flex text-xs leading-5 font-semibold rounded-full", log.state === 0 ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200" : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200")}>
+                                  {log.state === 0 ? 'ON' : 'OFF'}
+                                </span>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 capitalize">{log.mode}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                    {/* Navigasi Tabel */}
+                    <div className="mt-4 flex justify-between items-center">
+                      <div>
+                        <span className="text-sm text-gray-700">
+                          Halaman <span className="font-medium">{currentPage}</span> dari <span className="font-medium">{Math.ceil(actuatorLogs.length / logsPerPage)}</span>
+                        </span>
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                          disabled={currentPage === 1}
+                          className="px-4 py-2 text-sm font-medium text-gray-700 bg-white rounded-lg border hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          Sebelumnya
+                        </button>
+                        <button
+                          onClick={() => setCurrentPage(prev => Math.min(prev + 1, Math.ceil(actuatorLogs.length / logsPerPage)))}
+                          disabled={currentPage === Math.ceil(actuatorLogs.length / logsPerPage)}
+                          className="px-4 py-2 text-sm font-medium text-gray-700 bg-white rounded-lg border hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          Berikutnya
+                        </button>
+                      </div>
+                    </div>
+                    <div className="mt-8 flex justify-end">
+                      <button
+                        onClick={handleDeleteLogs}
+                        disabled={logsLoading || isDeleting || actuatorLogs.length === 0}
+                        className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:bg-red-300 disabled:cursor-not-allowed"
+                      >
+                        <Trash2 size={16} />
+                        {isDeleting ? "Menghapus..." : "Hapus Semua Log"}
+                      </button>
+                    </div>
+                  </>
                 )}
               </div>
             )}
