@@ -56,10 +56,6 @@ const AppHeader: React.FC = () => {
         <div>
           <h1 className="text-lg font-semibold text-gray-900">Kumbung Sense</h1>
           <div className="flex items-center space-x-4 text-sm text-gray-500">
-            <div className="flex items-center space-x-1">
-              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-              <span>Online</span>
-            </div>
             <div className="flex flex-col">
               <span>{user?.displayName}</span>
               <span>{user?.email}</span>
@@ -86,6 +82,9 @@ const AppHeader: React.FC = () => {
 
         {isDropdownOpen && (
           <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border">
+            <div className="px-4 py-2 border-b text-sm font-semibold text-gray-800">
+              {user?.displayName || "Pengguna"}
+            </div>
             <Link
               href="/profile"
               className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
