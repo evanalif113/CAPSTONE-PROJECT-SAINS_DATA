@@ -1,5 +1,7 @@
 // app/layout.tsx
 import type { Metadata } from "next";
+import { Analytics } from '@vercel/analytics/next';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 import { Inter } from "next/font/google";
 import { UIProvider } from "@/context/UIContext"; // Import UIProvider
 import { AuthProvider } from "@/context/AuthContext";
@@ -62,6 +64,8 @@ export default function RootLayout({
         <AuthProvider>
           <UIProvider>
             {children}
+            <Analytics />
+            <SpeedInsights />
           </UIProvider>
         </AuthProvider>
       </body>
