@@ -78,7 +78,7 @@ const Sidebar: React.FC = () => {
               href={item.href}
               onClick={closeSidebar} // onClick tetap bisa digunakan di Link
               className={cn(
-                "flex items-center gap-4 rounded-lg p-3 text-left font-medium transition-colors",
+                "flex items-center gap-4 rounded-lg p-3 font-medium transition-colors",
                 "lg:flex-col lg:gap-1 lg:text-center", // Perubahan untuk desktop
                 item.active
                   ? "bg-slate-900 text-white"
