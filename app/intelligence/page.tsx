@@ -186,6 +186,274 @@ function HarvestInputModal({
   );
 }
 
+// --- Data Dummy Panen & Sensor untuk Simulasi Analitik ---
+// Periode 1: Awal (hasil belum optimal, lingkungan tidak stabil)
+// Periode 2: Perbaikan (lingkungan makin stabil, kualitas naik)
+// Periode 3: Ideal (lingkungan stabil, hasil optimal)
+// Ada beberapa anomali (panen gagal, suhu/kelembapan melonjak)
+
+export const dummyHarvestData: Harvest[] = [
+  // Periode 1 (awal)
+  {
+    date: "2024-05-01",
+    amount: 2.1,
+    quality: "C",
+    note: "Banyak baglog terkontaminasi",
+    avgTemp: 27.2,
+    avgHumidity: 88.5,
+  },
+  {
+    date: "2024-05-12",
+    amount: 2.5,
+    quality: "B",
+    note: "Suhu fluktuatif, kelembapan turun malam hari",
+    avgTemp: 26.8,
+    avgHumidity: 85.2,
+  },
+  {
+    date: "2024-05-23",
+    amount: 2.0,
+    quality: "C",
+    note: "Kipas rusak 2 hari",
+    avgTemp: 28.5,
+    avgHumidity: 80.0,
+  },
+  // Periode 2 (perbaikan)
+  {
+    date: "2024-06-03",
+    amount: 3.2,
+    quality: "B",
+    note: "Mulai perbaiki kontrol kelembapan",
+    avgTemp: 26.0,
+    avgHumidity: 87.0,
+  },
+  {
+    date: "2024-06-14",
+    amount: 3.5,
+    quality: "A",
+    note: "Lingkungan lebih stabil",
+    avgTemp: 25.5,
+    avgHumidity: 89.5,
+  },
+  {
+    date: "2024-06-25",
+    amount: 3.1,
+    quality: "B",
+    note: "Kelembapan turun mendadak (anomali)",
+    avgTemp: 25.8,
+    avgHumidity: 78.0,
+  },
+  // Periode 3 (ideal)
+  {
+    date: "2024-07-06",
+    amount: 4.0,
+    quality: "A",
+    note: "Kondisi optimal",
+    avgTemp: 25.0,
+    avgHumidity: 90.0,
+  },
+  {
+    date: "2024-07-17",
+    amount: 4.2,
+    quality: "A",
+    note: "Kualitas dan kuantitas stabil",
+    avgTemp: 24.8,
+    avgHumidity: 91.0,
+  },
+  {
+    date: "2024-07-28",
+    amount: 3.8,
+    quality: "B",
+    note: "Sedikit penurunan kelembapan",
+    avgTemp: 25.2,
+    avgHumidity: 88.0,
+  },
+  {
+    date: "2024-08-10",
+    amount: 4.0,
+    quality: "A",
+    note: "Panen optimal, lingkungan stabil",
+    avgTemp: 25.0,
+    avgHumidity: 90.5,
+  },
+  {
+    date: "2024-08-24",
+    amount: 3.9,
+    quality: "A",
+    note: "Kualitas tetap baik",
+    avgTemp: 24.9,
+    avgHumidity: 91.0,
+  },
+  {
+    date: "2024-09-07",
+    amount: 3.7,
+    quality: "B",
+    note: "Kelembapan turun 1 hari",
+    avgTemp: 25.3,
+    avgHumidity: 87.5,
+  },
+  {
+    date: "2024-09-21",
+    amount: 4.1,
+    quality: "A",
+    note: "Panen meningkat lagi",
+    avgTemp: 24.8,
+    avgHumidity: 91.2,
+  },
+  {
+    date: "2024-10-05",
+    amount: 4.2,
+    quality: "A",
+    note: "Lingkungan sangat stabil",
+    avgTemp: 24.7,
+    avgHumidity: 92.0,
+  },
+  {
+    date: "2024-10-19",
+    amount: 3.8,
+    quality: "B",
+    note: "Suhu naik 2 hari (anomali)",
+    avgTemp: 25.5,
+    avgHumidity: 89.0,
+  },
+  {
+    date: "2024-11-02",
+    amount: 4.3,
+    quality: "A",
+    note: "Panen sangat baik",
+    avgTemp: 24.6,
+    avgHumidity: 92.5,
+  },
+  {
+    date: "2024-11-16",
+    amount: 4.0,
+    quality: "B",
+    note: "Kelembapan turun sedikit",
+    avgTemp: 25.1,
+    avgHumidity: 88.5,
+  },
+  {
+    date: "2024-11-30",
+    amount: 4.4,
+    quality: "A",
+    note: "Panen optimal",
+    avgTemp: 24.7,
+    avgHumidity: 92.8,
+  },
+  {
+    date: "2024-12-14",
+    amount: 4.2,
+    quality: "A",
+    note: "Kualitas dan kuantitas stabil",
+    avgTemp: 24.8,
+    avgHumidity: 91.9,
+  },
+  {
+    date: "2024-12-28",
+    amount: 4.1,
+    quality: "B",
+    note: "Kelembapan turun mendadak (anomali)",
+    avgTemp: 25.2,
+    avgHumidity: 86.0,
+  },
+  {
+    date: "2025-01-11",
+    amount: 4.3,
+    quality: "A",
+    note: "Panen awal tahun sangat baik",
+    avgTemp: 24.7,
+    avgHumidity: 92.2,
+  },
+  {
+    date: "2025-01-25",
+    amount: 4.0,
+    quality: "B",
+    note: "Suhu naik 1 hari (anomali)",
+    avgTemp: 25.4,
+    avgHumidity: 89.5,
+  },
+  {
+    date: "2025-02-08",
+    amount: 4.4,
+    quality: "A",
+    note: "Lingkungan kembali stabil",
+    avgTemp: 24.6,
+    avgHumidity: 92.7,
+  },
+  {
+    date: "2025-02-22",
+    amount: 4.2,
+    quality: "A",
+    note: "Kualitas tetap terjaga",
+    avgTemp: 24.8,
+    avgHumidity: 91.8,
+  },
+  {
+    date: "2025-03-08",
+    amount: 4.1,
+    quality: "B",
+    note: "Kelembapan turun sedikit",
+    avgTemp: 25.0,
+    avgHumidity: 89.0,
+  },
+  {
+    date: "2025-03-22",
+    amount: 4.5,
+    quality: "A",
+    note: "Panen sangat optimal",
+    avgTemp: 24.5,
+    avgHumidity: 93.0,
+  },
+  {
+    date: "2025-04-05",
+    amount: 4.3,
+    quality: "A",
+    note: "Lingkungan sangat stabil",
+    avgTemp: 24.7,
+    avgHumidity: 92.5,
+  },
+  {
+    date: "2025-04-19",
+    amount: 4.1,
+    quality: "B",
+    note: "Suhu naik 2 hari (anomali)",
+    avgTemp: 25.6,
+    avgHumidity: 89.2,
+  },
+  {
+    date: "2025-05-03",
+    amount: 4.4,
+    quality: "A",
+    note: "Panen sangat baik",
+    avgTemp: 24.7,
+    avgHumidity: 92.1,
+  },
+  {
+    date: "2025-05-17",
+    amount: 4.2,
+    quality: "A",
+    note: "Lingkungan stabil",
+    avgTemp: 24.8,
+    avgHumidity: 91.9,
+  },
+  {
+    date: "2025-05-31",
+    amount: 4.1,
+    quality: "B",
+    note: "Kelembapan turun sedikit",
+    avgTemp: 25.0,
+    avgHumidity: 89.5,
+  },
+  {
+    date: "2025-06-14",
+    amount: 4.5,
+    quality: "A",
+    note: "Panen pertengahan tahun optimal",
+    avgTemp: 24.6,
+    avgHumidity: 92.7,
+  },
+];
+
 // --- Main Page ---
 export default function IntelligencePage() {
   const { user } = useAuth();
@@ -193,7 +461,7 @@ export default function IntelligencePage() {
   const [metric, setMetric] = useState("Semua");
   const [dateRange, setDateRange] = useState({ from: "", to: "" });
   const [showHarvestModal, setShowHarvestModal] = useState(false);
-  const [harvestData, setHarvestData] = useState<Harvest[]>([]);
+  const [harvestData, setHarvestData] = useState<Harvest[]>(dummyHarvestData);
   const [greeting, setGreeting] = useState("");
   const [mediaTanamKering, setMediaTanamKering] = useState(100);
 
