@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { onValue, ref } from 'firebase/database';
 import { database } from '@/lib/firebaseConfig';
 import { Device } from '@/lib/manageDevices';
-import { SensorData } from '@/lib/fetchSensorData';
+import { SensorDate } from '@/lib/fetchSensorData';
 
 import { Edit, Trash2, Thermometer, Droplets, Sun, Sprout } from 'lucide-react';
 import LoadingSpinner from '@/components/LoadingSpinner';
@@ -19,7 +19,7 @@ interface SensorCardProps {
 }
 
 const SensorCard: React.FC<SensorCardProps> = ({ device, userId, onEdit, onDelete }) => {
-  const [data, setData] = useState<SensorData | null>(null);
+  const [data, setData] = useState<SensorDate | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

@@ -22,26 +22,40 @@ interface ActuatorCardProps {
 const ActuatorCard: React.FC<ActuatorCardProps> = ({ device, userId, onEdit, onDelete }) => {
   const [states, setStates] = useState<ActuatorData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [modeAuto, setModeAuto] = useState(true); // State untuk mode otomatis
 
   useEffect(() => {
-    // Listener real-time HANYA untuk data aktuator
+    setLoading(true);
+    // Listener untuk data aktuator
     const actuatorRef = ref(database, `${userId}/aktuator/data`);
-    const unsubscribe = onValue(actuatorRef, (snapshot) => {
+    const unsubscribeActuators = onValue(actuatorRef, (snapshot) => {
       if (snapshot.exists()) {
         setStates(snapshot.val());
       }
-      setLoading(false);
     });
 
-    // Cleanup listener
-    return () => unsubscribe();
+    // Listener untuk status mode
+    const modeRef = ref(database, `${userId}/mode/auto`);
+    const unsubscribeMode = onValue(modeRef, (snapshot) => {
+      // Default ke true (otomatis) jika tidak ada data
+      setModeAuto(snapshot.exists() ? !!snapshot.val() : true);
+      setLoading(false); // Set loading false setelah kedua data (atau default) didapat
+    });
+
+    // Cleanup listeners
+    return () => {
+      unsubscribeActuators();
+      unsubscribeMode();
+    };
   }, [userId]);
 
   const handleActuatorChange = useCallback((pin: number, newState: boolean) => {
+    // Tambahan pengecekan untuk tidak mengirim update jika mode auto
+    if (modeAuto) return;
     // Logika dibalik: ON (true) akan mengirim 0, OFF (false) akan mengirim 1
     // Tambahkan 'manual' sebagai mode pemicu
     updateActuatorState(userId, pin, newState ? 0 : 1, 'manual');
-  }, [userId]);
+  }, [userId, modeAuto]);
 
   return (
     <div className="bg-white rounded-lg shadow border p-6 flex flex-col justify-between">
@@ -58,9 +72,9 @@ const ActuatorCard: React.FC<ActuatorCardProps> = ({ device, userId, onEdit, onD
         
         {loading ? <div className="py-8 flex justify-center"><LoadingSpinner/></div> : (
           <div className="mt-4 space-y-3">
-            <div className="flex justify-between items-center"><span className="font-medium">Kipas</span><ToggleSwitch checked={!states?.['16']} onChange={(val) => handleActuatorChange(16, val)} /></div>
-            <div className="flex justify-between items-center"><span className="font-medium">Humidifier</span><ToggleSwitch checked={!states?.['17']} onChange={(val) => handleActuatorChange(17, val)} /></div>
-            <div className="flex justify-between items-center"><span className="font-medium">Lampu</span><ToggleSwitch checked={!states?.['18']} onChange={(val) => handleActuatorChange(18, val)} /></div>
+            <div className="flex justify-between items-center"><span className="font-medium">Kipas</span><ToggleSwitch checked={states?.['16'] === 0} onChange={(val) => handleActuatorChange(16, val)} disabled={modeAuto} /></div>
+            <div className="flex justify-between items-center"><span className="font-medium">Humidifier</span><ToggleSwitch checked={states?.['17'] === 0} onChange={(val) => handleActuatorChange(17, val)} disabled={modeAuto} /></div>
+            <div className="flex justify-between items-center"><span className="font-medium">Lampu</span><ToggleSwitch checked={states?.['18'] === 0} onChange={(val) => handleActuatorChange(18, val)} disabled={modeAuto} /></div>
           </div>
         )}
       </div>

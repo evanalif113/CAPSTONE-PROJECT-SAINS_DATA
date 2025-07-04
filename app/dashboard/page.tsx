@@ -345,7 +345,7 @@ export default function DashboardPage() {
                 </p>
               </div>
               <div className="flex items-center gap-4">
-                <span className="font-medium text-gray-700">Mode Sistem:</span>
+                <span className="font-medium text-gray-700">Mode</span>
                 <div className="flex items-center gap-2">
                   <span className={`font-semibold ${!modeAuto ? 'text-blue-600' : 'text-gray-400'}`}>Manual</span>
                   <ToggleSwitch
