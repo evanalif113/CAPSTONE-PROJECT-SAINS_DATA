@@ -8,13 +8,14 @@ import { useAuth } from "@/context/AuthContext";
 import { cn } from "@/lib/utils";
 
 import { 
-  House, ChartBarIcon, Lightbulb, Cpu, Bell, Settings, User
+  House, ChartBarIcon, ChartSpline, Lightbulb, Cpu, Bell, Settings, User
 } from "lucide-react";
 
 // --- DATA NAVIGASI ---
 const baseNavItems = [
   { name: "Beranda", href: "/dashboard", icon: House },
   { name: "Data", href: "/data", icon: ChartBarIcon },
+  { name: "Prediksi", href: "/prediction", icon: ChartSpline },
   { name: "Intelijen", href: "/intelligence", icon: Lightbulb },
   { name: "Perangkat", href: "/device", icon: Cpu },
   { name: "Notifikasi", href: "/alerts", icon: Bell },
