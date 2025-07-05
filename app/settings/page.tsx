@@ -109,7 +109,7 @@ export default function Settings() {
                     onChange={([newMin, newMax]) =>
                       setThresholds({ ...thresholds, temperatureMin: newMin, temperatureMax: newMax })
                     }
-                    min={0} max={50} unit="°C" colorClassName="bg-red-500"
+                    min={25} max={35} unit="°C" colorClassName="bg-red-500"
                   />
                   <RangeSlider
                     label="Ambang Batas Kelembapan"
@@ -117,7 +117,7 @@ export default function Settings() {
                     onChange={([newMin, newMax]) =>
                       setThresholds({ ...thresholds, humidityMin: newMin, humidityMax: newMax })
                     }
-                    min={0} max={100} unit="%" colorClassName="bg-blue-500"
+                    min={50} max={100} unit="%" colorClassName="bg-blue-500"
                   />
                   <RangeSlider
                     label="Ambang Batas Cahaya"
@@ -133,7 +133,7 @@ export default function Settings() {
                     onChange={([newMin, newMax]) =>
                       setThresholds({ ...thresholds, moistureMin: newMin, moistureMax: newMax })
                     }
-                    min={0} max={100} unit="%" colorClassName="bg-emerald-500"
+                    min={10} max={100} unit="%" colorClassName="bg-emerald-500"
                   />
                 </div>
                 <div className="mt-8 flex justify-end">
