@@ -462,16 +462,15 @@ export default function IntelligencePage() {
   const [dateRange, setDateRange] = useState({ from: "", to: "" });
   const [showHarvestModal, setShowHarvestModal] = useState(false);
   const [harvestData, setHarvestData] = useState<Harvest[]>(dummyHarvestData);
-  const [greeting, setGreeting] = useState("");
   const [mediaTanamKering, setMediaTanamKering] = useState(100);
 
-  useEffect(() => {
-    const currentHour = new Date().getHours();
-    if (currentHour >= 4 && currentHour < 11) setGreeting("Selamat Pagi");
-    else if (currentHour >= 11 && currentHour < 18)
-      setGreeting("Selamat Siang");
-    else setGreeting("Selamat Malam");
-  }, []);
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour >= 5 && hour < 12) return "Selamat Pagi";
+    if (hour >= 12 && hour < 15) return "Selamat Siang";
+    if (hour >= 15 && hour < 18) return "Selamat Sore";
+    return "Selamat Malam";
+  };
 
   const handleAddHarvest = (data: Harvest) => {
     setHarvestData((prev) => [...prev, data]);
@@ -579,7 +578,7 @@ export default function IntelligencePage() {
             {/* Greeting */}
             <div className="mb-4">
               <h1 className="text-3xl font-bold text-gray-800">
-                {greeting}, {user?.displayName || "Pengguna"}!
+                {getGreeting()}, {user?.displayName || 'Pengguna'}!
               </h1>
               <p className="text-md text-gray-500">
                 Berikut adalah analisis data dari Kumbung Jamur Anda.

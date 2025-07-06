@@ -45,6 +45,14 @@ export default function DashboardPage() {
 
   const intervalData = 60;
 
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour >= 5 && hour < 12) return "Selamat Pagi";
+    if (hour >= 12 && hour < 15) return "Selamat Siang";
+    if (hour >= 15 && hour < 18) return "Selamat Sore";
+    return "Selamat Malam";
+  };
+
   const loadSensorData = async () => {
     if (!user) return;
     // Hindari setLoading(true) pada refresh interval agar UI tidak berkedip
@@ -335,11 +343,13 @@ export default function DashboardPage() {
         <div className="flex-1 flex flex-col">
           <AppHeader />
           <main className="flex-1 p-6 space-y-6">
+              <h1 className="text-3xl font-bold text-gray-800 dark:text-white">
+                {getGreeting()}, {user?.displayName || 'Pengguna'}!
+              </h1>
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-2xl font-bold text-gray-900">Dashboard</h2>
                 <p className="text-sm text-gray-500 mt-1">
-                  Terakhir diperbarui{" "}
+                  Data Terakhir Diperbarui{" "}
                   {/* KOREKSI: Gunakan `timeFormatted` yang sudah ada */}
                   {latest ? latest.timeFormatted : ":"}
                 </p>

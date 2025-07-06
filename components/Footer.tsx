@@ -65,6 +65,12 @@ const Footer: React.FC = () => {
           </div>
           <div className="mt-4 flex gap-x-6 text-sm sm:mt-0">
             <Link
+              href="/About"
+              className="text-slate-400 transition-colors hover:text-white"
+            >
+              About
+            </Link>
+            <Link
               href="/privacy-policy"
               className="text-slate-400 transition-colors hover:text-white"
             >
