@@ -60,12 +60,16 @@ export default function Authentication() {
     setIsLoading(false);
   };
 
-  const handleAnonymousLogin = async () => {
+  const handleGuestLogin = async () => {
     setIsLoading(true);
     setError("");
     setSuccess("");
     try {
-      const userCredential = await signInAnonymously(auth);
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        "Guest@mail.com",
+        "guest12345"
+      );
       const idToken = await userCredential.user.getIdToken();
 
       document.cookie = `firebaseIdToken=${idToken}; path=/; max-age=3600`;
@@ -73,7 +77,13 @@ export default function Authentication() {
       setSuccess("Login sebagai tamu berhasil! Mengalihkan...");
       window.location.href = "/dashboard";
     } catch (err: any) {
-      setError(err.message || "Gagal masuk sebagai tamu.");
+        if (err.code === 'auth/user-not-found') {
+            setError("Akun tamu default tidak ditemukan. Silakan buat akun dengan email: Guest@mail.com dan password: guest12345");
+        } else if (err.code === 'auth/wrong-password') {
+            setError("Password untuk akun tamu salah. Gunakan password: guest12345");
+        } else {
+            setError(err.message || "Gagal masuk sebagai tamu.");
+        }
     }
     setIsLoading(false);
   };
@@ -250,7 +260,7 @@ export default function Authentication() {
         <div className="mt-6 border-t border-gray-200 pt-6 text-center">
           <p className="text-sm text-gray-500 mb-4">Atau</p>
           <button
-            onClick={handleAnonymousLogin}
+            onClick={handleGuestLogin}
             disabled={isLoading}
             className="w-full bg-slate-600 text-white py-3 rounded-lg font-medium hover:bg-slate-700 focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
           >

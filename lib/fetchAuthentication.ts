@@ -6,6 +6,8 @@ import {
   EmailAuthProvider,
   deleteUser,
 } from "firebase/auth";
+import { ref, remove } from "firebase/database";
+import { database } from "./firebaseConfig";
 
 /**
  * Updates the user's profile (display name).
@@ -36,15 +38,32 @@ export const changeUserPassword = async (
 };
 
 /**
- * Deletes the user's account after re-authenticating.
+ * Deletes the user's account and all their data from the database after re-authenticating.
  * @param user - The current Firebase user object.
  * @param password - The user's password for re-authentication.
  */
 export const deleteUserAccount = async (user: User, password: string) => {
+  const userId = user.uid; // Simpan UID sebelum user dihapus
+
+  // Jika pengguna anonim, langsung hapus data dan akun
+  if (user.isAnonymous) {
+    const userDatabaseRef = ref(database, `${userId}`);
+    await remove(userDatabaseRef);
+    await deleteUser(user);
+    return;
+  }
+
+  // Untuk pengguna email, perlu re-autentikasi
   if (!user.email) {
     throw new Error("User does not have an email for re-authentication.");
   }
   const credential = EmailAuthProvider.credential(user.email, password);
   await reauthenticateWithCredential(user, credential);
+
+  // Hapus data dari Realtime Database
+  const userDatabaseRef = ref(database, `${userId}`);
+  await remove(userDatabaseRef);
+
+  // Hapus akun pengguna
   await deleteUser(user);
 };
