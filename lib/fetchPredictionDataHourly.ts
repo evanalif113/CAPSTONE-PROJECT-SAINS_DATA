@@ -49,3 +49,5 @@ export const fetchPredictionData = async (
     throw new Error("Failed to fetch prediction data from Firebase.");
   }
 };
+
+

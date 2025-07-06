@@ -7,7 +7,7 @@ import { useAuth } from "@/context/AuthContext";
 import {
   fetchPredictionData,
   PredictionData,
-} from "@/lib/fetchPredictionData";
+} from "@/lib/fetchPredictionDataHourly";
 import AppHeader from "@/components/AppHeader";
 import Sidebar from "@/components/Sidebar";
 import ProtectedRoute from "@/components/ProtectedRoute";
