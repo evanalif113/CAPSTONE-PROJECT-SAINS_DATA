@@ -24,15 +24,6 @@ const Footer: React.FC = () => {
           {/* Social Media Links */}
           <div className="flex items-center gap-x-4">
             <a
-              href="https://twitter.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-slate-400 transition-colors hover:text-white"
-              aria-label="Twitter"
-            >
-              <Twitter size={20} />
-            </a>
-            <a
               href="https://github.com"
               target="_blank"
               rel="noopener noreferrer"
