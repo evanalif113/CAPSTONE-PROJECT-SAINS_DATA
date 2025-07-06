@@ -145,7 +145,7 @@ export default function PredictionPage() {
           <main className="flex-1 p-6 space-y-6">
             <div>
               <h1 className="text-3xl font-bold text-gray-800 dark:text-white flex items-center gap-3">
-                <BrainCircuit size={32} /> Prediksi Suhu dan Kelembapan
+                Prediksi Suhu dan Kelembapan
               </h1>
               <p className="text-gray-500 dark:text-gray-400 mt-1">
                 Prediksi suhu dan kelembapan untuk 2 jam ke depan berdasarkan AI.
