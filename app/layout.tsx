@@ -4,6 +4,7 @@ import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { Inter } from "next/font/google";
 import { UIProvider } from "@/context/UIContext"; // Import UIProvider
+import Footer from "@/components/Footer"
 import { AuthProvider } from "@/context/AuthContext";
 import "./globals.css";
 
@@ -66,8 +67,9 @@ export default function RootLayout({
             {children}
             <Analytics />
             <SpeedInsights />
-          </UIProvider>
+          </UIProvider>       
         </AuthProvider>
+        <Footer/>
       </body>
     </html>
   );
