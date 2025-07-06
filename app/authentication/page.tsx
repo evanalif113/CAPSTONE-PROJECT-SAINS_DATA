@@ -1,57 +1,79 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useState } from "react"
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-// Tambahkan import firebase auth
-import { auth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "@/lib/firebaseConfig"
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signInAnonymously,
+} from "firebase/auth";
+import { auth } from "@/lib/firebaseConfig";
 
 export default function Authentication() {
   const router = useRouter();
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState("")
-  const [success, setSuccess] = useState("")
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [isLogin, setIsLogin] = useState(false);
 
   const handleSignup = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
-    setError("")
-    setSuccess("")
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
+    setSuccess("");
     try {
-      // Signup dengan Firebase Auth
-      await createUserWithEmailAndPassword(auth, email, password)
-      setSuccess("Registrasi berhasil! Silakan login.")
-      setEmail("")
-      setPassword("")
+      await createUserWithEmailAndPassword(auth, email, password);
+      setSuccess("Registrasi berhasil! Silakan login.");
+      setEmail("");
+      setPassword("");
       setTimeout(() => {
-      router.push("/authentication"); // redirect ke halaman login
-      }, 1200)
+        router.push("/authentication");
+      }, 1200);
     } catch (err: any) {
-      setError(err.message || "Registrasi gagal.")
+      setError(err.message || "Registrasi gagal.");
     }
-    setIsLoading(false)
-  }
+    setIsLoading(false);
+  };
 
-  // Fungsi login dengan Firebase Auth
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
     setSuccess("");
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
       const idToken = await userCredential.user.getIdToken();
-      
-      // Set cookie untuk session management di middleware
-      document.cookie = `firebaseIdToken=${idToken}; path=/; max-age=3600`; // max-age 1 jam
+
+      document.cookie = `firebaseIdToken=${idToken}; path=/; max-age=3600`;
 
       setSuccess("Login berhasil! Mengalihkan...");
-      window.location.href = "/dashboard"; // redirect ke dashboard
+      window.location.href = "/dashboard";
     } catch (err: any) {
       setError(err.message || "Login gagal.");
+    }
+    setIsLoading(false);
+  };
+
+  const handleAnonymousLogin = async () => {
+    setIsLoading(true);
+    setError("");
+    setSuccess("");
+    try {
+      const userCredential = await signInAnonymously(auth);
+      const idToken = await userCredential.user.getIdToken();
+
+      document.cookie = `firebaseIdToken=${idToken}; path=/; max-age=3600`;
+
+      setSuccess("Login sebagai tamu berhasil! Mengalihkan...");
+      window.location.href = "/dashboard";
+    } catch (err: any) {
+      setError(err.message || "Gagal masuk sebagai tamu.");
     }
     setIsLoading(false);
   };
@@ -68,29 +90,43 @@ export default function Authentication() {
           />
         </div>
         {/* Title */}
-        <h1 className="text-2xl font-bold text-center text-gray-900 mb-2">Kumbung Sense</h1>
+        <h1 className="text-2xl font-bold text-center text-gray-900 mb-2">
+          Kumbung Sense
+        </h1>
 
         {/* Subtitle */}
-        <p className="text-center text-gray-600 mb-6">Teknologi AIoT untuk Budidaya Jamur yang Lebih Cerdas dan Presisi</p>
+        <p className="text-center text-gray-600 mb-6">
+          Teknologi AIoT untuk Budidaya Jamur yang Lebih Cerdas dan Presisi
+        </p>
 
         {/* Signup instruction */}
-        <p className="text-center text-gray-500 text-sm mb-8">Masukan Akun untuk mengakses Dashboard</p>
+        <p className="text-center text-gray-500 text-sm mb-8">
+          Masukan Akun untuk mengakses Dashboard
+        </p>
 
         {/* Error/Success Message */}
-        {error && <div className="mb-4 text-red-600 text-sm text-center">{error}</div>}
-        {success && <div className="mb-4 text-green-600 text-sm text-center">{success}</div>}
+        {error && (
+          <div className="mb-4 text-red-600 text-sm text-center">{error}</div>
+        )}
+        {success && (
+          <div className="mb-4 text-green-600 text-sm text-center">{success}</div>
+        )}
 
         {/* Toggle antara Signup dan Login */}
         <div className="flex justify-center mb-4">
           <button
-            className={`px-4 py-2 rounded-l-lg ${!isLogin ? "bg-teal-600 text-white" : "bg-gray-200 text-gray-700"}`}
+            className={`px-4 py-2 rounded-l-lg ${
+              !isLogin ? "bg-teal-600 text-white" : "bg-gray-200 text-gray-700"
+            }`}
             onClick={() => setIsLogin(false)}
             type="button"
           >
             Daftar
           </button>
           <button
-            className={`px-4 py-2 rounded-r-lg ${isLogin ? "bg-teal-600 text-white" : "bg-gray-200 text-gray-700"}`}
+            className={`px-4 py-2 rounded-r-lg ${
+              isLogin ? "bg-teal-600 text-white" : "bg-gray-200 text-gray-700"
+            }`}
             onClick={() => setIsLogin(true)}
             type="button"
           >
@@ -210,8 +246,23 @@ export default function Authentication() {
             </>
           )}
         </div>
+
+        <div className="mt-6 border-t border-gray-200 pt-6 text-center">
+          <p className="text-sm text-gray-500 mb-4">Atau</p>
+          <button
+            onClick={handleAnonymousLogin}
+            disabled={isLoading}
+            className="w-full bg-slate-600 text-white py-3 rounded-lg font-medium hover:bg-slate-700 focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+          >
+            {isLoading ? (
+              <span>Memproses...</span>
+            ) : (
+                <span>Masuk sebagai Tamu</span>
+            )}
+          </button>
+        </div>
       </div>
     </div>
-  )
+  );
 }
 
