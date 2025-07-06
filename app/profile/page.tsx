@@ -18,6 +18,7 @@ export default function ProfilePage() {
   const { user, loading, logout } = useAuth();
   const [activeTab, setActiveTab] = useState("Personal Information");
   const [isEditing, setIsEditing] = useState(false);
+  const isGuest = user?.email === "Guest@mail.com";
 
   // State untuk form edit profil
   const [displayName, setDisplayName] = useState("");
@@ -45,7 +46,7 @@ export default function ProfilePage() {
   // 3. PERBAIKAN: Implementasi fungsi simpan profil
   const handleSaveProfile = async (e: FormEvent) => {
     e.preventDefault();
-    if (!user) return;
+    if (!user || isGuest) return;
 
     setIsSaving(true);
     setError(null);
@@ -73,7 +74,7 @@ export default function ProfilePage() {
   // 4. PERBAIKAN: Implementasi fungsi ubah password dengan re-autentikasi
   const handleChangePassword = async (e: FormEvent) => {
     e.preventDefault();
-    if (!user || !user.email) return;
+    if (!user || !user.email || isGuest) return;
     if (newPassword !== confirmPassword) {
       setError("Password baru dan konfirmasi tidak cocok.");
       return;
@@ -105,7 +106,7 @@ export default function ProfilePage() {
 
   const handleDeleteAccount = async (e: FormEvent) => {
     e.preventDefault();
-    if (!user || !user.email) return;
+    if (!user || !user.email || isGuest) return;
 
     if (
       !window.confirm(
@@ -162,11 +163,12 @@ export default function ProfilePage() {
               </button>
               <button
                 onClick={() => setActiveTab("Security")}
+                disabled={isGuest}
                 className={`px-4 py-2 text-sm font-medium ${
                   activeTab === "Security"
                     ? "border-b-2 border-blue-600 text-blue-600"
                     : "text-gray-500"
-                }`}
+                } disabled:opacity-50 disabled:cursor-not-allowed`}
               >
                 Keamanan
               </button>
@@ -182,9 +184,10 @@ export default function ProfilePage() {
                   {!isEditing ? (
                     <button
                       onClick={() => setIsEditing(true)}
-                      className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                      disabled={isGuest}
+                      className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      <EditIcon/> <span className="ml-2">Edit</span>
+                      <EditIcon /> <span className="ml-2">Edit</span>
                     </button>
                   ) : (
                     <div className="flex space-x-2">
@@ -209,6 +212,15 @@ export default function ProfilePage() {
                   )}
                 </div>
                 <div className="bg-white rounded-lg border p-6">
+                  {isGuest && (
+                    <div className="mb-4 p-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700">
+                      <p className="font-bold">Mode Tamu</p>
+                      <p>
+                        Mengedit profil, mengubah kata sandi, dan menghapus akun
+                        dinonaktifkan untuk akun tamu.
+                      </p>
+                    </div>
+                  )}
                   <form
                     onSubmit={handleSaveProfile}
                     className="grid grid-cols-1 md:grid-cols-2 gap-6"
@@ -272,106 +284,128 @@ export default function ProfilePage() {
             {/* Konten Tab Keamanan */}
             {activeTab === "Security" && (
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-6">
-                  Ubah Password
-                </h3>
-                <div className="bg-white rounded-lg border p-6">
-                  <form
-                    onSubmit={handleChangePassword}
-                    className="space-y-4 max-w-md"
-                  >
-                    <div>
-                      <label className="block text-sm font-medium">
-                        Password Saat Ini
-                      </label>
-                      <input
-                        type="password"
-                        value={currentPassword}
-                        onChange={(e) => setCurrentPassword(e.target.value)}
-                        required
-                        className="mt-1 block w-full input-style border border-gray-300 rounded-lg"
-                      />
+                {isGuest ? (
+                  <div className="bg-white rounded-lg border p-6">
+                    <div className="p-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700">
+                      <p className="font-bold">Mode Tamu</p>
+                      <p>
+                        Mengubah kata sandi dan menghapus akun dinonaktifkan
+                        untuk akun tamu.
+                      </p>
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium">
-                        Password Baru
-                      </label>
-                      <input
-                        type="password"
-                        value={newPassword}
-                        onChange={(e) => setNewPassword(e.target.value)}
-                        required
-                        className="mt-1 block w-full input-style border border-gray-300 rounded-lg"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium">
-                        Konfirmasi Password Baru
-                      </label>
-                      <input
-                        type="password"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        required
-                        className="mt-1 block w-full input-style border border-gray-300 rounded-lg"
-                      />
-                    </div>
-                    {error && <p className="text-sm text-red-600">{error}</p>}
-                    {success && (
-                      <p className="text-sm text-green-600">{success}</p>
-                    )}
-                    <button
-                      type="submit"
-                      disabled={isSaving}
-                      className="w-full flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
-                    >
-                      {isSaving ? "Memproses..." : "Ubah Password"}
-                    </button>
-                  </form>
-                </div>
-
-                {/* Zona Berbahaya - Hapus Akun */}
-                <div className="mt-8">
-                  <h3 className="text-lg font-semibold text-red-600 mb-2">
-                    Zona Berbahaya
-                  </h3>
-                  <div className="bg-white rounded-lg border border-red-300 p-6">
-                    <p className="text-sm text-gray-700 mb-4">
-                      Menghapus akun Anda adalah tindakan permanen. Semua data
-                      Anda akan dihapus dan tidak dapat dipulihkan. Untuk
-                      melanjutkan, masukkan password Anda saat ini.
-                    </p>
-                    <form
-                      onSubmit={handleDeleteAccount}
-                      className="space-y-4 max-w-md"
-                    >
-                      <div>
-                        <label className="block text-sm font-medium">
-                          Password Anda
-                        </label>
-                        <input
-                          type="password"
-                          value={deletePassword}
-                          onChange={(e) => setDeletePassword(e.target.value)}
-                          required
-                          className="mt-1 block w-full input-style border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500"
-                        />
-                      </div>
-                      {error && (
-                        <p className="text-sm text-red-600">{error}</p>
-                      )}
-                      <button
-                        type="submit"
-                        disabled={isSaving}
-                        className="w-full flex items-center justify-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
-                      >
-                        {isSaving
-                          ? "Menghapus..."
-                          : "Hapus Akun Secara Permanen"}
-                      </button>
-                    </form>
                   </div>
-                </div>
+                ) : (
+                  <>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-6">
+                      Ubah Password
+                    </h3>
+                    <div className="bg-white rounded-lg border p-6">
+                      <form
+                        onSubmit={handleChangePassword}
+                        className="space-y-4 max-w-md"
+                      >
+                        <div>
+                          <label className="block text-sm font-medium">
+                            Password Saat Ini
+                          </label>
+                          <input
+                            type="password"
+                            value={currentPassword}
+                            onChange={(e) =>
+                              setCurrentPassword(e.target.value)
+                            }
+                            required
+                            className="mt-1 block w-full input-style border border-gray-300 rounded-lg"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium">
+                            Password Baru
+                          </label>
+                          <input
+                            type="password"
+                            value={newPassword}
+                            onChange={(e) => setNewPassword(e.target.value)}
+                            required
+                            className="mt-1 block w-full input-style border border-gray-300 rounded-lg"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium">
+                            Konfirmasi Password Baru
+                          </label>
+                          <input
+                            type="password"
+                            value={confirmPassword}
+                            onChange={(e) =>
+                              setConfirmPassword(e.target.value)
+                            }
+                            required
+                            className="mt-1 block w-full input-style border border-gray-300 rounded-lg"
+                          />
+                        </div>
+                        {error && (
+                          <p className="text-sm text-red-600">{error}</p>
+                        )}
+                        {success && (
+                          <p className="text-sm text-green-600">{success}</p>
+                        )}
+                        <button
+                          type="submit"
+                          disabled={isSaving}
+                          className="w-full flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+                        >
+                          {isSaving ? "Memproses..." : "Ubah Password"}
+                        </button>
+                      </form>
+                    </div>
+
+                    {/* Zona Berbahaya - Hapus Akun */}
+                    <div className="mt-8">
+                      <h3 className="text-lg font-semibold text-red-600 mb-2">
+                        Zona Berbahaya
+                      </h3>
+                      <div className="bg-white rounded-lg border border-red-300 p-6">
+                        <p className="text-sm text-gray-700 mb-4">
+                          Menghapus akun Anda adalah tindakan permanen. Semua
+                          data Anda akan dihapus dan tidak dapat dipulihkan.
+                          Untuk melanjutkan, masukkan password Anda saat ini.
+                        </p>
+                        <form
+                          onSubmit={handleDeleteAccount}
+                          className="space-y-4 max-w-md"
+                        >
+                          <div>
+                            <label className="block text-sm font-medium">
+                              Password Anda
+                            </label>
+                            <input
+                              type="password"
+                              value={deletePassword}
+                              onChange={(e) =>
+                                setDeletePassword(e.target.value)
+                              }
+                              required
+                              className="mt-1 block w-full input-style border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500"
+                            />
+                          </div>
+                          {error && (
+                            <p className="text-sm text-red-600">{error}</p>
+                          )}
+                          <button
+                            type="submit"
+                            disabled={isSaving}
+                            className="w-full flex items-center justify-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
+                          >
+                            {isSaving
+                              ? "Menghapus..."
+                              : "Hapus Akun Secara Permanen"}
+                          </button>
+                        </form>
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
             )}
           </main>

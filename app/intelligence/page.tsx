@@ -99,7 +99,7 @@ function HarvestInputModal({
     setForm({ date: "", amount: 0, quality: "", note: "" });
     onClose();
   };
-
+  
   if (!open) return null;
 
   return (

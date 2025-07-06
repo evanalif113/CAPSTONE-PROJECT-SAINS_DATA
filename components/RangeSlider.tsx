@@ -12,6 +12,7 @@ interface RangeSliderProps {
   step?: number;
   unit: string;
   colorClassName: string; // Kelas warna untuk trek, misal: "bg-blue-500"
+  disabled?: boolean; // Properti baru untuk menonaktifkan slider
 }
 
 export const RangeSlider = ({
@@ -23,9 +24,10 @@ export const RangeSlider = ({
   step = 1,
   unit,
   colorClassName,
+  disabled = false, // Nilai default
 }: RangeSliderProps) => {
   return (
-    <div className="space-y-4">
+    <div className={`space-y-4 ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}>
       <div className="flex justify-between items-center">
         <label className="text-sm font-medium text-gray-700">{label}</label>
         <div className="text-sm font-semibold text-gray-900 bg-gray-100 px-2 py-1 rounded">
@@ -40,6 +42,7 @@ export const RangeSlider = ({
         max={max}
         step={step}
         minStepsBetweenThumbs={1}
+        disabled={disabled} // Terapkan properti disabled
       >
         {/* Trek Latar Belakang */}
         <Slider.Track className="bg-gray-200 relative grow rounded-full h-[6px]">

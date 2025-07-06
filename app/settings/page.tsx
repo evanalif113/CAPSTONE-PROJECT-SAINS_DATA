@@ -5,6 +5,7 @@ import AppHeader from "@/components/AppHeader";
 import Sidebar from "@/components/Sidebar";
 import { RangeSlider } from "@/components/RangeSlider";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import LoadingSpinner from "@/components/LoadingSpinner";
 import { useAuth } from "@/context/AuthContext";
 import {
   fetchThresholds,
@@ -76,9 +77,17 @@ export default function Settings() {
   // Tampilkan loading spinner saat data diambil
   if (isLoading) {
     return (
-      <div className="flex h-screen items-center justify-center">
-        Memuat Pengaturan...
-      </div>
+      <ProtectedRoute>
+        <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
+          <Sidebar />
+          <div className="flex-1 flex flex-col">
+            <AppHeader />
+            <main className="flex-1 p-6 flex items-center justify-center">
+              <LoadingSpinner />
+            </main>
+          </div>
+        </div>
+      </ProtectedRoute>
     );
   }
 
