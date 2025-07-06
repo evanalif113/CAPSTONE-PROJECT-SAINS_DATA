@@ -92,7 +92,7 @@ export default function AboutPage() {
                 Tentang Kami
               </h1>
               <p className="text-gray-600 dark:text-gray-400 mb-8">
-                Tim di balik pengembangan perangkat lunak ini.
+                Tim di balik pengembangan sistem informasi ini.
               </p>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -105,14 +105,14 @@ export default function AboutPage() {
                     <Image
                       src={dev.avatarUrl}
                       alt={`Avatar of ${dev.name}`}
-                      width={120}
-                      height={120}
+                      width={100}
+                      height={100}
                       className="rounded-full mb-4 border-4 border-gray-200 dark:border-gray-600 pointer-events-none"
                     />
                     <h3 className="text-xl font-semibold text-gray-900 dark:text-white pointer-events-none">
                       {dev.name}
                     </h3>
-                    <p className="text-gray-500 dark:text-gray-400 mb-4 pointer-events-none">
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-4 pointer-events-none line-clamp-3">
                       {dev.role}
                     </p>
                     <div className="mt-auto inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-500 dark:bg-gray-700 rounded-lg pointer-events-none">
