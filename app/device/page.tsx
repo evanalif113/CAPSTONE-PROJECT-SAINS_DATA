@@ -11,8 +11,8 @@ import { useAuth } from "@/context/AuthContext";
 import { fetchDevices, addDevice, deleteDevice, updateDevice, Device } from "@/lib/manageDevices"; 
 
 // Komponen-komponen baru
-import SensorCard from "@/components/SensorCard"; // Akan kita buat
-import ActuatorCard from "@/components/ActuatorCard"; // Akan kita buat
+import SensorCard from "@/components/SensorCardDevice"; // Akan kita buat
+import ActuatorCard from "@/components/ActuatorCardDevice"; // Akan kita buat
 import DeviceModal from "@/components/DeviceModal"; // Akan kita perbarui
 
 import { Plus } from "lucide-react";

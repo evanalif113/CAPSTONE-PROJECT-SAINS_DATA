@@ -73,8 +73,8 @@ const ActuatorCard: React.FC<ActuatorCardProps> = ({ device, userId, onEdit, onD
         {loading ? <div className="py-8 flex justify-center"><LoadingSpinner/></div> : (
           <div className="mt-4 space-y-3">
             <div className="flex justify-between items-center"><span className="font-medium">Kipas</span><ToggleSwitch checked={states?.['16'] === 0} onChange={(val) => handleActuatorChange(16, val)} disabled={modeAuto} /></div>
-            <div className="flex justify-between items-center"><span className="font-medium">Humidifier</span><ToggleSwitch checked={states?.['17'] === 0} onChange={(val) => handleActuatorChange(17, val)} disabled={modeAuto} /></div>
-            <div className="flex justify-between items-center"><span className="font-medium">Lampu</span><ToggleSwitch checked={states?.['18'] === 0} onChange={(val) => handleActuatorChange(18, val)} disabled={modeAuto} /></div>
+            <div className="flex justify-between items-center"><span className="font-medium">Misting</span><ToggleSwitch checked={states?.['17'] === 0} onChange={(val) => handleActuatorChange(17, val)} disabled={modeAuto} /></div>
+            <div className="flex justify-between items-center"><span className="font-medium">Pencahayaan</span><ToggleSwitch checked={states?.['18'] === 0} onChange={(val) => handleActuatorChange(18, val)} disabled={modeAuto} /></div>
           </div>
         )}
       </div>

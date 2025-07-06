@@ -484,9 +484,9 @@ export default function DashboardPage() {
               <div className="p-4">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   {[
-                    { name: "Fan", pin: 16 },
-                    { name: "Humidifier", pin: 17 },
-                    { name: "Light", pin: 18 },
+                    { name: "Kipas", pin: 16 },
+                    { name: "Misting", pin: 17 },
+                    { name: "Pencahayaan", pin: 18 },
                   ].map((actuator) => (
                     <div
                       key={actuator.pin}
