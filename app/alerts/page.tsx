@@ -12,6 +12,7 @@ import {
   addNotification,
   deleteNotification,
   markNotificationAsRead,
+  deleteAllNotifications, // Import the new function
 } from "@/lib/fetchNotificationData";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { cn } from "@/lib/utils";
@@ -77,7 +78,24 @@ export default function Alerts() {
     }
   };
 
+  const handleDeleteAllAlerts = async () => {
+    if (!user || alerts.length === 0) return;
+    // Optional: Add a confirmation dialog
+    if (window.confirm("Apakah Anda yakin ingin menghapus semua notifikasi?")) {
+      try {
+        await deleteAllNotifications(user.uid);
+        refetchAlerts(); // Refresh the list (will become empty)
+      } catch (error) {
+        console.error("Gagal menghapus semua notifikasi:", error);
+      }
+    }
+  };
+
   const renderAlertIcon = (message: string) => {
+    // FIX: Add a guard to prevent crash if message is undefined
+    if (!message) {
+      return <Bell className="text-gray-400" />; // Return a default icon
+    }
     const lowerCaseMessage = message.toLowerCase();
     if (lowerCaseMessage.includes("kritikal") || lowerCaseMessage.includes("tinggi")) {
       return <TriangleAlert className="text-red-500" />;
@@ -144,9 +162,20 @@ export default function Alerts() {
                   <h3 className="text-lg font-semibold text-gray-900">
                     Notifikasi Aktif
                   </h3>
-                  <span className="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium">
-                    {alerts.length} Aktif
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={handleDeleteAllAlerts}
+                      disabled={alerts.length === 0 || loading}
+                      className="px-3 py-1 rounded-lg text-xs font-medium bg-red-100 text-red-700 hover:bg-red-200 transition-colors disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
+                      title="Hapus semua notifikasi"
+                    >
+                      <Trash2 size={14} className="inline mr-1" />
+                      Hapus Semua
+                    </button>
+                    <span className="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium">
+                      {alerts.length} Aktif
+                    </span>
+                  </div>
                 </div>
                 <div className="space-y-4">
                   {loading ? (
@@ -172,7 +201,7 @@ export default function Alerts() {
                             {renderAlertIcon(alert.message)}
                             <div className={cn(alert.read && "text-gray-500")}>
                               <span className="text-gray-900 font-medium">
-                                {alert.message}
+                                {alert.message || "Pesan tidak tersedia."}
                               </span>
                               <p className="text-sm text-gray-500">
                                 {new Date(alert.timestamp).toLocaleString(

@@ -94,3 +94,17 @@ export const deleteNotification = async (userId: string, notificationId: string)
   }
 };
 
+/**
+ * Menghapus semua notifikasi untuk pengguna tertentu.
+ * @param userId - ID pengguna.
+ */
+export const deleteAllNotifications = async (userId: string): Promise<void> => {
+  try {
+    const notificationsRef = ref(database, `${userId}/notifications`);
+    await remove(notificationsRef);
+  } catch (error) {
+    console.error("Error deleting all notifications:", error);
+    throw new Error("Gagal menghapus semua notifikasi.");
+  }
+};
+
