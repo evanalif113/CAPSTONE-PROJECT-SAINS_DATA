@@ -15,7 +15,7 @@ const developers = [
   {
     id: 1,
     name: "Evan Alif Widhyatma",
-    role: "Embedded Systems Engineer, Firmware Engineer, Database Designer, Back-end Developer, AI Researcher",
+    role: "Embedded Systems Engineer, Firmware Engineer, Database Designer, Backend Developer, AI Researcher",
     github: "evanalif113",
     avatarUrl: "https://media.licdn.com/dms/image/v2/D5603AQFVFvglk8kC3w/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1727273555054?e=1757548800&v=beta&t=5Vqu63kPgpHqieoDJpiLYz6X62BwpqGqpp3XIRrCSCY", // Ganti dengan URL avatar asli
     linkedin: "evan-alif-widhyatma-371966180/",
@@ -23,7 +23,7 @@ const developers = [
   {
     id: 2,
     name: "Aisyah Hanan",
-    role: "UI/UX Designer, Frontend Developer, Data Analis dan Sistem Analis",
+    role: "UI/UX Designer, Frontend Developer, Data Analis, Sistem Analis",
     github: "aisyahhhhanannn192",
     avatarUrl: "https://media.licdn.com/dms/image/v2/D5603AQHslpUSuncQmA/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1719328817369?e=1757548800&v=beta&t=tLB8YN2t7-On3UXRLnf-Yx4MrwiXX4YR6QJ0FUoSZK4", // Ganti dengan URL avatar asli
     linkedin: "aisyah-hanan-467a4a215/",
@@ -31,7 +31,7 @@ const developers = [
   {
     id: 3,
     name: "Putri Cahya Ningrum",
-    role: "Public Relation, Dokumenter Projek, Quality Assurance, Graphic Designer",
+    role: "Public Relation, Dokumenter Projek, Quality Assurance,  Desainer Logo",
     github: "putriningrum",
     avatarUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlLwNo_ZZIm1-8OQgVR3FXL0VtdzeRR1aXyA&s", // Ganti dengan URL avatar asli
     linkedin: "putri-cahya-ningrum-b8b3a5256",
