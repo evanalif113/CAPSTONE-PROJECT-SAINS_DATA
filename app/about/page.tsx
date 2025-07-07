@@ -33,7 +33,7 @@ const developers = [
     name: "Putri Cahya Ningrum",
     role: "Public Relation, Dokumenter Projek, Quality Assurance, Desainer Logo",
     github: "putriningrum",
-    avatarUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlLwNo_ZZIm1-8OQgVR3FXL0VtdzeRR1aXyA&s", // Ganti dengan URL avatar asli
+    avatarUrl: "/img/putri-cahya.jpg", // Ganti dengan URL avatar asli
     linkedin: "putri-cahya-ningrum-b8b3a5256",
   },
 ];
