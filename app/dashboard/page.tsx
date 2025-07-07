@@ -184,6 +184,19 @@ export default function DashboardPage() {
     return [min, max];
   }
 
+  const isSystemOffline = useMemo(() => {
+    if (!latest?.timestamp) {
+      // If there's no data or timestamp, we can't determine the status.
+      // The main component already handles the "No Data" screen.
+      return false;
+    }
+    const fifteenMinutesInMillis = 15 * 60 * 1000;
+    const lastDataTime = latest.timestamp; // Already in milliseconds
+    const now = new Date().getTime();
+
+    return now - lastDataTime > fifteenMinutesInMillis;
+  }, [latest]);
+
   // Chart Card Component
   const ChartCard = ({
     title,
@@ -343,15 +356,17 @@ export default function DashboardPage() {
         <div className="flex-1 flex flex-col">
           <AppHeader />
           <main className="flex-1 p-6 space-y-6">
+            <div className="flex items-center justify-between">
               <h1 className="text-3xl font-bold text-gray-800 dark:text-white">
                 {getGreeting()}, {user?.displayName || 'Pengguna'}!
               </h1>
+            </div>
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-500 mt-1">
                   Data Terakhir Diperbarui{" "}
                   {/* KOREKSI: Gunakan `timeFormatted` yang sudah ada */}
-                  {latest ? latest.timeFormatted : ":"}
+                  {latest ? latest.dateFormatted : ":"}
                 </p>
               </div>
               <div className="flex items-center gap-4">
@@ -449,8 +464,12 @@ export default function DashboardPage() {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="flex justify-between">
                     <span className="text-gray-600">Status Sistem</span>
-                    <span className="bg-green-500 text-white px-2 py-1 rounded text-sm">
-                      Online
+                    <span
+                      className={`px-2 py-1 rounded text-sm text-white ${
+                        isSystemOffline ? "bg-red-500" : "bg-green-500"
+                      }`}
+                    >
+                      {isSystemOffline ? "Offline" : "Online"}
                     </span>
                   </div>
                   <div className="flex justify-between">
@@ -458,9 +477,7 @@ export default function DashboardPage() {
                       Terakhir data diterima
                     </span>
                     <span className="text-gray-900">
-                      {latest && latest.timestamp
-                        ? new Date(latest.timestamp).toLocaleString()
-                        : "-"}
+                      {latest ? latest.timeFormatted : "-"}
                     </span>
                   </div>
                   <div className="flex justify-between">

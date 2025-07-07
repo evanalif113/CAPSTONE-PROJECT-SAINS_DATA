@@ -17,7 +17,8 @@ export interface SensorValue {
 }
 
 export interface SensorDate extends SensorValue {
-  timestamp: number;
+  timestamp: number; // UNIX timestamp in milliseconds
+  dateFormatted: string; // Optional, if you want to store a formatted date
   timeFormatted: string;
 }
 
@@ -50,14 +51,15 @@ export async function fetchSensorData(
     const results: SensorDate[] = [];
 
     snapshot.forEach((child) => {
-      // 1. Ambil timestamp dari KEY, bukan dari VALUE
-      const timestamp = Number(child.key); // <-- INI KUNCI PAKE UNIX TIME
-      console.log("Processing timestamp (from key):", timestamp);
+      // 1. Ambil timestamp dari KEY (detik), dan konversi ke milidetik untuk JS
+      const timestampInSeconds = Number(child.key);
+      const timestampInMillis = timestampInSeconds * 1000;
+      console.log("Processing timestamp (ms):", timestampInMillis);
       const data: SensorValue = child.val();
       console.log("Sensor value from child:", data);
 
       // 2. Format waktu menggunakan timestamp yang benar
-      const formattedTime = new Date(timestamp * 1000).toLocaleTimeString(
+      const formattedTime = new Date(timestampInMillis).toLocaleString(
         'id-ID',
         {
           timeZone: "Asia/Jakarta", // Pastikan zona waktu sesuai
@@ -68,13 +70,29 @@ export async function fetchSensorData(
         }
       ).replace(/\./g, ':');  //replace untuk mengganti titik dengan titik dua
       console.log("Formatted time:", formattedTime);
+      // 2.1 Format tanggal jika diperlukan
+      const dateFormatted = new Date(timestampInMillis).toLocaleString(
+        'id-ID',
+        {
+          timeZone: "Asia/Jakarta", // Pastikan zona waktu sesuai
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          hour12: false,
+        }
+      ).replace(/\./g, ':');  //replace untuk mengganti titik dengan titik dua
+      console.log("Formatted time:", formattedTime);
       // 3. Gabungkan semua data sesuai interface SensorData
       const resultItem = {
-        timestamp: timestamp,
+        timestamp: timestampInMillis, // Simpan dalam milidetik
         temperature: data.temperature,
         humidity: data.humidity,
         light: data.light,
         moisture: data.moisture,
+        dateFormatted: dateFormatted,
         timeFormatted: formattedTime,
       };
       console.log("Pushing item to results:", resultItem);
