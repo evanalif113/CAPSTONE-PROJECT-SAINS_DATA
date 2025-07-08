@@ -17,7 +17,7 @@ const developers = [
     name: "Evan Alif Widhyatma",
     role: "Embedded Systems Engineer, Firmware Engineer, Database Designer, Fullstack Developer, AI Researcher",
     github: "evanalif113",
-    avatarUrl: "https://media.licdn.com/dms/image/v2/D5603AQFVFvglk8kC3w/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1727273555054?e=1757548800&v=beta&t=5Vqu63kPgpHqieoDJpiLYz6X62BwpqGqpp3XIRrCSCY", // Ganti dengan URL avatar asli
+    avatarUrl: "https://avatars.githubusercontent.com/u/56740250?s=400&u=c89c2318fb527247e99962257f8664ef96b366d1&v=4", // Ganti dengan URL avatar asli
     linkedin: "evan-alif-widhyatma-371966180/",
   },
   {
