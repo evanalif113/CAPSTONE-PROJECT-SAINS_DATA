@@ -7,12 +7,6 @@ export function middleware(request: NextRequest) {
   const token = request.cookies.get('firebaseIdToken');
   const { pathname } = request.nextUrl;
 
-  // Jika tidak ada token dan pengguna mencoba mengakses rute selain otentikasi
-  if (!token && pathname !== '/authentication') {
-    // Redirect ke halaman login
-    return NextResponse.redirect(new URL('/authentication', request.url));
-  }
-
   // Jika ada token dan pengguna mencoba mengakses halaman otentikasi
   if (token && pathname === '/authentication') {
     // Redirect ke dashboard
