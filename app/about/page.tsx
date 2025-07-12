@@ -6,44 +6,7 @@ import Link from "next/link";
 import { Github } from "lucide-react";
 import AboutModal from "@/components/AboutModal"; // Import the modal
 import { Toaster, toast } from "sonner"; // Import sonner
-
-// Anda bisa mengganti data ini dengan data developer yang sebenarnya
-const developers = [
-  {
-    id: 1,
-    name: "Evan Alif Widhyatma",
-    role: "Embedded Systems Engineer, Firmware Engineer, Database Designer, Fullstack Developer, AI Researcher",
-    github: "evanalif113",
-    avatarUrl: "https://gravatar.com/avatar/908ca1637c2e533406b4c1e5145cb0bc?size=256", // Ganti dengan URL avatar asli
-    linkedin: "evan-alif-widhyatma-371966180/",
-  },
-  {
-    id: 2,
-    name: "Aisyah Hanan",
-    role: "UI/UX Designer, Frontend Developer, Data Analis, Sistem Analis",
-    github: "aisyahhhhanannn192",
-    avatarUrl: "https://media.licdn.com/dms/image/v2/D5603AQHslpUSuncQmA/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1719328817369?e=1757548800&v=beta&t=tLB8YN2t7-On3UXRLnf-Yx4MrwiXX4YR6QJ0FUoSZK4", // Ganti dengan URL avatar asli
-    linkedin: "aisyah-hanan-467a4a215/",
-  },
-  {
-    id: 3,
-    name: "Putri Cahya Ningrum",
-    role: "Public Relation, Dokumenter Projek, Quality Assurance, Desainer Logo",
-    github: "putriningrum",
-    avatarUrl: "/img/putri-cahya.jpg", // Ganti dengan URL avatar asli
-    linkedin: "putri-cahya-ningrum-b8b3a5256",
-  },
-];
-
-// Define the Developer type
-interface Developer {
-  id: number;
-  name: string;
-  role: string;
-  github: string;
-  avatarUrl: string;
-  linkedin: string;
-}
+import { developers, Developer } from "@/lib/developers";
 
 export default function AboutPage() {
   const [selectedDeveloper, setSelectedDeveloper] = useState<Developer | null>(null);
