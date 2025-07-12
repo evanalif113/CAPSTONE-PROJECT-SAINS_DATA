@@ -14,11 +14,15 @@ import Link from "next/link";
 import AboutModal from "@/components/AboutModal"; // Import the modal
 import { Toaster, toast } from "sonner"; // Import sonner
 import { developers, Developer } from "@/lib/developers";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { Menu, X } from "lucide-react";
 
 const LandingPage = () => {
   const [selectedDeveloper, setSelectedDeveloper] = useState<Developer | null>(
     null
   );
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const isMobile = useIsMobile();
 
   const features = [
     {
@@ -61,38 +65,93 @@ const LandingPage = () => {
             />
             <h1 className="text-2xl font-bold text-teal-600 dark:text-teal-400">Kumbung Sense</h1>
           </div>
-          <nav className="hidden md:flex space-x-8">
-            <a
-              href="#home"
-              className="hover:text-teal-600 dark:hover:text-teal-400 transition-colors"
+          
+          {/* Desktop Navigation */}
+          {!isMobile ? (
+            <>
+              <nav className="hidden md:flex space-x-8">
+                <a
+                  href="#home"
+                  className="hover:text-teal-600 dark:hover:text-teal-400 transition-colors"
+                >
+                  Home
+                </a>
+                <a
+                  href="#features"
+                  className="hover:text-teal-600 dark:hover:text-teal-400 transition-colors"
+                >
+                  Fitur
+                </a>
+                <a
+                  href="#about"
+                  className="hover:text-teal-600 dark:hover:text-teal-400 transition-colors"
+                >
+                  Pengembang
+                </a>
+                <a
+                  href="#contact"
+                  className="hover:text-teal-600 dark:hover:text-teal-400 transition-colors"
+                >
+                  Pemesanan
+                </a>
+              </nav>
+              <Link href="/authentication">
+                <Button className="bg-teal-600 hover:bg-teal-700 dark:bg-teal-500 dark:hover:bg-teal-600">
+                  Masuk Dashboard
+                </Button>
+              </Link>
+            </>
+          ) : (
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="text-gray-800 dark:text-gray-200 z-50"
+              aria-label="Toggle menu"
             >
-              Home
-            </a>
-            <a
-              href="#features"
-              className="hover:text-teal-600 dark:hover:text-teal-400 transition-colors"
-            >
-              Fitur
-            </a>
-            <a
-              href="#about"
-              className="hover:text-teal-600 dark:hover:text-teal-400 transition-colors"
-            >
-              Pengembang
-            </a>
-            <a
-              href="#contact"
-              className="hover:text-teal-600 dark:hover:text-teal-400 transition-colors"
-            >
-              Pemesanan
-            </a>
-          </nav>
-          <Link href="/authentication">
-            <Button className="bg-teal-600 hover:bg-teal-700 dark:bg-teal-500 dark:hover:bg-teal-600">
-              Masuk Dashboard
-            </Button>
-          </Link>
+              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          )}
         </div>
+
+        {/* Mobile Navigation Menu */}
+        {isMobile && isMenuOpen && (
+          <div className="absolute top-0 left-0 w-full bg-white dark:bg-gray-800 pt-20 pb-6 shadow-lg">
+            <nav className="flex flex-col items-center space-y-6">
+              <a
+                href="#home"
+                onClick={() => setIsMenuOpen(false)}
+                className="hover:text-teal-600 dark:hover:text-teal-400 transition-colors text-lg"
+              >
+                Home
+              </a>
+              <a
+                href="#features"
+                onClick={() => setIsMenuOpen(false)}
+                className="hover:text-teal-600 dark:hover:text-teal-400 transition-colors text-lg"
+              >
+                Fitur
+              </a>
+              <a
+                href="#about"
+                onClick={() => setIsMenuOpen(false)}
+                className="hover:text-teal-600 dark:hover:text-teal-400 transition-colors text-lg"
+              >
+                Pengembang
+              </a>
+              <a
+                href="#contact"
+                onClick={() => setIsMenuOpen(false)}
+                className="hover:text-teal-600 dark:hover:text-teal-400 transition-colors text-lg"
+              >
+                Pemesanan
+              </a>
+              <Link href="/authentication" className="w-full px-6">
+                <Button className="bg-teal-600 hover:bg-teal-700 dark:bg-teal-500 dark:hover:bg-teal-600 w-full">
+                  Masuk Dashboard
+                </Button>
+              </Link>
+            </nav>
+          </div>
+        )}
       </header>
 
       <main>
