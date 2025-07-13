@@ -96,7 +96,7 @@ const LandingPage = () => {
                   Pemesanan
                 </a>
               </nav>
-              <Link href="/authentication">
+              <Link href="/authentication" target="_blank" rel="noopener noreferrer">
                 <Button className="bg-teal-600 hover:bg-teal-700 dark:bg-teal-500 dark:hover:bg-teal-600">
                   Masuk Dashboard
                 </Button>
@@ -145,7 +145,7 @@ const LandingPage = () => {
               >
                 Pemesanan
               </a>
-              <Link href="/authentication" className="w-full px-6">
+              <Link href="/authentication" className="w-full px-6" target="_blank" rel="noopener noreferrer">
                 <Button className="bg-teal-600 hover:bg-teal-700 dark:bg-teal-500 dark:hover:bg-teal-600 w-full">
                   Masuk Dashboard
                 </Button>
