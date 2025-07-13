@@ -16,6 +16,7 @@ import { Toaster, toast } from "sonner"; // Import sonner
 import { developers, Developer } from "@/lib/developers";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Menu, X } from "lucide-react";
+import Footer from "@/components/Footer";
 
 const LandingPage = () => {
   const [selectedDeveloper, setSelectedDeveloper] = useState<Developer | null>(
@@ -317,6 +318,7 @@ const LandingPage = () => {
           </div>
         </section>
       </main>
+      <Footer />
       <AboutModal
         developer={selectedDeveloper}
         onClose={() => setSelectedDeveloper(null)}
