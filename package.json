@@ -1,6 +1,6 @@
 {
   "name": "kumbung-sense",
-  "version": "2.5.0",
+  "version": "3.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
