@@ -1,5 +1,5 @@
 // Mengimpor instance 'database' dan fungsi-fungsi dari file konfigurasi pusat
-import { database, ref, onValue, set, push } from "./firebaseConfig";
+import { database, ref, onValue, set, push } from "@/lib/firebaseConfig";
 // Mengimpor TIPE 'Unsubscribe' langsung dari pustaka Firebase
 import { Unsubscribe } from "firebase/database";
 

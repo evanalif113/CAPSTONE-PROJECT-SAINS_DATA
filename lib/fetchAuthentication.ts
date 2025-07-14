@@ -7,7 +7,7 @@ import {
   deleteUser,
 } from "firebase/auth";
 import { ref, remove } from "firebase/database";
-import { database } from "./firebaseConfig";
+import { database } from "@/lib/firebaseConfig"; // Adjust the import path as necessary
 
 /**
  * Updates the user's profile (display name).
