@@ -16,6 +16,8 @@ import {
   PlusCircle,
   X,
   Info,
+  Pencil,
+  Trash2,
 } from "lucide-react";
 // Impor komponen UI dan otentikasi
 import AppHeader from "@/components/AppHeader";
@@ -28,6 +30,8 @@ import { useAuth } from "@/context/AuthContext";
 import {
   listenToHarvestData,
   addHarvestData,
+  updateHarvestData,
+  deleteHarvestData,
   Harvest,
   NewHarvestData,
 } from "@/lib/fetchHarvestLog";
@@ -77,6 +81,7 @@ interface HarvestInputModalProps {
   open: boolean;
   onClose: () => void;
   onSubmit: (formData: HarvestFormInput) => void;
+  initialData?: HarvestFormInput | null;
 }
 
 // --- Komponen Modal (Dengan Tipe yang Benar) ---
@@ -84,6 +89,7 @@ function HarvestInputModal({
   open,
   onClose,
   onSubmit,
+  initialData,
 }: HarvestInputModalProps) {
   const [form, setForm] = useState<HarvestFormInput>({
     date: new Date().toISOString().slice(0, 10),
@@ -91,6 +97,19 @@ function HarvestInputModal({
     quality: "A",
     note: "",
   });
+
+  useEffect(() => {
+    if (initialData) {
+      setForm(initialData);
+    } else {
+      setForm({
+        date: new Date().toISOString().slice(0, 10),
+        amount: 0,
+        quality: "A",
+        note: "",
+      });
+    }
+  }, [initialData, open]);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -122,7 +141,9 @@ function HarvestInputModal({
         >
           <X className="w-5 h-5" />
         </button>
-        <h2 className="text-lg font-bold mb-4">Input Data Panen</h2>
+        <h2 className="text-lg font-bold mb-4">
+          {initialData ? "Edit Data Panen" : "Input Data Panen"}
+        </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -186,7 +207,7 @@ function HarvestInputModal({
               type="submit"
               className="px-6 py-2 bg-blue-600 text-white rounded-lg"
             >
-              Simpan Data
+              {initialData ? "Simpan Perubahan" : "Simpan Data"}
             </button>
           </div>
         </form>
@@ -199,6 +220,7 @@ function HarvestInputModal({
 export default function IntelligencePage() {
   const { user } = useAuth();
   const [showHarvestModal, setShowHarvestModal] = useState(false);
+  const [editingHarvest, setEditingHarvest] = useState<Harvest | null>(null);
   const [mediaTanamKering, setMediaTanamKering] = useState(100);
 
   // State untuk data dari Firebase
@@ -206,10 +228,14 @@ export default function IntelligencePage() {
   const [sensorLog, setSensorLog] = useState<SensorDate[]>([]);
 
   useEffect(() => {
-    const unsubscribeHarvest = listenToHarvestData(setHarvestData);
+    if (!user) return; // Jangan lakukan apa-apa jika user belum login
+
+    const unsubscribeHarvest = listenToHarvestData(user.uid, (data) => {
+      setHarvestData(data);
+    });
 
     const getSensorLog = async () => {
-      const userIdForSensor = "GQAUD4ySfaNncpiZEkiKYNITWvK2";
+      const userIdForSensor = user.uid; // Gunakan UID user yang login
       if (userIdForSensor) {
         try {
           const data = await fetchSensorData(userIdForSensor, 100);
@@ -226,30 +252,76 @@ export default function IntelligencePage() {
     };
   }, [user]);
 
-  const handleAddHarvest = async (formData: HarvestFormInput) => {
-    const avgTemp =
-      sensorLog.length > 0
-        ? sensorLog.reduce((sum, log) => sum + log.temperature, 0) /
-          sensorLog.length
-        : 25;
-    const avgHumidity =
-      sensorLog.length > 0
-        ? sensorLog.reduce((sum, log) => sum + log.humidity, 0) /
-          sensorLog.length
-        : 90;
+  const handleAddOrUpdateHarvest = async (formData: HarvestFormInput) => {
+    if (!user) {
+      console.error("User tidak terautentikasi.");
+      return;
+    }
 
-    // addHarvestData akan menangani timestamp secara otomatis
-    const newHarvest = {
-      ...formData,
-      avgTemp: parseFloat(avgTemp.toFixed(1)),
-      avgHumidity: parseFloat(avgHumidity.toFixed(1)),
-      timestamp: Date.now(),
-    };
+    if (editingHarvest) {
+      // Mode Edit
+      const updatedData: Partial<NewHarvestData> = {
+        ...formData,
+        // Timestamp tidak diubah saat edit, kecuali diperlukan
+      };
+      try {
+        await updateHarvestData(user.uid, editingHarvest.id, updatedData);
+        console.log("Data panen berhasil diperbarui!");
+      } catch (error) {
+        console.error("Gagal memperbarui data panen:", error);
+      }
+    } else {
+      // Mode Tambah Baru
+      const avgTemp =
+        sensorLog.length > 0
+          ? sensorLog.reduce((sum, log) => sum + log.temperature, 0) /
+            sensorLog.length
+          : 25;
+      const avgHumidity =
+        sensorLog.length > 0
+          ? sensorLog.reduce((sum, log) => sum + log.humidity, 0) /
+            sensorLog.length
+          : 90;
 
-    try {
-      await addHarvestData(newHarvest);
-    } catch (error) {
-      console.error("Gagal menambahkan data panen:", error);
+      const newHarvest: NewHarvestData = {
+        ...formData,
+        avgTemp: parseFloat(avgTemp.toFixed(1)),
+        avgHumidity: parseFloat(avgHumidity.toFixed(1)),
+        timestamp: Date.now(),
+      };
+
+      try {
+        await addHarvestData(user.uid, newHarvest);
+        console.log("Data panen berhasil ditambahkan!");
+      } catch (error) {
+        console.error("Gagal menambahkan data panen:", error);
+      }
+    }
+    setEditingHarvest(null);
+  };
+
+  const handleOpenEditModal = (harvest: Harvest) => {
+    setEditingHarvest(harvest);
+    setShowHarvestModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowHarvestModal(false);
+    setEditingHarvest(null);
+  };
+
+  const handleDeleteHarvest = async (id: string) => {
+    if (!user) {
+      console.error("User tidak terautentikasi.");
+      return;
+    }
+    if (window.confirm("Apakah Anda yakin ingin menghapus data panen ini?")) {
+      try {
+        await deleteHarvestData(user.uid, id);
+        console.log("Data panen berhasil dihapus!");
+      } catch (error) {
+        console.error("Gagal menghapus data panen:", error);
+      }
     }
   };
 
@@ -387,7 +459,10 @@ export default function IntelligencePage() {
 
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-2">
               <button
-                onClick={() => setShowHarvestModal(true)}
+                onClick={() => {
+                  setEditingHarvest(null);
+                  setShowHarvestModal(true);
+                }}
                 className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-semibold"
               >
                 <PlusCircle className="w-5 h-5 mr-2" />
@@ -433,92 +508,128 @@ export default function IntelligencePage() {
                   <h3 className="font-semibold mb-2 text-center">
                     Grafik Pertumbuhan Panen Kumulatif
                   </h3>
-                  <Plot
-                    data={[
-                      {
-                        x: cumulativeGrowthData.map(
-                          (d) => new Date(d.timestamp)
-                        ),
-                        y: cumulativeGrowthData.map((d) => d.cumulativeAmount),
-                        type: "scatter",
-                        mode: "lines+markers",
-                        name: "Total Panen (kg)",
-                        line: { color: "#8b5cf6" },
-                      },
-                    ]}
-                    layout={{
-                      height: 300,
-                      margin: { t: 20, b: 50, l: 50, r: 20 },
-                      xaxis: { title: "Waktu" },
-                      yaxis: { title: "Total Panen (kg)" },
-                    }}
-                    config={{ displayModeBar: false, responsive: true }}
-                    style={{ width: "100%", height: "300px" }}
-                  />
-                  <p className="text-xs text-gray-500 mt-2 text-center">
-                    Menunjukkan total produksi dari waktu ke waktu. Kemiringan
-                    garis menandakan laju produksi.
-                  </p>
+                  {isEmpty ? (
+                    <div className="flex items-center justify-center h-[300px] text-gray-400">
+                      Belum ada data
+                    </div>
+                  ) : (
+                    <>
+                      <Plot
+                        data={[
+                          {
+                            x: cumulativeGrowthData.map(
+                              (d) => new Date(d.timestamp)
+                            ),
+                            y: cumulativeGrowthData.map(
+                              (d) => d.cumulativeAmount
+                            ),
+                            type: "scatter",
+                            mode: "lines+markers",
+                            name: "Total Panen (kg)",
+                            line: { color: "#8b5cf6" },
+                          },
+                        ]}
+                        layout={{
+                          height: 300,
+                          margin: { t: 20, b: 50, l: 50, r: 20 },
+                          xaxis: { title: "Waktu" },
+                          yaxis: { title: "Total Panen (kg)" },
+                        }}
+                        config={{ displayModeBar: false, responsive: true }}
+                        style={{ width: "100%", height: "300px" }}
+                      />
+                      <p className="text-xs text-gray-500 mt-2 text-center">
+                        Menunjukkan total produksi dari waktu ke waktu.
+                        Kemiringan garis menandakan laju produksi.
+                      </p>
+                    </>
+                  )}
                 </div>
                 <div className="bg-white rounded-lg p-4 shadow">
                   <h3 className="font-semibold mb-2 text-center">
                     Distribusi Kualitas Panen
                   </h3>
-                  <Plot
-                    data={[
-                      {
-                        values: Object.values(
-                          getQualityDistribution(harvestData)
-                        ),
-                        labels: ["A", "B", "C"],
-                        type: "pie",
-                        hole: 0.5,
-                        marker: { colors: ["#22c55e", "#facc15", "#f87171"] },
-                      },
-                    ]}
-                    layout={{
-                      height: 250,
-                      margin: { t: 10, b: 10, l: 10, r: 10 },
-                      showlegend: true,
-                    }}
-                    config={{ displayModeBar: false, responsive: true }}
-                    style={{ width: "100%", height: "250px" }}
-                  />
+                  {isEmpty ? (
+                    <div className="flex items-center justify-center h-[250px] text-gray-400">
+                      Belum ada data
+                    </div>
+                  ) : (
+                    <Plot
+                      data={[
+                        {
+                          values: Object.values(
+                            getQualityDistribution(harvestData)
+                          ),
+                          labels: ["A", "B", "C"],
+                          type: "pie",
+                          hole: 0.5,
+                          marker: {
+                            colors: ["#22c55e", "#facc15", "#f87171"],
+                          },
+                        },
+                      ]}
+                      layout={{
+                        height: 250,
+                        margin: { t: 10, b: 10, l: 10, r: 10 },
+                        showlegend: true,
+                      }}
+                      config={{ displayModeBar: false, responsive: true }}
+                      style={{ width: "100%", height: "250px" }}
+                    />
+                  )}
                 </div>
                 <div className="bg-white rounded-lg p-4 shadow">
                   <h3 className="font-semibold mb-2 text-center">
                     Korelasi Jumlah vs. Kualitas
                   </h3>
-                  <Plot
-                    data={[
-                      {
-                        x: harvestData.map((h) => h.amount),
-                        y: harvestData.map((h) => qualityToNumber(h.quality)),
-                        mode: "markers",
-                        type: "scatter",
-                      },
-                    ]}
-                    layout={{
-                      height: 250,
-                      margin: { t: 10, b: 40, l: 40, r: 10 },
-                      xaxis: { title: "Jumlah (kg)" },
-                      yaxis: {
-                        title: "Kualitas",
-                        tickvals: [1, 2, 3],
-                        ticktext: ["C", "B", "A"],
-                      },
-                    }}
-                    config={{ displayModeBar: false, responsive: true }}
-                    style={{ width: "100%", height: "250px" }}
-                  />
+                  {isEmpty ? (
+                    <div className="flex items-center justify-center h-[250px] text-gray-400">
+                      Belum ada data
+                    </div>
+                  ) : (
+                    <Plot
+                      data={[
+                        {
+                          x: harvestData.map((h) => h.amount),
+                          y: harvestData.map((h) =>
+                            qualityToNumber(h.quality)
+                          ),
+                          mode: "markers",
+                          type: "scatter",
+                        },
+                      ]}
+                      layout={{
+                        height: 250,
+                        margin: { t: 10, b: 40, l: 40, r: 10 },
+                        xaxis: { title: "Jumlah (kg)" },
+                        yaxis: {
+                          title: "Kualitas",
+                          tickvals: [1, 2, 3],
+                          ticktext: ["C", "B", "A"],
+                        },
+                      }}
+                      config={{ displayModeBar: false, responsive: true }}
+                      style={{ width: "100%", height: "250px" }}
+                    />
+                  )}
                 </div>
               </div>
             </div>
 
             <HarvestInputModal
               open={showHarvestModal}
-              onClose={() => setShowHarvestModal(false)}
-              onSubmit={handleAddHarvest}
+              onClose={handleCloseModal}
+              onSubmit={handleAddOrUpdateHarvest}
+              initialData={
+                editingHarvest
+                  ? {
+                      date: editingHarvest.date,
+                      amount: editingHarvest.amount,
+                      quality: editingHarvest.quality,
+                      note: editingHarvest.note,
+                    }
+                  : null
+              }
             />
 
             <div className="bg-white rounded-lg shadow border border-gray-200 p-4 mt-8 overflow-x-auto">
@@ -543,6 +654,7 @@ export default function IntelligencePage() {
                       </th>
                       <th className="py-2 text-left">Kualitas</th>
                       <th className="py-2 text-left">Catatan</th>
+                      <th className="py-2 text-left">Aksi</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -575,6 +687,22 @@ export default function IntelligencePage() {
                           <QualityBadge quality={row.quality} />
                         </td>
                         <td className="py-2">{row.note}</td>
+                        <td className="py-2 flex items-center space-x-2">
+                          <button
+                            onClick={() => handleOpenEditModal(row)}
+                            className="text-blue-600 hover:text-blue-800 p-1"
+                            title="Edit"
+                          >
+                            <Pencil className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteHarvest(row.id)}
+                            className="text-red-600 hover:text-red-800 p-1"
+                            title="Hapus"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
