@@ -12,6 +12,7 @@ export interface NewHarvestData {
   note: string;
   avgTemp: number;
   avgHumidity: number;
+  timestamp: number; // Waktu dalam milidetik sejak epoch (1970-01-01T00:00:00Z)
 }
 
 // Tipe data panen lengkap setelah diambil dari Firebase (sudah punya ID)
@@ -40,6 +41,7 @@ export function listenToHarvestData(
         id: key,
         ...data[key],
       }));
+      loadedHarvests.sort((a, b) => a.timestamp - b.timestamp);
       callback(loadedHarvests);
     } else {
       callback([]);
@@ -58,5 +60,10 @@ export async function addHarvestData(
 ): Promise<void> {
   const harvestLogRef = ref(database, `${DB_ROOT_ID}/harvest_log`);
   const newPostRef = push(harvestLogRef);
-  await set(newPostRef, harvestData);
+
+  const dataWithTimestamp: NewHarvestData = {
+    ...harvestData,
+    timestamp: Date.now(), // Menambahkan timestamp saat data dibuat
+  };
+  await set(newPostRef, dataWithTimestamp);
 }

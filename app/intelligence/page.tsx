@@ -31,12 +31,13 @@ import {
   Harvest,
   NewHarvestData,
 } from "@/lib/fetchHarvestLog";
-import { fetchSensorData, SensorDate } from "@/lib/fetchSensorData"; // Untuk mengambil data sensor
+import { fetchSensorData, SensorDate } from "@/lib/fetchSensorData";
 
 // Load Plotly secara dinamis untuk performa
 const Plot = dynamic(() => import("react-plotly.js"), { ssr: false });
 
 // --- Helper Functions ---
+// Fungsi-fungsi ini bisa dipindahkan ke lib/utils.ts jika ingin lebih rapi
 function getQualityDistribution(harvestData: Harvest[]) {
   const counts = { A: 0, B: 0, C: 0 };
   harvestData.forEach((h) => {
@@ -66,10 +67,16 @@ function getAmountBins(harvestData: Harvest[], binSize = 5) {
 }
 
 // --- Tipe untuk Props Modal ---
+// Disesuaikan dengan data yang benar-benar diinput oleh pengguna
+type HarvestFormInput = Omit<
+  NewHarvestData,
+  "avgTemp" | "avgHumidity" | "timestamp"
+>;
+
 interface HarvestInputModalProps {
   open: boolean;
   onClose: () => void;
-  onSubmit: (formData: Omit<NewHarvestData, "avgTemp" | "avgHumidity">) => void;
+  onSubmit: (formData: HarvestFormInput) => void;
 }
 
 // --- Komponen Modal (Dengan Tipe yang Benar) ---
@@ -78,9 +85,7 @@ function HarvestInputModal({
   onClose,
   onSubmit,
 }: HarvestInputModalProps) {
-  const [form, setForm] = useState<
-    Omit<NewHarvestData, "avgTemp" | "avgHumidity">
-  >({
+  const [form, setForm] = useState<HarvestFormInput>({
     date: new Date().toISOString().slice(0, 10),
     amount: 0,
     quality: "A",
@@ -201,9 +206,7 @@ export default function IntelligencePage() {
   const [sensorLog, setSensorLog] = useState<SensorDate[]>([]);
 
   useEffect(() => {
-    const unsubscribeHarvest = listenToHarvestData((data) => {
-      setHarvestData(data);
-    });
+    const unsubscribeHarvest = listenToHarvestData(setHarvestData);
 
     const getSensorLog = async () => {
       const userIdForSensor = "GQAUD4ySfaNncpiZEkiKYNITWvK2";
@@ -223,30 +226,28 @@ export default function IntelligencePage() {
     };
   }, [user]);
 
-  const handleAddHarvest = async (
-    formData: Omit<NewHarvestData, "avgTemp" | "avgHumidity">
-  ) => {
+  const handleAddHarvest = async (formData: HarvestFormInput) => {
     const avgTemp =
       sensorLog.length > 0
         ? sensorLog.reduce((sum, log) => sum + log.temperature, 0) /
           sensorLog.length
         : 25;
-
     const avgHumidity =
       sensorLog.length > 0
         ? sensorLog.reduce((sum, log) => sum + log.humidity, 0) /
           sensorLog.length
         : 90;
 
-    const newHarvest: NewHarvestData = {
+    // addHarvestData akan menangani timestamp secara otomatis
+    const newHarvest = {
       ...formData,
       avgTemp: parseFloat(avgTemp.toFixed(1)),
       avgHumidity: parseFloat(avgHumidity.toFixed(1)),
+      timestamp: Date.now(),
     };
 
     try {
       await addHarvestData(newHarvest);
-      console.log("Data panen berhasil ditambahkan!");
     } catch (error) {
       console.error("Gagal menambahkan data panen:", error);
     }
@@ -260,6 +261,7 @@ export default function IntelligencePage() {
     return "Selamat Malam";
   };
 
+  // --- Kalkulasi KPI dan Data Grafik ---
   const totalPanenBasah = useMemo(
     () => harvestData.reduce((sum, h) => sum + h.amount, 0),
     [harvestData]
@@ -286,6 +288,17 @@ export default function IntelligencePage() {
     [harvestData]
   );
 
+  const cumulativeGrowthData = useMemo(() => {
+    let cumulativeAmount = 0;
+    return harvestData.map((h) => {
+      cumulativeAmount += h.amount;
+      return {
+        timestamp: h.timestamp,
+        cumulativeAmount: cumulativeAmount,
+      };
+    });
+  }, [harvestData]);
+
   const kpiCards = [
     {
       label: "Efisiensi Biologis",
@@ -307,7 +320,7 @@ export default function IntelligencePage() {
     },
     {
       label: "Suhu Rata-rata",
-      value: avgTemp.toFixed(1),
+      value: avgTemp,
       unit: "°C",
       up: true,
       color: "bg-yellow-100 text-yellow-800",
@@ -316,7 +329,7 @@ export default function IntelligencePage() {
     },
     {
       label: "Kelembaban Rata-rata",
-      value: avgHumidity.toFixed(1),
+      value: avgHumidity,
       unit: "%",
       up: true,
       color: "bg-cyan-100 text-cyan-800",
@@ -404,9 +417,7 @@ export default function IntelligencePage() {
                     )}
                   </div>
                   <div className="text-3xl font-bold text-gray-900">
-                    {typeof kpi.value === "number"
-                      ? Number(kpi.value).toFixed(1)
-                      : kpi.value}
+                    {Number(kpi.value).toFixed(1)}
                     <span className="text-base font-normal text-gray-500 ml-1">
                       {kpi.unit}
                     </span>
@@ -417,7 +428,38 @@ export default function IntelligencePage() {
 
             <div className="mt-10">
               <h2 className="text-xl font-bold mb-4">Analisis Lanjutan</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="bg-white rounded-lg p-4 shadow md:col-span-2">
+                  <h3 className="font-semibold mb-2 text-center">
+                    Grafik Pertumbuhan Panen Kumulatif
+                  </h3>
+                  <Plot
+                    data={[
+                      {
+                        x: cumulativeGrowthData.map(
+                          (d) => new Date(d.timestamp)
+                        ),
+                        y: cumulativeGrowthData.map((d) => d.cumulativeAmount),
+                        type: "scatter",
+                        mode: "lines+markers",
+                        name: "Total Panen (kg)",
+                        line: { color: "#8b5cf6" },
+                      },
+                    ]}
+                    layout={{
+                      height: 300,
+                      margin: { t: 20, b: 50, l: 50, r: 20 },
+                      xaxis: { title: "Waktu" },
+                      yaxis: { title: "Total Panen (kg)" },
+                    }}
+                    config={{ displayModeBar: false, responsive: true }}
+                    style={{ width: "100%", height: "300px" }}
+                  />
+                  <p className="text-xs text-gray-500 mt-2 text-center">
+                    Menunjukkan total produksi dari waktu ke waktu. Kemiringan
+                    garis menandakan laju produksi.
+                  </p>
+                </div>
                 <div className="bg-white rounded-lg p-4 shadow">
                   <h3 className="font-semibold mb-2 text-center">
                     Distribusi Kualitas Panen
@@ -428,26 +470,21 @@ export default function IntelligencePage() {
                         values: Object.values(
                           getQualityDistribution(harvestData)
                         ),
-                        labels: ["A (Sangat Baik)", "B (Baik)", "C (Cukup)"],
+                        labels: ["A", "B", "C"],
                         type: "pie",
                         hole: 0.5,
                         marker: { colors: ["#22c55e", "#facc15", "#f87171"] },
-                        textinfo: "percent+label",
                       },
                     ]}
                     layout={{
                       height: 250,
                       margin: { t: 10, b: 10, l: 10, r: 10 },
-                      showlegend: false,
+                      showlegend: true,
                     }}
                     config={{ displayModeBar: false, responsive: true }}
                     style={{ width: "100%", height: "250px" }}
                   />
-                  <p className="text-xs text-gray-500 mt-2 text-center">
-                    Proporsi kualitas panen untuk deteksi dini masalah produksi.
-                  </p>
                 </div>
-
                 <div className="bg-white rounded-lg p-4 shadow">
                   <h3 className="font-semibold mb-2 text-center">
                     Korelasi Jumlah vs. Kualitas
@@ -459,58 +496,21 @@ export default function IntelligencePage() {
                         y: harvestData.map((h) => qualityToNumber(h.quality)),
                         mode: "markers",
                         type: "scatter",
-                        marker: { color: "#3b82f6", size: 10 },
-                        text: harvestData.map(
-                          (h) => `Tanggal: ${h.date}<br>Kualitas: ${h.quality}`
-                        ),
                       },
                     ]}
                     layout={{
                       height: 250,
                       margin: { t: 10, b: 40, l: 40, r: 10 },
-                      xaxis: { title: "Jumlah Panen (kg)" },
+                      xaxis: { title: "Jumlah (kg)" },
                       yaxis: {
-                        title: "Kualitas (A=3, B=2, C=1)",
+                        title: "Kualitas",
                         tickvals: [1, 2, 3],
                         ticktext: ["C", "B", "A"],
-                        range: [0.5, 3.5],
                       },
                     }}
                     config={{ displayModeBar: false, responsive: true }}
                     style={{ width: "100%", height: "250px" }}
                   />
-                  <p className="text-xs text-gray-500 mt-2 text-center">
-                    Apakah panen besar cenderung berkualitas rendah? Optimasi
-                    strategi panen.
-                  </p>
-                </div>
-
-                <div className="bg-white rounded-lg p-4 shadow">
-                  <h3 className="font-semibold mb-2 text-center">
-                    Frekuensi Jumlah Panen
-                  </h3>
-                  <Plot
-                    data={[
-                      {
-                        x: getAmountBins(harvestData).map((bin) => bin.range),
-                        y: getAmountBins(harvestData).map((bin) => bin.count),
-                        type: "bar",
-                        marker: { color: "#6366f1" },
-                      },
-                    ]}
-                    layout={{
-                      height: 250,
-                      margin: { t: 10, b: 40, l: 40, r: 10 },
-                      xaxis: { title: "Rentang Jumlah Panen (kg)" },
-                      yaxis: { title: "Frekuensi" },
-                    }}
-                    config={{ displayModeBar: false, responsive: true }}
-                    style={{ width: "100%", height: "250px" }}
-                  />
-                  <p className="text-xs text-gray-500 mt-2 text-center">
-                    Pola panen: lebih sering panen kecil atau besar? Cek
-                    efisiensi operasional.
-                  </p>
                 </div>
               </div>
             </div>
@@ -546,43 +546,37 @@ export default function IntelligencePage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {harvestData
-                      .sort(
-                        (a, b) =>
-                          new Date(b.date).getTime() -
-                          new Date(a.date).getTime()
-                      )
-                      .map((row) => (
-                        <tr
-                          key={row.id}
-                          className={`border-b last:border-b-0 ${
-                            row.quality === "A"
-                              ? "bg-green-50"
-                              : row.quality === "B"
-                              ? "bg-yellow-50"
-                              : row.quality === "C"
-                              ? "bg-red-50"
-                              : ""
-                          }`}
-                        >
-                          <td className="py-2">{row.date}</td>
-                          <td className="py-2 font-bold">{row.amount}</td>
-                          <td className="py-2">
-                            {row.avgTemp !== undefined
-                              ? Number(row.avgTemp).toFixed(1)
-                              : "-"}
-                          </td>
-                          <td className="py-2">
-                            {row.avgHumidity !== undefined
-                              ? Number(row.avgHumidity).toFixed(1)
-                              : "-"}
-                          </td>
-                          <td className="py-2">
-                            <QualityBadge quality={row.quality} />
-                          </td>
-                          <td className="py-2">{row.note}</td>
-                        </tr>
-                      ))}
+                    {harvestData.map((row) => (
+                      <tr
+                        key={row.id}
+                        className={`border-b last:border-b-0 ${
+                          row.quality === "A"
+                            ? "bg-green-50"
+                            : row.quality === "B"
+                            ? "bg-yellow-50"
+                            : row.quality === "C"
+                            ? "bg-red-50"
+                            : ""
+                        }`}
+                      >
+                        <td className="py-2">{row.date}</td>
+                        <td className="py-2 font-bold">{row.amount}</td>
+                        <td className="py-2">
+                          {row.avgTemp !== undefined
+                            ? Number(row.avgTemp).toFixed(1)
+                            : "-"}
+                        </td>
+                        <td className="py-2">
+                          {row.avgHumidity !== undefined
+                            ? Number(row.avgHumidity).toFixed(1)
+                            : "-"}
+                        </td>
+                        <td className="py-2">
+                          <QualityBadge quality={row.quality} />
+                        </td>
+                        <td className="py-2">{row.note}</td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               )}
