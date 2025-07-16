@@ -9,10 +9,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
 import AboutModal from "@/components/AboutModal"; // Import the modal
-import { Toaster, toast } from "sonner"; // Import sonner
+import { Toaster } from "sonner"; // Import sonner
 import { developers, Developer } from "@/lib/developers";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Menu, X } from "lucide-react";
