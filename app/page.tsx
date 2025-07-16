@@ -93,14 +93,9 @@ const LandingPage = () => {
                   href="#contact"
                   className="hover:text-teal-600 dark:hover:text-teal-400 transition-colors"
                 >
-                  Pemesanan
+                  Kontak
                 </a>
               </nav>
-              <Link href="/authentication" target="_blank" rel="noopener noreferrer">
-                <Button className="bg-teal-600 hover:bg-teal-700 dark:bg-teal-500 dark:hover:bg-teal-600">
-                  Masuk Dashboard
-                </Button>
-              </Link>
             </>
           ) : (
             <button
@@ -143,13 +138,8 @@ const LandingPage = () => {
                 onClick={() => setIsMenuOpen(false)}
                 className="hover:text-teal-600 dark:hover:text-teal-400 transition-colors text-lg"
               >
-                Pemesanan
+                Kontak
               </a>
-              <Link href="/authentication" className="w-full px-6" target="_blank" rel="noopener noreferrer">
-                <Button className="bg-teal-600 hover:bg-teal-700 dark:bg-teal-500 dark:hover:bg-teal-600 w-full">
-                  Masuk Dashboard
-                </Button>
-              </Link>
             </nav>
           </div>
         )}
@@ -167,12 +157,23 @@ const LandingPage = () => {
               dan memprediksi hasil panen jamur Anda. Tingkatkan efisiensi dan
               profitabilitas bisnis dengan berbasis data.
             </p>
-            <Button
-              size="lg"
-              className="bg-teal-600 hover:bg-teal-700 text-lg px-8 py-6 dark:bg-teal-500 dark:hover:bg-teal-600"
-            >
-              <a href="#contact">Mulai Sekarang</a>
-            </Button>
+            <div className="flex justify-center items-center gap-4">
+              <Button
+                size="lg"
+                className="bg-teal-600 hover:bg-teal-700 text-lg px-8 py-6 dark:bg-teal-500 dark:hover:bg-teal-600"
+              >
+                <a href="#contact">Hubungi Kami</a>
+              </Button>
+              <Link href="/authentication">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="text-lg px-8 py-6 border-teal-600 text-teal-600 hover:bg-teal-50 hover:text-teal-700 dark:border-teal-500 dark:text-teal-400 dark:hover:bg-gray-800 dark:hover:text-teal-300"
+                >
+                  Masuk Dashboard
+                </Button>
+              </Link>
+            </div>
             <div className="mt-12">
               <img
                 src="/background.png"
@@ -261,59 +262,25 @@ const LandingPage = () => {
               <h3 className="text-3xl font-bold text-gray-900 dark:text-white">
                 Tertarik dengan Kumbung Sense?
               </h3>
-              <p className="text-gray-600 dark:text-gray-400 mt-2">
+              <p className="text-gray-600 dark:text-gray-400 mt-2 max-w-2xl mx-auto">
                 Hubungi kami untuk informasi lebih lanjut, demo produk, atau
-                pemesanan.
+                pemesanan. Klik tombol di bawah untuk memulai percakapan via
+                WhatsApp.
               </p>
             </div>
-            <div className="max-w-lg mx-auto bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md">
-              <form className="space-y-6">
-                <div>
-                  <label
-                    htmlFor="name"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-                  >
-                    Nama
-                  </label>
-                  <input
-                    type="text"
-                    id="name"
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500 bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="email"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-                  >
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500 bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="message"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-                  >
-                    Pesan
-                  </label>
-                  <textarea
-                    id="message"
-                    rows={4}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500 bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                  ></textarea>
-                </div>
+            <div className="text-center">
+              <a
+                href="https://wa.me/6288225418750?text=Halo,%20saya%20tertarik%20dengan%20produk%20Kumbung%20Sense."
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 <Button
-                  type="submit"
-                  className="w-full bg-teal-600 hover:bg-teal-700 dark:bg-teal-500 dark:hover:bg-teal-600"
+                  size="lg"
+                  className="bg-green-500 hover:bg-green-600 text-white text-lg px-8 py-6"
                 >
-                  Kirim Pesan
+                  Hubungi via WhatsApp
                 </Button>
-              </form>
+              </a>
             </div>
           </div>
         </section>
