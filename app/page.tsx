@@ -270,7 +270,7 @@ const LandingPage = () => {
             </div>
             <div className="text-center">
               <a
-                href="https://wa.me/6288225418750?text=Halo,%20saya%20tertarik%20dengan%20produk%20Kumbung%20Sense."
+                href="https://wa.me/6287770831960?text=Halo,%20saya%20tertarik%20dengan%20produk%20Kumbung%20Sense."
                 target="_blank"
                 rel="noopener noreferrer"
               >
