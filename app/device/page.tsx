@@ -112,7 +112,7 @@ export default function DevicePage() {
                 {devices.map((device) =>
                   // Logika Tampilan Baru: Gunakan komponen yang sesuai
                   device.type === 'sensor' ? (
-                    <SensorCard 
+                    <SensorCard
                       key={device.id} 
                       device={device} 
                       userId={user!.uid} 
