@@ -361,8 +361,10 @@ export default function IntelligencePage() {
   );
 
   const cumulativeGrowthData = useMemo(() => {
+    // Urutkan harvestData berdasarkan timestamp ASCENDING (terlama ke terbaru)
+    let sorted = [...harvestData].sort((a, b) => a.timestamp - b.timestamp);
     let cumulativeAmount = 0;
-    return harvestData.map((h) => {
+    return sorted.map((h) => {
       cumulativeAmount += h.amount;
       return {
         timestamp: h.timestamp,
@@ -591,9 +593,7 @@ export default function IntelligencePage() {
                       data={[
                         {
                           x: harvestData.map((h) => h.amount),
-                          y: harvestData.map((h) =>
-                            qualityToNumber(h.quality)
-                          ),
+                          y: harvestData.map((h) => qualityToNumber(h.quality)),
                           mode: "markers",
                           type: "scatter",
                         },
