@@ -4,21 +4,21 @@ Aplikasi monitoring dan kontrol IoT untuk kumbung jamur berbasis Framework Next.
 
 ---
 
-## 🛡️ Status & Informasi Project
+## Status & Informasi Project
 
-[![Build Passing](https://img.shields.io/badge/Build-Passing-brightgreen?style=flat-square&logo=github)](https://github.com/evanalif113/Kumbung-Sense/actions)
-[![Versi Project](https://img.shields.io/badge/Version-3.1.0-blue.svg?style=flat-square)](https://github.com/evanalif113/Kumbung-Sense)
-[![Lisensi MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](https://opensource.org/licenses/MIT)
+[![Build Passing](https://img.shields.io/badge/Build-Passing-brightgreen?style=flat&logo=github)](https://github.com/evanalif113/Kumbung-Sense/actions)
+[![Versi Project](https://img.shields.io/badge/Version-3.1.0-blue.svg?style=flat)](https://github.com/evanalif113/Kumbung-Sense)
+[![Lisensi MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat)](https://opensource.org/licenses/MIT)
 
 ---
 
-## 🚀 Gambaran Umum
+## Gambaran Umum
 
 Kumbung Sense adalah **aplikasi web inovatif** yang dirancang untuk membantu petani jamur modern dalam **memantau dan mengontrol kondisi lingkungan kumbung secara real-time**. Dengan integrasi IoT yang canggih, pengguna dapat mengakses data sensor (suhu, kelembapan, intensitas cahaya, dan kelembapan media tanam) serta mengendalikan perangkat aktuator (kipas, humidifier, lampu) langsung dari dashboard yang responsif dan intuitif.
 
 ---
 
-## ✨ Fitur Utama
+## Fitur Utama
 
 Aplikasi ini dilengkapi dengan berbagai fitur yang mendukung budidaya jamur yang lebih cerdas dan efisien:
 
@@ -35,7 +35,7 @@ Aplikasi ini dilengkapi dengan berbagai fitur yang mendukung budidaya jamur yang
 
 ---
 
-## 🛠️ Tumpukan Teknologi (Tech Stack)
+## Tech Stack
 
 Kumbung Sense dibangun menggunakan teknologi-teknologi modern dan teruji:
 
@@ -60,7 +60,7 @@ Kumbung Sense dibangun menggunakan teknologi-teknologi modern dan teruji:
 
 ---
 
-## 🚀 Memulai Project
+## Memulai Project
 
 Ikuti langkah-langkah sederhana ini untuk menjalankan Kumbung Sense di lingkungan lokal Anda:
 
@@ -81,7 +81,7 @@ Ikuti langkah-langkah sederhana ini untuk menjalankan Kumbung Sense di lingkunga
 
 ---
 
-## ⚙️ Deployment
+## Deployment
 
 Untuk deployment aplikasi ke lingkungan produksi, ikuti panduan berikut:
 
@@ -96,7 +96,7 @@ Untuk deployment aplikasi ke lingkungan produksi, ikuti panduan berikut:
 
 ---
 
-## 💡 Cara Kerja
+## Cara Kerja
 
 Kumbung Sense beroperasi dengan memanfaatkan sinergi antara aplikasi web dan perangkat IoT. Aplikasi ini terintegrasi dengan perangkat keras IoT melalui protokol komunikasi yang sesuai, memungkinkan **pertukaran data dua arah** secara efisien. Data dari sensor-sensor lingkungan (seperti suhu, kelembapan, intensitas cahaya, dan kelembapan media tanam) secara terus-menerus dikumpulkan dan dikirim ke aplikasi secara real-time.
 
