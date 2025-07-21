@@ -15,26 +15,28 @@ Kumbung Sense adalah aplikasi web yang membantu petani jamur dalam memantau dan 
 - Notifikasi
 - Profil Pengguna
 - Manajemen perangkat
-- Responsive UI
+- UI Responsive
 
 ## Tech Stack
 
-- [React](https://reactjs.org/) (Library)
-- [Next.js](https://nextjs.org/) (Framework Development)
-- [TypeScript](https://www.typescriptlang.org/) (Programming Language)
-- [Firebase](https://firebase.google.com) (Database and Backend)
+- [NodeJS] (https://nodejs.org/id) (Runtime Environment untuk JavaScript )
+- [React](https://reactjs.org/) (Pustaka Pengembangan Website)
+- [Next.js](https://nextjs.org/) (Kerangka Kerja Pengembangan Website)
+- [TypeScript](https://www.typescriptlang.org/) (Bahasa Pemrograman Backend)
+- [Firebase](https://firebase.google.com) (Basis Data dan Backend)
 - [Tailwind CSS](https://tailwindcss.com/) (CSS)
-- [Plotly.js](https://plotly.com/javascript/) (visualisasi data)
-- [lucide-react](https://) (Icon Library)
+- [Plotly.js](https://plotly.com/javascript/) (Pustaka Visualisasi Data)
+- [Radix UI](https://www.radix-ui.com/) (Pustaka Komponen Antarmuka)
+- [lucide-react](https://lucide.dev/guide/packages/lucide-react) (Pustaka Ikon)
 
-## Getting Started
+## Langkah Memulai
 
-1. **Clone repository:**
+1. **Kloning repositori:**
    ```bash
    git clone https://github.com/evanalif113/Kumbung-Sense.git
    cd kumbung-sense
    ```
-2. **Install dependencies:**
+2. **Install dependensi:**
    ```bash
    npm install
    ```
@@ -62,12 +64,5 @@ Untuk melakukan deployment aplikasi, ikuti langkah-langkah berikut:
 ## How It Works
 
 Kumbung Sense memanfaatkan teknologi berikut untuk memberikan fungsionalitasnya:
-
-- **React** dan **Next.js** untuk antarmuka pengguna yang responsif dan dinamis.
-- **TypeScript** untuk bahasa pengembangan website yang lebih aman dan terstruktur.
-- **Firebase Authentication** untuk autentikasi pengguna yang aman.
-- **Firebase Database** untuk Database No SQL
-- **Tailwind CSS** untuk desain antarmuka yang modern dan responsif.
-- **Plotly.js** untuk visualisasi data sensor yang interaktif.
 
 Aplikasi ini terintegrasi dengan perangkat IoT melalui protokol yang sesuai, memungkinkan komunikasi dua arah antara aplikasi dan perangkat keras. Data sensor dikumpulkan dan dikirim ke aplikasi secara real-time, memberikan wawasan langsung kepada pengguna tentang kondisi kumbung mereka. Pengguna juga dapat mengontrol perangkat seperti kipas, humidifier, dan lampu langsung dari aplikasi, memungkinkan penyesuaian cepat terhadap perubahan kondisi lingkungan.
